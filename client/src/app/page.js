@@ -1,11 +1,17 @@
-import Test from "./components/Test";
+"use client"
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Home from "./page";
+import Signin from "./pages/signin";
+import Signup from "./pages/signup";
+import Profile from "./pages/profile";
+import About from "./pages/about";
+import Header from "./components/Header";
 
-export default function Home() {
+export default function App() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <Test />
-      </div>
-    </main>
+     <Header />
+    
+        
+   
   );
 }
