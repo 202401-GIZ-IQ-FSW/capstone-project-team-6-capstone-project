@@ -1,0 +1,105 @@
+const User = require('../models/user');
+const bcrypt = require('bcrypt');
+
+async function login (req, res) {
+    try {
+      const { email, password, rememberMe } = req.body;
+  
+      // User must exist in the database for sign in request
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).send({ error: 'Wrong email' });
+      }
+  
+      // bcrypt compare is used to validate the plain text password sent in the request body with the hashed password stored in the database
+      const valid = await bcrypt.compare(password, user.password);
+      if (!valid) {
+        return res.status(400).send({ error: 'Wrong password' });
+      }
+  
+      // If the user is already signed in don't sign in again
+      if (req.session?.user) {
+        return res.status(400).send({ error: 'User already logged in' });
+      }
+  
+      if (rememberMe) {
+          req.session.cookie.maxAge = 14 * 24 * 3600 * 1000; // Value of 14 days in milliseconds
+      }
+  
+      // Regenerate session ID is used to prevent session fixation attacks
+      req.session.regenerate((err) => {
+        if (err) {
+          return res.status(500).send({ error: 'Could not regenerate session' });
+        }
+        // If password is valid, it's a sign in success. User details are returned in response and session
+        req.session.user = user;
+        res.json({ message: 'Login Success', user });
+      });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+async function signup (req, res) {
+    try {
+      const {
+        name,
+        username,
+        email,
+        password,
+        confirmPassword,
+      } = req.body;
+  
+      // Check password typed correctly by user twice
+      if (password !== confirmPassword) {
+        return res.status(400).send({ error: 'passwords do not match' });
+      }
+  
+      // User must not exist in the database for sign up request
+      let user = await User.findOne({ email });
+      if (user) {
+        return res.status(400).send({ error: `${email}: email already exist` });
+      }
+  
+      // User must not exist in the database for sign up request
+      user = await User.findOne({ username });
+      if (user) {
+        return res.status(400).send({ error: `${username}: username already exist` });
+      }
+  
+      // Create the user record on the database
+      user = await User.create({
+        name,
+        username,
+        email,
+        password
+      });
+  
+      // Once user record is created, it's a sign up success user details is returned in response and session
+      // Regenerate session ID is used to prevent session fixation attacks
+      req.session.regenerate((err) => {
+        if (err) {
+          return res.status(500).send({ error: 'Could not regenerate session' });
+        }
+        req.session.user = user;
+        res.status(201).json({ message: 'Signup Success', user });
+      });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+async function logout (req, res) {
+    try {
+        // express session destroy function is used to destroy the session and unset the req.session property
+        req.session.destroy();
+        res.send({ message: 'Logout Success' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+module.exports = {
+    login,
+    signup,
+    logout
+};
