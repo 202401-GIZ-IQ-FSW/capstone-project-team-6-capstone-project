@@ -1,9 +1,10 @@
 import React from 'react'
 
-export default function Signup() {
+
+export default function Creat() {
   return (
     <div>
-      Signup
+      Creat
     </div>
   )
 }
