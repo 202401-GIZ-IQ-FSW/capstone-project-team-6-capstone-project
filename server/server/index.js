@@ -15,7 +15,14 @@ const port =
     ? process.env.NODE_LOCAL_TEST_PORT
     : process.env.NODE_LOCAL_PORT;
 
-app.use(cors());
+// CORS configuration
+const corsOptions = {
+  origin: ["http://localhost:3000"], // Replace with client URL
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
@@ -42,22 +49,12 @@ if (isProduction) {
 // use the session
 app.use(session(sessionOptions));
 
-// attach user to session
-function attachUser(req, res, next) {
-  res.locals.user = req.session?.user ?? null;
-  next();
-}
-
-// use the attachUser function
-app.use(attachUser);
-
 // Using Routes for User Auth
 app.use('/user', authenticationRouter);
 
 app.get("/", (req, res) => {
-  res.json(
-    "Welcome to support ticket website"
-  );
+  if (req.session?.user) { return res.json({ message: `Welcome ${req.session.user?.name}`}); }
+  return res.json({ message: "Welcome Guest"});
 });
 
 app.listen(port, () => {
@@ -67,7 +64,7 @@ app.listen(port, () => {
 
 app.get("/test", (req, res) => {
   res.json(
-    "Server connection to client works!!  Good Luck with your capstones :D"
+    "Server connection to client works!! Good Luck with your capstones :D"
   );
 });
 

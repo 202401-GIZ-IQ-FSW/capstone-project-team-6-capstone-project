@@ -8,18 +8,18 @@ async function login (req, res) {
       // User must exist in the database for sign in request
       const user = await User.findOne({ email });
       if (!user) {
-        return res.status(400).send({ error: 'Wrong email' });
+        return res.status(400).json({ error: 'Wrong email' });
       }
   
       // bcrypt compare is used to validate the plain text password sent in the request body with the hashed password stored in the database
       const valid = await bcrypt.compare(password, user.password);
       if (!valid) {
-        return res.status(400).send({ error: 'Wrong password' });
+        return res.status(400).json({ error: 'Wrong password' });
       }
   
       // If the user is already signed in don't sign in again
       if (req.session?.user) {
-        return res.status(400).send({ error: 'User already logged in' });
+        return res.status(400).json({ error: 'User is already logged in' });
       }
   
       if (rememberMe) {
@@ -29,11 +29,12 @@ async function login (req, res) {
       // Regenerate session ID is used to prevent session fixation attacks
       req.session.regenerate((err) => {
         if (err) {
-          return res.status(500).send({ error: 'Could not regenerate session' });
+          return res.status(500).json({ error: 'Could not regenerate session' });
         }
         // If password is valid, it's a sign in success. User details are returned in response and session
         req.session.user = user;
-        res.json({ message: 'Login Success', user });
+        // console.log("login session", req.session.user)
+        res.json({ message: 'Login Success'});
       });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -52,19 +53,19 @@ async function signup (req, res) {
   
       // Check password typed correctly by user twice
       if (password !== confirmPassword) {
-        return res.status(400).send({ error: 'passwords do not match' });
+        return res.status(400).json({ error: 'passwords do not match' });
       }
   
       // User must not exist in the database for sign up request
       let user = await User.findOne({ email });
       if (user) {
-        return res.status(400).send({ error: `${email}: email already exist` });
+        return res.status(400).json({ error: `${email}: email already exist` });
       }
   
       // User must not exist in the database for sign up request
       user = await User.findOne({ username });
       if (user) {
-        return res.status(400).send({ error: `${username}: username already exist` });
+        return res.status(400).json({ error: `${username}: username already exist` });
       }
   
       // Create the user record on the database
@@ -79,20 +80,38 @@ async function signup (req, res) {
       // Regenerate session ID is used to prevent session fixation attacks
       req.session.regenerate((err) => {
         if (err) {
-          return res.status(500).send({ error: 'Could not regenerate session' });
+          return res.status(500).json({ error: 'Could not regenerate session' });
         }
         req.session.user = user;
-        res.status(201).json({ message: 'Signup Success', user });
+        res.status(201).json({ message: 'Signup Success' });
       });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 }
+
+async function getSession (req, res) {
+  // console.log("getSession session", req.session?.user)
+  try {
+      if (req.session?.user) {
+        return res.status(200).json({ user: req.session.user });
+      } else {
+        return res.status(400).json({ error: "User is not logged in" });
+      }
+  } catch (err) {
+      res.status(500).json({ error: err.message });
+  }
+}
+
 async function logout (req, res) {
     try {
         // express session destroy function is used to destroy the session and unset the req.session property
-        req.session.destroy();
-        res.send({ message: 'Logout Success' });
+        req.session.destroy((err) => {
+          if (err) {
+              return res.status(500).json({ error: 'Could not destroy session' });
+          }
+          res.json({ message: 'Logout Success' });
+      });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -101,5 +120,6 @@ async function logout (req, res) {
 module.exports = {
     login,
     signup,
+    getSession,
     logout
 };
