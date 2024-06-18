@@ -1,11 +1,12 @@
-import Test from "./components/Test";
+"use client"
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Navbar from "./components/Navbar";
 
-export default function Home() {
+
+
+
+export default function App() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <Test />
-      </div>
-    </main>
+     <Navbar />
   );
 }
