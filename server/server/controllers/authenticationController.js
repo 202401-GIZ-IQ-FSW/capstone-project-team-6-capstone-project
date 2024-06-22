@@ -25,14 +25,16 @@ async function login (req, res) {
       if (rememberMe) {
           req.session.cookie.maxAge = 14 * 24 * 3600 * 1000; // Value of 14 days in milliseconds
       }
-  
+      // If password is valid, it's a sign in success. User details are returned in session
       // Regenerate session ID is used to prevent session fixation attacks
       req.session.regenerate((err) => {
         if (err) {
           return res.status(500).json({ error: 'Could not regenerate session' });
         }
-        // If password is valid, it's a sign in success. User details are returned in response and session
-        req.session.user = user;
+        // Convert the user document to a plain object and delete the password field
+        const userObj = user.toObject();
+        delete userObj.password;
+        req.session.user = userObj;
         // console.log("login session", req.session.user)
         res.json({ message: 'Login Success'});
       });
@@ -49,6 +51,8 @@ async function signup (req, res) {
         email,
         password,
         confirmPassword,
+        role,
+        ...rest
       } = req.body;
   
       // Check password typed correctly by user twice
@@ -73,16 +77,20 @@ async function signup (req, res) {
         name,
         username,
         email,
-        password
+        password,
+        ...rest
       });
   
-      // Once user record is created, it's a sign up success user details is returned in response and session
+      // Once user record is created, it's a sign up success user details is returned in session
       // Regenerate session ID is used to prevent session fixation attacks
       req.session.regenerate((err) => {
         if (err) {
           return res.status(500).json({ error: 'Could not regenerate session' });
         }
-        req.session.user = user;
+        // Convert the user document to a plain object and delete the password field
+        const userObj = user.toObject();
+        delete userObj.password;
+        req.session.user = userObj;
         res.status(201).json({ message: 'Signup Success' });
       });
     } catch (err) {
@@ -96,7 +104,7 @@ async function getSession (req, res) {
       if (req.session?.user) {
         return res.status(200).json({ user: req.session.user });
       } else {
-        return res.status(400).json({ error: "User is not logged in" });
+        return res.status(403).json({ error: "User is not logged in" });
       }
   } catch (err) {
       res.status(500).json({ error: err.message });
@@ -108,7 +116,7 @@ async function logout (req, res) {
         // express session destroy function is used to destroy the session and unset the req.session property
         req.session.destroy((err) => {
           if (err) {
-              return res.status(500).json({ error: 'Could not destroy session' });
+            return res.status(500).json({ error: 'Could not destroy session' });
           }
           res.json({ message: 'Logout Success' });
       });
