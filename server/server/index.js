@@ -5,7 +5,7 @@ require("dotenv").config();
 
 // Importing Database connection info
 const connectToMongo = require("./db/connection");
-////commentss
+
 // Importing Routes
 const authenticationRouter = require('./routes/authenticationRouter');
 const profileRouter = require('./routes/profileRouter');
