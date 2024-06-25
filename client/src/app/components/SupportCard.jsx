@@ -1,5 +1,3 @@
-
-
 // components/SupportCard.js
 
 const SupportCard = () => {

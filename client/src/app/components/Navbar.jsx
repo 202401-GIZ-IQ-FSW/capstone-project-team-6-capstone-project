@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import Link from 'next/link';
 
-
 const Navbar = () => {
   const [isSticky, setSticky] = useState(false);
 

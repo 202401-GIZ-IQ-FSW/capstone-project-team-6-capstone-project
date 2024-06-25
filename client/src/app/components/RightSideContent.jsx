@@ -1,7 +1,3 @@
-
-
-
-
 // components/RightSideContent.js
 
 import React from 'react';
@@ -33,7 +29,7 @@ const RightSideContent = () => {
      
         
         {foundCards.map((card, index) => (
-          <div key={index} className="mb-4 bg-gray-100 border  p-4 mb-4 rounded-md">
+          <div key={index} className="mb-4 bg-gray-100 border p-4 rounded-md">
             <div className="flex items-center mb-2">
               <div className="w-1/4 h-48 bg-gray-200 rounded-md mr-4"></div> {/* Square image */}
               <div className='w-3/4'>
