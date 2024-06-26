@@ -1,14 +1,16 @@
-"use client"
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Navbar from "./components/Navbar";
+// "use client"
+// import { BrowserRouter, Route, Routes } from "react-router-dom";
+// import Navbar from "./components/Navbar";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolder, faTicketAlt, faArrowUp, faLifeRing, faUsers } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 
+
 export default function App() {
+
   return (
     <>
-     <Navbar />
+     {/* <Navbar /> */}
      <div className="bg-gray-100 min-h-screen">
       <div className="container mx-auto p-4 md:p-8">
         <div className="bg-white p-8 md:p-20 rounded-lg shadow-md">
