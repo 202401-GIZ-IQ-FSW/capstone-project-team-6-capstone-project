@@ -76,10 +76,4 @@ app.listen(port, async () => {
   await connectToMongo();
 });
 
-app.get("/test", (req, res) => {
-  res.json(
-    "Server connection to client works!! Good Luck with your capstones :D"
-  );
-});
-
 module.exports = app;

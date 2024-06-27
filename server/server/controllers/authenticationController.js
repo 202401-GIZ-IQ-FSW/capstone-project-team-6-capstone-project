@@ -19,7 +19,7 @@ async function login (req, res) {
   
       // If the user is already signed in don't sign in again
       if (req.session?.user) {
-        return res.status(400).json({ error: 'User is already logged in' });
+        return res.status(400).json({ error: 'User is already signed in' });
       }
   
       if (rememberMe) {
@@ -36,7 +36,7 @@ async function login (req, res) {
         delete userObj.password;
         req.session.user = userObj;
         // console.log("login session", req.session.user)
-        res.json({ message: 'Login Success'});
+        res.json({ message: 'Sign in success'});
       });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -91,7 +91,7 @@ async function signup (req, res) {
         const userObj = user.toObject();
         delete userObj.password;
         req.session.user = userObj;
-        res.status(201).json({ message: 'Signup Success' });
+        res.status(201).json({ message: 'Sign up success' });
       });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -104,7 +104,7 @@ async function getSession (req, res) {
       if (req.session?.user) {
         return res.status(200).json({ user: req.session.user });
       } else {
-        return res.status(403).json({ error: "User is not logged in" });
+        return res.status(403).json({ error: "User is not signed in" });
       }
   } catch (err) {
       res.status(500).json({ error: err.message });
@@ -118,7 +118,7 @@ async function logout (req, res) {
           if (err) {
             return res.status(500).json({ error: 'Could not destroy session' });
           }
-          res.json({ message: 'Logout Success' });
+          res.json({ message: 'Sign out success' });
       });
     } catch (err) {
         res.status(500).json({ error: err.message });

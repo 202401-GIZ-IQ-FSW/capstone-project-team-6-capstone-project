@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { useAuth } from "../components/AuthContext";
 
-export default function signout() {
+
+export default function SignOut() {
   const { setUser, setSignedIn } = useAuth();
   const router = useRouter();
   const [message, setMessage] = useState("");
@@ -12,6 +13,7 @@ export default function signout() {
   useEffect(() => {
     setMessage(""); // Reset message
     setError(""); // Reset error
+
     const signOut = async () => {
       try {
         const response = await fetch('http://localhost:3001/user/logout', {
@@ -24,6 +26,9 @@ export default function signout() {
           setMessage(data.message)
           setUser(null);
           setSignedIn(false);
+          
+          // localStorage.removeItem('user');
+          // localStorage.removeItem('signedIn');
 
           setTimeout(() => {
             router.push('/'); // Adjust the path as needed
@@ -36,6 +41,7 @@ export default function signout() {
             router.push('/'); // Adjust the path as needed
           }, 1000);
         }
+
       } catch (error) {
         setError(error);
       }
@@ -43,7 +49,7 @@ export default function signout() {
 
     signOut();
     console.log("use effect signout page")
-  }, []);
+  }, [router, setSignedIn, setUser]);
 
   return (
     <div className="flex justify-center items-center h-screen flex-col">

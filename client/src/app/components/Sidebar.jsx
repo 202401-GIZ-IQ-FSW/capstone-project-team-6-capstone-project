@@ -105,7 +105,7 @@ const Sidebar = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="issueDescription" className="text-sm text-gray-600 block mb-1">
+          <label for="issueDescription" className="text-sm text-gray-600 block mb-1">
             Issue Description
           </label>
           <textarea
@@ -118,7 +118,7 @@ const Sidebar = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="category" className="text-sm text-gray-600 block mb-1">
+          <label for="category" className="text-sm text-gray-600 block mb-1">
             Category
           </label>
           <input
@@ -131,7 +131,7 @@ const Sidebar = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="attachment" className="text-sm text-gray-600 block mb-1">
+          <label for="attachment" className="text-sm text-gray-600 block mb-1">
             Attachment
           </label>
           <input
