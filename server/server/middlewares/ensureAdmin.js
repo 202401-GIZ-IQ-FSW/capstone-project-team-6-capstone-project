@@ -6,7 +6,7 @@ const ensureAdmin = async (req, res, next) => {
     const user = await User.findById(req.session?.user?._id)
     // If the user is not found
     if (!user) {
-        return res.status(403).send({ error: 'Unauthorized the user either does not exist or is not logged in' });
+        return res.status(403).send({ error: 'Unauthorized the user either does not exist or is not signed in' });
     }
     const role = req.session.user.role;
     const roles = ['superAdmin', 'admin'];

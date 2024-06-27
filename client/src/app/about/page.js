@@ -6,7 +6,7 @@ import {
   faLinkedin,
 } from "@fortawesome/free-brands-svg-icons";
 
-export default function About() {
+export default function about() {
   return (
     <div className="bg-white text-black">
       <div className="container mx-auto p-6">
