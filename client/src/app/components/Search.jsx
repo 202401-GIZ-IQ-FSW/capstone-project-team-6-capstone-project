@@ -18,9 +18,9 @@ export default function Search() {
 
 
   return (
-    <div className="flex-auto">
-      <dialog id="my_modal_3" className="modal">
-        <div className="modal-box">
+    <div className=" flex-auto">
+      <dialog id="my_modal_3" className=" modal">
+        <div className="bg-gray-400 modal-box">
           <button
             type="button"
             className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
@@ -37,7 +37,7 @@ export default function Search() {
                 type="text"
                 name="Tieket ID<"
                 placeholder="Enter Tieket ID"
-                className="w-80 px-3 py-1 border rounded-md outline-none"
+                className="bg-gray-100 text-gray-600 w-80 px-3 py-1 border rounded-md outline-none"
               />
             </div>
 
@@ -47,7 +47,7 @@ export default function Search() {
             
               <button
                 type="submit"
-                className="bg-pink-500 text-white rounded-md px-3 py-1 hover:bg-pink-700 duration-200"
+                className="bg-gray-800 text-white rounded-md px-3 py-1 hover:bg-gray-400 duration-200"
               >
                 Submit
               </button>

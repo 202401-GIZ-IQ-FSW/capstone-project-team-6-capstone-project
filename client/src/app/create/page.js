@@ -41,24 +41,24 @@ const PostNewTicket = () => {
   }
 
   return (
-    <div>
+    <div className="bg-white">
       <Navbar />
       <div className="max-w-screen-lg mx-auto px-4 py-8">
         {/* Create New Ticket title */}
-        <h2 className="text-3xl font-bold mb-4 text-left">Create New Ticket</h2>
+        <h2 className=" text-gray-600 text-3xl font-bold mb-4 text-left">Create New Ticket</h2>
         {/* Ticket Details title */}
-        <h3 className="text-xl font-semibold mb-4">Ticket Details</h3>
+        <h3 className=" text-gray-600 text-xl font-semibold mb-4">Ticket Details</h3>
         
         {/* Form for creating a new ticket */}
         <form className="space-y-4">
           {/* Email Address and Phone Number fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block mb-1">Email Address</label>
+              <label className="text-gray-600 block mb-1">Email Address</label>
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="input-field w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                className="input-field w-full px-4 py-2 border border-gray-900 bg-gray-100 rounded-md focus:outline-none focus:border-blue-500"
                 value={ticketFormData.email}
                 onChange={(e) =>
                   setTicketFormData({ ...ticketFormData, email: e.target.value })
@@ -66,11 +66,11 @@ const PostNewTicket = () => {
               />
             </div>
             <div>
-              <label className="block mb-1">Phone Number</label>
+              <label className=" text-gray-600 block mb-1">Phone Number</label>
               <input
                 type="tel"
                 placeholder="Enter your phone number"
-                className="input-field w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                className="input-field w-full px-4 py-2 border border-gray-900 bg-gray-100 rounded-md focus:outline-none focus:border-blue-500"
                 value={ticketFormData.phoneNumber}
                 onChange={(e) =>
                   setTicketFormData({
@@ -84,11 +84,11 @@ const PostNewTicket = () => {
 
           {/* Name field */}
           <div>
-            <label className="block mb-1">Name</label>
+            <label className="text-gray-600 block mb-1">Name</label>
             <input
               type="text"
               placeholder="Enter your name"
-              className="input-field w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+              className="input-field w-full px-4 py-2 border bg-gray-100 border-gray-900 rounded-md focus:outline-none focus:border-blue-500"
               value={ticketFormData.name}
               onChange={(e) =>
                 setTicketFormData({ ...ticketFormData, name: e.target.value })
@@ -97,11 +97,11 @@ const PostNewTicket = () => {
           </div>
 
           {/* Date of Birth field */}
-          <div>
-            <label className="block mb-1">Date of Birth</label>
+          <div >
+            <label className=" text-gray-600 block mb-1 ">Date of Birth</label>
             <input
               type="date"
-              className="input-field w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+              className=" text-gray-400 input-field w-full px-4 py-2 border bg-gray-100 border-gray-900 rounded-md focus:outline-none focus:border-blue-500"
               value={ticketFormData.dateOfBirth}
               onChange={(e) =>
                 setTicketFormData({
@@ -114,11 +114,11 @@ const PostNewTicket = () => {
 
           {/* Country field */}
           <div>
-            <label className="block mb-1">Country</label>
-            <input
+            <label className="text-gray-600 block mb-1">Country</label>
+            <input 
               type="text"
               placeholder="Enter your country"
-              className="input-field w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+              className=" bg-gray-100 input-field w-full px-4 py-3 border border-gray-900 rounded-md focus:outline-none focus:border-blue-500"
               value={ticketFormData.country}
               onChange={(e) =>
                 setTicketFormData({
@@ -133,7 +133,7 @@ const PostNewTicket = () => {
             <button
               type="button" // Change to "submit" if integrating with form submission
               onClick={handleCreateTicket}
-              className={`bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded ${
+              className={`bg-gray-800 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded ${
                 !handleTicketFormValid() ? "opacity-50 cursor-not-allowed" : ""
               }`}
               disabled={!handleTicketFormValid()}
