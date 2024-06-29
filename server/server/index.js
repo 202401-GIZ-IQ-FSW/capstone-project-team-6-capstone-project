@@ -8,6 +8,13 @@ const connectToMongo = require("./db/connection");
 
 // Importing Routes
 const authenticationRouter = require('./routes/authenticationRouter');
+const profileRouter = require('./routes/profileRouter');
+const adminRouter = require('./routes/adminRouter');
+const ticketsRouter = require('./routes/ticketsRouter');
+
+// Importing Middlewares
+const ensureAuthenticated = require('./middlewares/ensureAuthenticated');
+const ensureAdmin = require('./middlewares/ensureAdmin');
 
 const app = express();
 const port =
@@ -51,21 +58,22 @@ app.use(session(sessionOptions));
 
 // Using Routes for User Auth
 app.use('/user', authenticationRouter);
+// Using Routes for user profile
+app.use('/user/profile', ensureAuthenticated, profileRouter);
+// Using Routes for admin
+app.use('/admin', ensureAuthenticated, ensureAdmin, adminRouter);
+// Using Routes for tickets
+app.use('/tickets', ensureAuthenticated, ticketsRouter);
 
 app.get("/", (req, res) => {
   if (req.session?.user) { return res.json({ message: `Welcome ${req.session.user?.name}`}); }
   return res.json({ message: "Welcome Guest"});
 });
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`Server listening on port ${port}`);
-  connectToMongo();
-});
-
-app.get("/test", (req, res) => {
-  res.json(
-    "Server connection to client works!! Good Luck with your capstones :D"
-  );
+  // Connecting to the Database
+  await connectToMongo();
 });
 
 module.exports = app;

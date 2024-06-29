@@ -55,6 +55,9 @@ services:
       - SERVER_PORT=$NODE_LOCAL_PORT
       - IS_DOCKER=true
       - SECRET_KEY=$APP_SECRET
+      - ADMIN_EMAIL=$ADMIN_EMAIL
+      - ADMIN_PASS=$ADMIN_PASS
+      - ADMIN_USERNAME=$ADMIN_USERNAME
     stdin_open: true
     tty: true
     links:
