@@ -1,8 +1,6 @@
 // PostNewTicket.jsx
 "use client";
-
 import { useState } from "react";
-import Navbar from "../components/Navbar";
 
 const PostNewTicket = () => {
   const [showTicketDialog, setShowTicketDialog] = useState(true); // Initially true to show the dialog
@@ -42,7 +40,7 @@ const PostNewTicket = () => {
 
   return (
     <div className="bg-white">
-      <Navbar />
+
       <div className="max-w-screen-lg mx-auto px-4 py-8">
         {/* Create New Ticket title */}
         <h2 className=" text-gray-600 text-3xl font-bold mb-4 text-left">Create New Ticket</h2>
