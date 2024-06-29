@@ -60,6 +60,11 @@ const Navbar = () => {
       )}
       {signedIn && (
         <li>
+          <Link href="/statistics">Statistics</Link>
+        </li>
+      )}
+      {signedIn && (
+        <li>
           <Link href="/profile">Profile</Link>
         </li>
       )}

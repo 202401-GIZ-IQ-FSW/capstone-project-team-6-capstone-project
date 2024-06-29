@@ -14,6 +14,22 @@ export default function searchPage() {
   const { signedIn } = useAuth();
   const router = useRouter();
 
+  useEffect(() => {
+    if (signedIn === false) {
+      setTimeout(() => {
+        router.push('/signin'); // Adjust the path as needed
+      }, 1000);
+    }
+  }, [router, signedIn]);
+
+  if (signedIn === null) {
+    return (
+      <div className="flex justify-center items-center m-52">
+        <div className="pageLoader"></div>
+      </div>
+    );
+  }
+
   const handleInputChange = (field, value) => {
     switch (field) {
       case 'ticketId':
@@ -39,22 +55,6 @@ export default function searchPage() {
     // Add your API calls or state management logic here
   };
   
-  useEffect(() => {
-    if (signedIn === false) {
-      setTimeout(() => {
-        router.push('/signin'); // Adjust the path as needed
-      }, 1000);
-    }
-  }, [router, signedIn]);
-
-  if (signedIn === null) {
-    return (
-      <div className="flex justify-center items-center m-52">
-        <div className="pageLoader"></div>
-      </div>
-    );
-  }
-
   return (
     <>
       {signedIn === false && 
