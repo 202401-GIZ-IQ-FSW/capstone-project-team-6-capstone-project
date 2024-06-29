@@ -7,17 +7,21 @@ import { useAuth } from "./AuthContext";
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { signedIn } = useAuth();
-  const [isClient, setIsClient] = useState(false);
+  // const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  // useEffect(() => {
+  //   setIsClient(true);
+  // }, []);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  if (!isClient) {
+  // if (!isClient) {
+  //   return <div className="navLoader"></div>;
+  // }
+
+  if (signedIn === null) {
     return <div className="navLoader"></div>;
   }
 
@@ -44,7 +48,7 @@ const Navbar = () => {
       <li>
         <Link href="/about">About</Link>
       </li>
-      {!signedIn ? (
+      {signedIn === false ? (
         <li>
           <Link href="/signup">Sign Up</Link>
         </li>
@@ -53,17 +57,17 @@ const Navbar = () => {
           <Link href="/create">Create</Link>
         </li>
       )}
-      {signedIn && (
+      {signedIn === true && (
         <li>
           <Link href="/search">Search</Link>
         </li>
       )}
-      {signedIn && (
+      {signedIn === true && (
         <li>
           <Link href="/statistics">Statistics</Link>
         </li>
       )}
-      {signedIn && (
+      {signedIn === true && (
         <li>
           <Link href="/profile">Profile</Link>
         </li>
@@ -114,12 +118,12 @@ const Navbar = () => {
           </ul>
         </div>
         <div className="navbar-end">
-          {!signedIn && (
+          {signedIn === false && (
             <Link href="/signin" className="btn">
               Sign In
             </Link>
           )}
-          {signedIn && (
+          {signedIn === true && (
             <Link href="/signout" className="btn">
               Sign Out
             </Link>
