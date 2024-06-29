@@ -22,6 +22,10 @@ const port =
     ? process.env.NODE_LOCAL_TEST_PORT
     : process.env.NODE_LOCAL_PORT;
 
+connectToMongo().then(() => {
+  console.info('Connected to db');
+});
+
 // CORS configuration
 const corsOptions = {
   origin: ["http://localhost:3000"], // Replace with client URL
@@ -35,7 +39,7 @@ app.use(express.json());
 
 // Configure session options
 const sessionOptions = {
-  secret: process.env.SECRET_KEY,
+  secret: process.env.APP_SECRET,
   name: 'sid',
   resave: false, // don't save the sessions back to the session store
   saveUninitialized: false, // don't save uninitialized sessions to the session store
@@ -73,7 +77,7 @@ app.get("/", (req, res) => {
 app.listen(port, async () => {
   console.log(`Server listening on port ${port}`);
   // Connecting to the Database
-  await connectToMongo();
+  // await connectToMongo();
 });
 
 module.exports = app;

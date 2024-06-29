@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 const User = require('../models/user');
 
-const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME, TEST_DB_HOST, ADMIN_EMAIL, ADMIN_PASS, ADMIN_USERNAME } =
+const { MONGODB_USER, MONGODB_PASSWORD, DB_HOST, DB_PORT, MONGODB_DATABASE, TEST_DB_HOST, ADMIN_EMAIL, ADMIN_PASS, ADMIN_USERNAME } =
   process.env;
 
-const DB_URI = `mongodb://${DB_USER}:${DB_PASSWORD}@${
+const DB_URI = `mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${
   process.env.NODE_ENV === "test" ? TEST_DB_HOST : DB_HOST
-}:${DB_PORT}/${DB_NAME}?authSource=admin`;
+}:${DB_PORT}/${MONGODB_DATABASE}?authSource=admin`;
 
 const url = DB_URI;
 
