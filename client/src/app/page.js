@@ -1,10 +1,7 @@
 "use client"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFolder, faTicketAlt, faArrowUp, faLifeRing, faUsers, faFolderOpen, faFolderClosed, faUpDown, faArrowDownUpAcrossLine, faArrowUpLong } from '@fortawesome/free-solid-svg-icons';
+import { faFolder, faTicketAlt, faArrowUp, faLifeRing, faUsers } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
-
-
-
 
 export default function App() {
 

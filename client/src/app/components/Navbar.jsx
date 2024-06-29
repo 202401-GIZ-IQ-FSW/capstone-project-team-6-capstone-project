@@ -21,6 +21,21 @@ const Navbar = () => {
     return <div className="navLoader"></div>;
   }
 
+  // const searchItem = ( 
+  //   <li>
+  //     <button
+  //       onClick={() => {
+  //         const modal = document.getElementById("my_modal_3");
+  //         if (modal) {
+  //           modal.showModal();
+  //         }
+  //       }}
+  //     >Search
+  //     </button>
+  //     <Search /> 
+  //   </li> 
+  // );
+
   const navItems = (
     <>
       <li>
@@ -36,11 +51,6 @@ const Navbar = () => {
       ) : (
         <li>
           <Link href="/create">Create</Link>
-        </li>
-      )}
-      {signedIn && (
-        <li>
-          <Link href="/notifications">Notifications</Link>
         </li>
       )}
       {signedIn && (
