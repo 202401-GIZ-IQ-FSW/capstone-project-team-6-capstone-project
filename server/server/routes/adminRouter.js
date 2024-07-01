@@ -15,4 +15,7 @@ router.route('/new-admin')
 router.route('/new-support-agent')
         .put(adminController.createSupportAgent)
 
+router.route('/update-user-role/:id')
+        .put(adminController.updateUserRole)
+
 module.exports = router

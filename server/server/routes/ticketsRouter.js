@@ -11,4 +11,7 @@ router.route('/:id')
         .delete(ticketsController.deleteTicket)
         .put(ticketsController.updateTicket)
 
+router.route('/status-priority/:id')
+        .put(ticketsController.updateTicketStatus)        
+
 module.exports = router

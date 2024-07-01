@@ -1,34 +1,35 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
-import { useAuth } from "../components/AuthContext";
+import { useAuth } from "../../../components/AuthContext";
 
-
-export default function SignOut() {
-  const { setUser, setSignedIn } = useAuth();
+export default function deleteUserPage({params}) {
+  const { user } = useAuth();
   const router = useRouter();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  const userId = params.id;
+  const roles = ["superAdmin", "admin"];
 
   useEffect(() => {
     setMessage(""); // Reset message
     setError(""); // Reset error
 
-    const signOut = async () => {
+    const deleteUser = async () => {
       try {
-        const response = await fetch('http://localhost:3001/user/logout', {
-            credentials: 'include'
-        });
+        let response;
 
+        if (roles.includes(user?.role)) {
+          response = await fetch(`http://localhost:3001/admin/view-user/${userId}`, { method: 'DELETE', credentials: 'include' });
+        } else {
+          response = await fetch(`http://localhost:3001/user/profile`, { method: 'DELETE', credentials: 'include' });
+        }
+        
         const data = await response.json();
 
         if (response.ok) {
           setMessage(data.message)
-          setUser(null);
-          setSignedIn(false);
-          
-          // localStorage.removeItem('user');
-          // localStorage.removeItem('signedIn');
 
           setTimeout(() => {
             router.push('/');
@@ -38,7 +39,7 @@ export default function SignOut() {
           // Handle server errors
           setError(data.error);
           setTimeout(() => {
-            router.push('/');
+            router.push('/'); 
           }, 1000);
         }
 
@@ -47,15 +48,15 @@ export default function SignOut() {
       }
     };
 
-    signOut();
-    console.log("use effect sign out page")
-  }, [router, setSignedIn, setUser]);
+    deleteUser();
+    console.log("use effect delete user page")
+  }, []);
 
   return (
     <div className="flex justify-center my-20 mx-6">
       {message && 
         <div className="flex flex-col font-semibold text-center">
-          <h1>Signing out...</h1>
+          <h1>Deleting ...</h1>
           <p>{message}</p>
         </div>}
       {!message && error && <div className="font-semibold"><p>{error}</p></div>}

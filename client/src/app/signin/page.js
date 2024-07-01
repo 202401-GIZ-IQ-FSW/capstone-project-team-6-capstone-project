@@ -15,7 +15,7 @@ export default function SignIn() {
   const { signedIn, setSignedIn } = useAuth();
   const [showPassword, setShowPassword] = useState(false); 
 
-  const onSubmit = async (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setMessage(""); // Reset message
     setError(""); // Reset error
@@ -40,8 +40,8 @@ export default function SignIn() {
 
         // Successful login, navigate to home page
         setTimeout(() => {
-          router.push('/'); // Adjust the path as needed
-        }, 1000); // Delay navigation to show the message for 2 seconds
+          router.push('/');
+        }, 1000); // Delay navigation to show the message for 1 seconds
 
       } else {
         // Handle server errors
@@ -56,7 +56,7 @@ export default function SignIn() {
     if (signedIn && !message) {
       setError("User is already signed in");
       setTimeout(() => {
-        router.push('/'); // Adjust the path as needed
+        router.push('/');
       }, 1000);
     }
   }, [router, signedIn]);
@@ -73,7 +73,7 @@ export default function SignIn() {
               {message && <div className="flex justify-center m-4 p-1 bg-emerald-300 rounded-md"><br/><p>{message}</p><br/></div>}
               {error && <div className="flex justify-center m-4 p-1 bg-red-500 rounded-md"><br/><p>{error}</p><br/></div>}
 
-              <form className="mt-8 space-y-4" onSubmit={onSubmit}>
+              <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
                 <div>
                   <label className="text-gray-800 text-xs lg:text-sm mb-2 block">Enter your email address</label>
                   <div className="relative flex items-center">
