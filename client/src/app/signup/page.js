@@ -20,7 +20,7 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false); 
   const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
 
-  const onSubmit = async (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setMessage(""); // Reset message
     setError(""); // Reset error
@@ -45,8 +45,8 @@ export default function SignUp() {
 
         // Successful login, navigate to home page
         setTimeout(() => {
-          router.push('/'); // Adjust the path as needed
-        }, 1000); // Delay navigation to show the message for 2 seconds
+          router.push('/');
+        }, 1000); // Delay navigation to show the message for 1 seconds
 
       } else {
         // Handle server errors
@@ -61,7 +61,7 @@ export default function SignUp() {
     if (signedIn && !message) {
       setError("User is already signed in");
       setTimeout(() => {
-        router.push('/'); // Adjust the path as needed
+        router.push('/');
       }, 1000);
     }
   }, [router, signedIn]);
@@ -75,7 +75,7 @@ export default function SignUp() {
             <h1 className="text-gray-800 text-3xl lg:text-5xl font-bold pb-2 text-center">Join our platform</h1>
             <p className="text-gray-800 text-xs lg:text-sm text-center">Provide your details to get started with support</p>
 
-            <form onSubmit={onSubmit} className=" py-10 px-6 flex flex-col justify-center items-center">
+            <form onSubmit={handleSubmit} className=" py-10 px-6 flex flex-col justify-center items-center">
 
               <div className="space-y-6 max-w-md lg:w-full">
 

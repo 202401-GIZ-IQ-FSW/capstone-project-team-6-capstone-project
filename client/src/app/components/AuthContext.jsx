@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     fetchUserSession();
-  }, []);
+  }, [signedIn]);
 
   return (
     <AuthContext.Provider value={{ user, setUser, signedIn, setSignedIn }}>

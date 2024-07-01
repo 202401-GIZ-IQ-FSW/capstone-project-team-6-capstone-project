@@ -1,13 +1,14 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Search from "./Search";
 import { useAuth } from "./AuthContext";
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { signedIn } = useAuth();
+  const { signedIn, user } = useAuth();
   // const [isClient, setIsClient] = useState(false);
+  const roles = ["superAdmin", "admin"];
 
   // useEffect(() => {
   //   setIsClient(true);
@@ -72,6 +73,21 @@ const Navbar = () => {
           <Link href="/profile">Profile</Link>
         </li>
       )}
+      {signedIn === true && (
+        <li>
+          <Link href="/tickets">Tickets</Link>
+        </li>
+      )}
+      { ( signedIn === true && roles.includes(user?.role) ) && (
+        <li>
+          <Link href="/users">Users</Link>
+        </li>
+      )}
+      {signedIn === true && (
+        <li>
+          <Link href={`/users/view-user/${user?._id}`}>My Account</Link>
+        </li>
+      )}
     </>
   );
 
@@ -112,8 +128,8 @@ const Navbar = () => {
             <span>Tickets</span>
           </Link>
         </div>
-        <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal px-1 menu-lg font-semibold">
+        <div className="navbar-center hidden lg:flex lg:flex-row lg:flex-wrap lg:justify-center lg:w-7/12">
+          <ul className="menu menu-horizontal lg:justify-center px-1 menu-lg font-semibold">
             {navItems}
           </ul>
         </div>

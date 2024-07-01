@@ -17,7 +17,7 @@ export default function App() {
               <h1 className="text-center lg:text-start text-xl lg:text-4xl font-bold mb-4 lg:mb-8">Submit your technical issues and queries easily!</h1>
               <p className="text-center lg:text-start text-gray-600 text-xs lg:text-lg mb-8 lg:mb-12">Securely submit and manage support tickets for technical issues</p>
            
-              <Link href="/new-ticket">
+              <Link href="/tickets/new-ticket">
                 <span className="px-3 py-3 lg:px-4 lg:py-4 text-sm lg:text-lg tracking-wide rounded-md bg-gray-700 text-slate-200 font-semibold border-2 hover:bg-slate-500 focus:outline-none">
                   Submit new ticket
                 </span>

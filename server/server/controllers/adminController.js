@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Ticket = require('../models/ticket');
 
 const getUsers = async (req, res) => {
   try {
@@ -62,7 +63,11 @@ const deleteUser = async (req, res) => {
     if (!isLoggedUser && !isSuperAdmin && !roles.includes(user.role)) {
       return res.status(403).json({error: "Not Authorized, only SuperAdmin can delete other admins"})
     }
-  
+
+    // Find and delete all tickets belonging to the user
+    await Ticket.deleteMany({ user: user._id });
+
+    // Delete user profile
     await user.remove()
 
     if (isLoggedUser) {
@@ -70,11 +75,11 @@ const deleteUser = async (req, res) => {
         if (err) {
           return res.status(500).json({ error: 'Could not destroy session' });
         }
-        return res.status(200).json({ message: 'User deleted successfully' })
+        return res.status(200).json({ message: 'Profile and associated tickets deleted successfully' })
       });
     }
 
-    res.status(200).json({ message: 'User deleted successfully' })
+    res.status(200).json({ message: 'Profile and associated tickets deleted successfully' })
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -113,7 +118,7 @@ const createAdmin = async (req, res) => {
 
 const createSupportAgent = async (req, res) => {
   try {
-    const loggedUserRole = req.session?.user.role ;
+    const loggedUserRole = req.session?.user.role;
     const roles = ['superAdmin', 'admin']
 
     if (!roles.includes(loggedUserRole)) {
@@ -145,10 +150,50 @@ const createSupportAgent = async (req, res) => {
   }
 };
 
+const updateUserRole = async (req, res) => {
+  try {
+    const loggedUserRole = req.session?.user.role;
+    const superAdminLoggedIn = loggedUserRole === 'superAdmin';
+    const userId = req.params.id;
+
+    const { role } = req.body;
+    const newRoles = ['admin', 'supportAgent', 'customer']
+
+    if (!role || !newRoles.includes(role)) {
+      return res.status(400).json({ error: 'Please provide a valid role must be of admin, supportAgent or customer' });
+    }
+
+    const user = await User.findById(userId).select('-password');
+
+    if (!user) {
+      return res.status(404).json({error: "User not found"})
+    }
+
+    if (user.role === 'admin' && !superAdminLoggedIn) {
+      return res.status(403).json({error: "Not Authorized, only superAdmin can change admin role"})
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {role: role},
+      { new: true, select: '-password' }
+    )
+
+    if (!updatedUser) {
+      return res.status(404).json({error: "User not found"})
+    }
+    
+    res.status(200).json(updatedUser)
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   getUsers,
   getUser,
   deleteUser,
   createAdmin,
-  createSupportAgent
+  createSupportAgent,
+  updateUserRole
 };
