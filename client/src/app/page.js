@@ -19,12 +19,12 @@ export default function App() {
            
               <Link href="/tickets/new-ticket">
                 <span className="px-3 py-3 lg:px-4 lg:py-4 text-sm lg:text-lg tracking-wide rounded-md bg-gray-700 text-slate-200 font-semibold border-2 hover:bg-slate-500 focus:outline-none">
-                  Submit new ticket
+                  Submit New Ticket
                 </span>
               </Link>
             </div>
           
-            <div className="-order-1 lg:order-1 my-6 lg:my-2 lg:col-span-2 lg:col-start-5 text-gray-700 text-8xl lg:text-[14rem] flex justify-center  lg:items-center">
+            <div className="-order-1 lg:order-1 my-6 lg:my-2 lg:col-span-2 lg:col-start-5 text-gray-700 text-8xl lg:text-[13rem] flex justify-center  lg:items-center">
               <FontAwesomeIcon icon={faFolder} />
             </div>
 

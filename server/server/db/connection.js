@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 const User = require('../models/user');
 
-const { MONGODB_USER, MONGODB_PASSWORD, DB_HOST, DB_PORT, MONGODB_DATABASE, TEST_DB_HOST, ADMIN_EMAIL, ADMIN_PASS, ADMIN_USERNAME } =
+const { DB_ATLAS_URL_TEST, MONGODB_USER, MONGODB_PASSWORD, DB_HOST, DB_PORT, MONGODB_DATABASE, TEST_DB_HOST, ADMIN_EMAIL, ADMIN_PASS, ADMIN_USERNAME } =
   process.env;
 
-const DB_URI = `mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${
-  process.env.NODE_ENV === "test" ? TEST_DB_HOST : DB_HOST
-}:${DB_PORT}/${MONGODB_DATABASE}?authSource=admin`;
+// const DB_URI = `mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${
+//   process.env.NODE_ENV === "test" ? TEST_DB_HOST : DB_HOST
+// }:${DB_PORT}/${MONGODB_DATABASE}?authSource=admin`;
 
-const url = DB_URI;
+const url = DB_ATLAS_URL_TEST;
 
 const connectToMongo = async () => {
   mongoose.connect(url, { useNewUrlParser: true });
