@@ -111,11 +111,8 @@ export default function usersPage() {
           <div className="flex flex-col items-center gap-1">
 
             <div className="w-screen lg:w-full py-4 px-6">
-              <div className="flex items-center justify-between p-4 rounded-lg border-[#60829d] border-2 gap-4">
+              <div className="text-center p-4 rounded-lg border-[#60829d] border-2">
                 <h1 className="font-bold lg:text-3xl">Users</h1>
-                <Link href="/tickets/new-ticket" className="btn">
-                  New User
-                </Link>
               </div>
             </div>
 
