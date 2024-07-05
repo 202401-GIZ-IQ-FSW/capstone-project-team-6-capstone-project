@@ -10,6 +10,7 @@ export default function ticketsPage() {
   const router = useRouter();
   const [ tickets, setTickets ] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (signedIn === false) {
@@ -21,6 +22,7 @@ export default function ticketsPage() {
 
   useEffect(() => {
     if (signedIn) {
+      setLoading(true);
       setError(""); // Reset error
 
       const fetchTickets = async () => {
@@ -38,6 +40,8 @@ export default function ticketsPage() {
           }
         } catch (error) {
           setError(error.message);
+        } finally {
+          setLoading(false);
         }
       };
 
@@ -45,7 +49,7 @@ export default function ticketsPage() {
     }
   }, [signedIn]);
 
-  if (signedIn === null) {
+  if (signedIn === null || loading) {
     return (
       <div className="flex justify-center items-center m-52">
         <div className="pageLoader"></div>
@@ -123,7 +127,7 @@ export default function ticketsPage() {
                   </div>
                 </div>
             ) : (
-              <p className="m-10 font-semibold">{error}</p>
+              <p className="h-20 m-10 font-semibold">{error}</p>
             )}
 
           </div>

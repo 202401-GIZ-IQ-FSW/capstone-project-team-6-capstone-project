@@ -92,8 +92,8 @@ const Navbar = () => {
   );
 
   return (
-    <header className="max-w-screen-2xl container mx-auto transition-all duration-300 ease-in-out bg-blue">
-      <div className="navbar xl:px-24">
+    <header className="mx-auto transition-all duration-300 ease-in-out bg-blue">
+      <div className="navbar pr-4 pl-2 md:pl-10 md:pr-12">
         <div className="navbar-start">
           <div className="dropdown">
             <div

@@ -10,6 +10,7 @@ export default function viewUserPage({params}) {
   const router = useRouter();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const userId = params.id; 
   const roles = ["superAdmin", "admin"];
@@ -32,6 +33,8 @@ export default function viewUserPage({params}) {
 
   useEffect(() => {
     if (signedIn) {
+      setLoading(true);
+
       const fetchUser = async () => {
         try {
           let response;
@@ -51,6 +54,8 @@ export default function viewUserPage({params}) {
           }
         } catch (error) {
             setError(error);
+        } finally {
+          setLoading(false);
         }
       };
 
@@ -58,7 +63,7 @@ export default function viewUserPage({params}) {
     }
   }, [signedIn]);
 
-  if (signedIn === null) {
+  if (signedIn === null || loading) {
     return (
       <div className="flex justify-center items-center m-52">
         <div className="pageLoader"></div>
@@ -85,6 +90,9 @@ export default function viewUserPage({params}) {
 
       if (response.ok) {
         setMessage("User role updated successfully");
+        setTimeout(() => {
+          setMessage("");
+        }, 2000);
       } else {
         // Handle server errors
         setError(data.error);
@@ -110,6 +118,21 @@ export default function viewUserPage({params}) {
   const formatDateOfBirth = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  const userRoleDisplay = (role) => {
+    switch (role) {
+      case 'superAdmin':
+        return 'Super Admin';
+      case 'admin':
+        return 'Admin';
+      case 'supportAgent':
+        return 'Support Agent';
+      case 'customer':
+        return 'Customer';
+      default:
+        return '';
+    }
   };
 
   return (
@@ -161,14 +184,14 @@ export default function viewUserPage({params}) {
             <p className=" text-gray-600 lg:text-lg font-normal mb-4"><b>Country:</b> {userFormData?.country ? userFormData?.country : ""}</p>
             <p className=" text-gray-600 lg:text-lg font-normal mb-4"><b>Date of birth:</b> {userFormData?.dateOfBirth ? formatDateOfBirth(userFormData?.dateOfBirth) : ""}</p>
             <p className=" text-gray-600 lg:text-lg font-normal mb-4"><b>Age:</b> {userFormData?.age ? userFormData?.age : ""}</p>
-            <p className=" text-gray-600 lg:text-lg font-normal mb-4"><b>Account Type:</b> {userFormData?.role}</p>
+            <p className=" text-gray-600 lg:text-lg font-normal mb-4"><b>Account Type:</b> {userRoleDisplay(userFormData.role)}</p>
 
-            { ( user?.role === "superAdmin" || ( user?.role === "admin" && !roles.includes(userFormData?.role) ) ) &&
+            { ( (user?.role === "superAdmin" && user?._id !== userId) || ( user?.role === "admin" && !roles.includes(userFormData?.role) ) ) &&
                 <p className=" text-gray-600 text-lg font-normal my-2 text-wrap"><b>Change User Role</b></p>
             }
 
             {/* Form for updating user role */}
-            { ( user?.role === "superAdmin" || ( user?.role === "admin" && !roles.includes(userFormData?.role) ) ) &&
+            { ( (user?.role === "superAdmin" && user?._id !== userId) || ( user?.role === "admin" && !roles.includes(userFormData?.role) ) ) &&
               <form className="space-y-4" onSubmit={handleUpdateUser}>
 
               {/* Role field */}

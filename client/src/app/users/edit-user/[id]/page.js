@@ -88,6 +88,9 @@ export default function editUserPage({params}) {
 
       if (response.ok) {
         setMessage("User updated successfully");
+        setTimeout(() => {
+          setMessage("");
+        }, 2000);
       } else {
         // Handle server errors
         setError(data.error);
