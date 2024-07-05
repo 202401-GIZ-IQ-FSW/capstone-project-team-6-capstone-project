@@ -10,6 +10,7 @@ export default function viewTicketPage({params}) {
   const router = useRouter();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const ticketId = params.id; 
   const roles = ["superAdmin", "admin", "supportAgent"];
@@ -34,6 +35,8 @@ export default function viewTicketPage({params}) {
   useEffect(() => {
     if (signedIn) {
       setError(""); // Reset error
+      setLoading(true);
+      
       const fetchTicket = async () => {
         try {
           const response = await fetch(`http://localhost:3001/tickets/${ticketId}`, {
@@ -49,6 +52,8 @@ export default function viewTicketPage({params}) {
           }
         } catch (error) {
             setError(error);
+        } finally {
+          setLoading(false);
         }
       };
 
@@ -56,7 +61,7 @@ export default function viewTicketPage({params}) {
     }
   }, [signedIn]);
 
-  if (signedIn === null) {
+  if (signedIn === null || loading) {
     return (
       <div className="flex justify-center items-center m-52">
         <div className="pageLoader"></div>
@@ -83,6 +88,9 @@ export default function viewTicketPage({params}) {
 
       if (response.ok) {
         setMessage("Ticket updated successfully");
+        setTimeout(() => {
+          setMessage("");
+        }, 2000);
       } else {
         // Handle server errors
         setError(data.error);

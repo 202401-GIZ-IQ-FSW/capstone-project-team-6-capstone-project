@@ -1,164 +1,89 @@
 // components/Sidebar.js
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const Sidebar = () => {
-  const [ticketId, setTicketId] = useState('');
-  const [issueDescription, setIssueDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [attachment, setAttachment] = useState('');
-  const [filters, setFilters] = useState({
-    billingInquiry: false,
-    technicalSupport: false,
-    loginAssistance: false,
-    submitNewTicket: false,
+const Sidebar = ({ onFiltersChange, userRole }) => {
+ 
+  const [ticketPriority, setTicketPriority] = useState({
+    Low: false,
+    Medium: false,
+    High: false,
+    Urgent: false,
+    Critical:false
   });
+
   const [ticketCategories, setTicketCategories] = useState({
-    technicalIssue: false,
-    billingInquiries: false,
-    accountAccess: false,
-    resolved: false,
+    "General Inquiry": false,
+    Technical: false,
+    "Bug Report": false,
   });
+  
   const [ticketStatus, setTicketStatus] = useState({
-    open: false,
-    inProgress: false,
-    closed: false,
-    loremIpsum: false,
+    Open: false,
+    "In Progress": false,
+    Closed: false,
   });
-  const [priorityLevel, setPriorityLevel] = useState('');
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchField, setSearchField] = useState("title");
+
+  useEffect(() => {
+    const newFilters = {
+      status: Object.keys(ticketStatus).filter(key => ticketStatus[key]),
+      category: Object.keys(ticketCategories).filter(key => ticketCategories[key]),
+      priority: Object.keys(ticketPriority).filter(key => ticketPriority[key]),
+      searchQuery,
+      searchField,
+    };
+    // console.log("new filters", newFilters)
+    onFiltersChange(newFilters);
+  }, [ticketPriority, ticketCategories, ticketStatus, searchQuery, searchField, onFiltersChange]);
 
   const handleCheckboxChange = (section, label, checked) => {
     switch (section) {
-      case 'filters':
-        setFilters((prevFilters) => ({
-          ...prevFilters,
-          [label]: checked,
-        }));
+      case 'ticketPriority':
+        setTicketPriority(prev => ({ ...prev, [label]: checked }));
         break;
       case 'ticketCategories':
-        setTicketCategories((prevCategories) => ({
-          ...prevCategories,
-          [label]: checked,
-        }));
+        setTicketCategories(prev => ({ ...prev, [label]: checked }));
         break;
       case 'ticketStatus':
-        setTicketStatus((prevStatus) => ({
-          ...prevStatus,
-          [label]: checked,
-        }));
+        setTicketStatus(prev => ({ ...prev, [label]: checked }));
         break;
       default:
         break;
     }
   };
 
-  const handlePriorityLevelChange = (level) => {
-    setPriorityLevel(level);
-  };
+  const handleSearchChange = (e) => setSearchQuery(e.target.value);
 
-  const handleCreateTicket = () => {
-    // Logic to handle ticket creation
-    console.log('Creating ticket...');
-    console.log('Ticket ID:', ticketId);
-    console.log('Issue Description:', issueDescription);
-    console.log('Category:', category);
-    console.log('Attachment:', attachment);
-    console.log('Filters:', filters);
-    console.log('Ticket Categories:', ticketCategories);
-    console.log('Ticket Status:', ticketStatus);
-    console.log('Priority Level:', priorityLevel);
-    // Add your API calls or state management logic here
-  };
+  const handleSearchFieldChange = (e) => setSearchField(e.target.value);
 
   return (
-    <div className="bg-gray-100 h-full w-80 flex flex-col p-4 space-y-4">
-      {/* Your Ticket Section */}
-      <div>
-        <div className="flex items-center mb-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 mr-2 text-gray-600 cursor-pointer"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          <span className="text-lg font-semibold text-gray-800">Your Ticket</span>
-        </div>
-        <div className="mb-4">
-          <label htmlFor="ticketId" className="text-sm text-gray-600 block mb-1">
-            Ticket ID
-          </label>
-          <input
-            id="ticketId"
-            type="text"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
-            placeholder="Enter Ticket ID"
-            value={ticketId}
-            onChange={(e) => setTicketId(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <label for="issueDescription" className="text-sm text-gray-600 block mb-1">
-            Issue Description
-          </label>
-          <textarea
-            id="issueDescription"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
-            rows="4"
-            placeholder="Describe the issue"
-            value={issueDescription}
-            onChange={(e) => setIssueDescription(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <label for="category" className="text-sm text-gray-600 block mb-1">
-            Category
-          </label>
-          <input
-            id="category"
-            type="text"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
-            placeholder="Enter category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <label for="attachment" className="text-sm text-gray-600 block mb-1">
-            Attachment
-          </label>
-          <input
-            id="attachment"
-            type="file"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
-            onChange={(e) => setAttachment(e.target.files[0])}
-          />
-        </div>
-        <button
-          className="bg-gray-200 text-black px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none"
-          onClick={handleCreateTicket}
-        >
-          Create Ticket
-        </button>
-      </div>
+    <div className="bg-gray-100 h-full w-4/12 md:w-3/12 flex flex-col p-4 space-y-4">
 
-      {/* Divider and Ticket Filter Section */}
-      <hr className="my-4 border-gray-300" />
+      {/* Search Section */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-800 mb-2">Ticket Filter</h2>
-        <div className="space-y-2">
-          <Checkbox label="Billing Inquiry" checked={filters.billingInquiry} onChange={(checked) => handleCheckboxChange('filters', 'billingInquiry', checked)} />
-          <Checkbox label="Technical Support" checked={filters.technicalSupport} onChange={(checked) => handleCheckboxChange('filters', 'technicalSupport', checked)} />
-          <Checkbox label="Login Assistance" checked={filters.loginAssistance} onChange={(checked) => handleCheckboxChange('filters', 'loginAssistance', checked)} />
-          <Checkbox label="Submit New Ticket" checked={filters.submitNewTicket} onChange={(checked) => handleCheckboxChange('filters', 'submitNewTicket', checked)} />
-        </div>
+        <h2 className="text-lg font-semibold text-gray-800 mb-2">Search By</h2>
+
+        <select
+          value={searchField}
+          onChange={handleSearchFieldChange}
+          className="w-full px-4 py-2 border rounded-md mb-2"
+        >
+          <option value="title">Title</option>
+          {userRole !== "customer" && <option value="user">User</option>}
+          <option value="number">Number</option>
+          <option value="description">Description</option>
+        </select>
+
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="w-full px-4 py-2 border rounded-md"
+          placeholder={`Search by ${searchField}`}
+        />
       </div>
 
       {/* Divider and Ticket Category Section */}
@@ -166,10 +91,9 @@ const Sidebar = () => {
       <div>
         <h2 className="text-lg font-semibold text-gray-800 mb-2">Ticket Category</h2>
         <div className="space-y-2">
-          <Checkbox label="Technical Issue" checked={ticketCategories.technicalIssue} onChange={(checked) => handleCheckboxChange('ticketCategories', 'technicalIssue', checked)} />
-          <Checkbox label="Billing Inquiries" checked={ticketCategories.billingInquiries} onChange={(checked) => handleCheckboxChange('ticketCategories', 'billingInquiries', checked)} />
-          <Checkbox label="Account Access" checked={ticketCategories.accountAccess} onChange={(checked) => handleCheckboxChange('ticketCategories', 'accountAccess', checked)} />
-          <Checkbox label="Resolved" checked={ticketCategories.resolved} onChange={(checked) => handleCheckboxChange('ticketCategories', 'resolved', checked)} />
+          <Checkbox label="General Inquiry" checked={ticketCategories["General Inquiry"]} onChange={(checked) => handleCheckboxChange('ticketCategories', 'General Inquiry', checked)} />
+          <Checkbox label="Technical" checked={ticketCategories.Technical} onChange={(checked) => handleCheckboxChange('ticketCategories', 'Technical', checked)} />
+          <Checkbox label="Bug Report" checked={ticketCategories["Bug Report"]} onChange={(checked) => handleCheckboxChange('ticketCategories', 'Bug Report', checked)} />
         </div>
       </div>
 
@@ -178,25 +102,25 @@ const Sidebar = () => {
       <div>
         <h2 className="text-lg font-semibold text-gray-800 mb-2">Ticket Status</h2>
         <div className="space-y-2">
-          <Checkbox label="Open" checked={ticketStatus.open} onChange={(checked) => handleCheckboxChange('ticketStatus', 'open', checked)} />
-          <Checkbox label="In Progress" checked={ticketStatus.inProgress} onChange={(checked) => handleCheckboxChange('ticketStatus', 'inProgress', checked)} />
-          <Checkbox label="Closed" checked={ticketStatus.closed} onChange={(checked) => handleCheckboxChange('ticketStatus', 'closed', checked)} />
-          <Checkbox label="Lorem Ipsum" checked={ticketStatus.loremIpsum} onChange={(checked) => handleCheckboxChange('ticketStatus', 'loremIpsum', checked)} />
+          <Checkbox label="Open" checked={ticketStatus.Open} onChange={(checked) => handleCheckboxChange('ticketStatus', 'Open', checked)} />
+          <Checkbox label="In Progress" checked={ticketStatus["In Progress"]} onChange={(checked) => handleCheckboxChange('ticketStatus', 'In Progress', checked)} />
+          <Checkbox label="Closed" checked={ticketStatus.Closed} onChange={(checked) => handleCheckboxChange('ticketStatus', 'Closed', checked)} />
         </div>
       </div>
 
-      {/* Divider and Priority Level Section */}
+      {/* Divider and Ticket Priority Level Section */}
       <hr className="my-4 border-gray-300" />
       <div>
-        <h2 className="text-lg font-semibold text-gray-800 mb-2">Priority Level</h2>
-        <div className="space-x-2">
-          <PriorityButton label="Low" selected={priorityLevel === 'Low'} onClick={() => handlePriorityLevelChange('Low')} />
-          <PriorityButton label="Medium" selected={priorityLevel === 'Medium'} onClick={() => handlePriorityLevelChange('Medium')} />
-          <PriorityButton label="High" selected={priorityLevel === 'High'} onClick={() => handlePriorityLevelChange('High')} />
-          <PriorityButton label="Urgent" selected={priorityLevel === 'Urgent'} onClick={() => handlePriorityLevelChange('Urgent')} />
-          <PriorityButton label="Criteria" selected={priorityLevel === 'Criteria'} onClick={() => handlePriorityLevelChange('Criteria')} />
+        <h2 className="text-lg font-semibold text-gray-800 mb-2">Ticket Priority Level</h2>
+        <div className="space-y-2">
+          <Checkbox label="Low" checked={ticketPriority.Low} onChange={(checked) => handleCheckboxChange('ticketPriority', 'Low', checked)} />
+          <Checkbox label="Medium" checked={ticketPriority.Medium} onChange={(checked) => handleCheckboxChange('ticketPriority', 'Medium', checked)} />
+          <Checkbox label="High" checked={ticketPriority.High} onChange={(checked) => handleCheckboxChange('ticketPriority', 'High', checked)} />
+          <Checkbox label="Urgent" checked={ticketPriority.Urgent} onChange={(checked) => handleCheckboxChange('ticketPriority', 'Urgent', checked)} />
+          <Checkbox label="Critical" checked={ticketPriority.Critical} onChange={(checked) => handleCheckboxChange('ticketPriority', 'Critical', checked)} />
         </div>
       </div>
+
     </div>
   );
 };
@@ -213,18 +137,6 @@ const Checkbox = ({ label, checked, onChange }) => {
       />
       <span className="ml-2 text-sm text-gray-700">{label}</span>
     </label>
-  );
-};
-
-// Priority button component
-const PriorityButton = ({ label, selected, onClick }) => {
-  return (
-    <button
-      className={`border border-black px-3 py-1 rounded-md ${selected ? 'bg-black text-white' : 'bg-white text-black'} hover:bg-gray-200 focus:outline-none`}
-      onClick={onClick}
-    >
-      {label}
-    </button>
   );
 };
 

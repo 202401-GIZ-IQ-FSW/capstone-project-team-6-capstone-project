@@ -51,6 +51,9 @@ export default function newTicketPage() {
 
       if (response.ok) {
         setMessage("Ticket created successfully");
+        setTimeout(() => {
+          setMessage("");
+        }, 2000);
       } else {
         // Handle server errors
         setError(data.error);

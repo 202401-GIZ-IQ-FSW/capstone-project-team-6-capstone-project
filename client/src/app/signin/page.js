@@ -69,9 +69,6 @@ export default function SignIn() {
             <div className="p-8 rounded-2xl bg-white shadow">
               <h1 className="text-gray-800 text-center text-2xl lg:text-4xl font-bold pb-2">Sign in</h1>
               <p className="text-gray-800 text-center text-xs lg:text-sm">Sign in to manage your support tickets</p>
-              
-              {message && <div className="flex justify-center m-4 p-1 bg-emerald-300 rounded-md"><br/><p>{message}</p><br/></div>}
-              {error && <div className="flex justify-center m-4 p-1 bg-red-500 rounded-md"><br/><p>{error}</p><br/></div>}
 
               <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
                 <div>
@@ -117,6 +114,9 @@ export default function SignIn() {
                     </label>
                   </div>
                 </div>
+
+                {message && <div className="flex justify-center my-4 p-1 bg-emerald-300 rounded-md"><br/><p>{message}</p><br/></div>}
+                {error && <div className="flex justify-center my-4 p-1 bg-red-500 rounded-md"><br/><p>{error}</p><br/></div>}
 
                 <div className="mt-8">
                   <button type="submit" className="w-full py-3 px-4 text-sm lg:text-base tracking-wide rounded-md text-gray-800 font-semibold border-2 hover:bg-slate-400 focus:outline-none">

@@ -54,11 +54,11 @@ export default function SignOut() {
   return (
     <div className="flex justify-center my-20 mx-6">
       {message && 
-        <div className="flex flex-col font-semibold text-center">
+        <div className="h-40 flex flex-col font-semibold text-center">
           <h1>Signing out...</h1>
           <p>{message}</p>
         </div>}
-      {!message && error && <div className="font-semibold"><p>{error}</p></div>}
+      {!message && error && <div className="h-40 font-semibold"><p>{error}</p></div>}
     </div>
   );
 }
