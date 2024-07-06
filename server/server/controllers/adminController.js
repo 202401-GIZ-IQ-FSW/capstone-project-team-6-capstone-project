@@ -33,12 +33,13 @@ const getUser = async (req, res) => {
     const user = await User.findById(req.params.id).select('-password');
 
     if (!user) {
-      return res.status(404).json({error: "User not found"})
+      return res.status(404).json({error: "User not found"});
     }
     
     if (user._id.toString() !== req.session?.user._id && !isSuperAdmin && !roles.includes(user.role)) {
-      return res.status(403).json({error: "Not Authorized, only super admin can view other admins accounts"})
+      return res.status(403).json({error: "Not Authorized, only super admin can view other admins accounts"});
     }
+
     res.status(200).json(user)
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -58,14 +59,17 @@ const deleteUser = async (req, res) => {
       return res.status(404).json({error: "User not found"})
     }
 
-    const isLoggedUser = user._id.toString() === req.session?.user._id
+    const isLoggedUser = user._id.toString() === req.session?.user._id;
 
     if (!isLoggedUser && !isSuperAdmin && !roles.includes(user.role)) {
       return res.status(403).json({error: "Not Authorized, only SuperAdmin can delete other admins"})
     }
 
     // Find and delete all tickets belonging to the user
-    await Ticket.deleteMany({ user: user._id });
+    await Ticket.deleteMany({ user: user?._id });
+
+    // Find and update all tickets assigned to the user
+    await Ticket.updateMany({assignedUser: user?._id}, {$unset: {assignedUser: ""}});
 
     // Delete user profile
     await user.remove()
@@ -169,21 +173,18 @@ const updateUserRole = async (req, res) => {
       return res.status(404).json({error: "User not found"})
     }
 
-    if (user.role === 'admin' && !superAdminLoggedIn) {
+    if ( ['superAdmin', 'admin'].includes(user.role) && !superAdminLoggedIn ) {
       return res.status(403).json({error: "Not Authorized, only superAdmin can change admin role"})
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      {role: role},
-      { new: true, select: '-password' }
-    )
-
-    if (!updatedUser) {
-      return res.status(404).json({error: "User not found"})
+    if ( role === 'customer' && ['admin', 'supportAgent'].includes(user.role) ) {
+      await Ticket.updateMany({assignedUser: userId}, {$unset: {assignedUser: ""}});
     }
+
+    user.role = role;
+    await user.save();
     
-    res.status(200).json(updatedUser)
+    res.status(200).json(user)
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

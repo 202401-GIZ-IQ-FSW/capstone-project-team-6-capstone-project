@@ -22,7 +22,6 @@ const getProfile = async (req, res) => {
       return res.status(404).json({error: "User not found"})
     }
 
-    delete user.password;
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -87,6 +86,9 @@ const deleteProfile = async (req, res) => {
   
     // Find and delete all tickets belonging to the user
     await Ticket.deleteMany({ user: id });
+
+    // Find and update all tickets assigned to the user
+    await Ticket.updateMany({assignedUser: id}, {$unset: {assignedUser: ""}});
 
     // Delete user profile
     await user.remove()

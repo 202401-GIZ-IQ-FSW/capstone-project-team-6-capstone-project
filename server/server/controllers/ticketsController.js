@@ -95,6 +95,8 @@ const deleteTicket = async (req, res) => {
 const updateTicket = async (req, res) => {
   try {
     const ticket = await Ticket.findById(req.params.id)
+    const { title, description, category } = req.body;
+    const newData = { title, description, category };
 
     if (!ticket) {
       return res.status(404).json({error: "Ticket not found"})
@@ -105,7 +107,7 @@ const updateTicket = async (req, res) => {
     }
 
     // Filter out empty fields
-    const filteredData = filterEmptyFields(req.body);
+    const filteredData = filterEmptyFields(newData);
 
     // Check if there is any data left to update
     if (Object.keys(filteredData).length === 0) {
@@ -124,22 +126,36 @@ const updateTicket = async (req, res) => {
   }
 };
 
-const updateTicketStatus = async (req, res) => {
+const updateStatusPriorityAssignedTo = async (req, res) => {
   try {
-    const ticket = await Ticket.findById(req.params.id)
-    const roles = ['superAdmin', 'admin', 'supportAgent']
-    const role = req.session?.user.role;
+    const ticket = await Ticket.findById(req.params.id);
+    const roles = ['superAdmin', 'admin', 'supportAgent'];
+    const userRole = req.session?.user.role;
+    const { status, priority, assignToSelf } = req.body;
+    const newData = { status, priority };
+    
+    const loggedUserTicket = ticket?.user._id.toString() === req.session?.user._id;
 
     if (!ticket) {
-      return res.status(404).json({error: "Ticket not found"})
+      return res.status(404).json({error: "Ticket not found"});
     }
   
-    if (ticket.user._id.toString() !== req.session?.user._id && !roles.includes(role) ) {
-      return res.status(403).json({error: "Not Authorized"})
+    if ( ( ( !loggedUserTicket || priority || assignToSelf ) && !roles.includes(userRole) ) ) {
+      return res.status(403).json({error: "Not Authorized"});
     }
     
+    if (assignToSelf && (assignToSelf !== "yes" && assignToSelf !== "no") ) {
+      return res.status(400).json({ error: 'Please provide a value of either yes or no for assign to self' });
+    }
+
     // Filter out empty fields
-    const filteredData = filterEmptyFields(req.body);
+    const filteredData = filterEmptyFields(newData);
+
+    if (assignToSelf && assignToSelf === "yes" && !ticket?.assignedUser) {
+      filteredData.assignedUser = req.session?.user?._id;
+    } else if (assignToSelf && assignToSelf === "no" && ticket?.assignedUser?._id.toString() === req.session?.user?._id) {
+      filteredData.$unset = { assignedUser: 1 };
+    }
 
     // Check if there is any data left to update
     if (Object.keys(filteredData).length === 0) {
@@ -164,5 +180,5 @@ module.exports = {
   createTicket,
   deleteTicket,
   updateTicket,
-  updateTicketStatus
+  updateStatusPriorityAssignedTo
 };

@@ -13,8 +13,9 @@ export default function searchPage() {
   const [tickets, setTickets] = useState([]);
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [filters, setFilters] = useState({
-    status: [],
+    assignedTo: [],
     category: [],
+    status: [],
     priority: [],
     searchQuery: "",
     searchField: "title"
@@ -62,12 +63,18 @@ export default function searchPage() {
     const applyFilters = () => {
       let filtered = tickets;
 
-      if (filters.status.length > 0) {
-        filtered = filtered.filter(ticket => filters.status.includes(ticket.status));
+      if (filters.assignedTo.length > 0) {
+        filtered = filtered.filter(ticket => filters.assignedTo.includes(
+          ticket.assignedUser?.name === user?.name ? "Assigned to me" : !ticket.assignedUser ? "None" : ""
+        ));
       }
 
       if (filters.category.length > 0) {
         filtered = filtered.filter(ticket => filters.category.includes(ticket.category));
+      }
+
+      if (filters.status.length > 0) {
+        filtered = filtered.filter(ticket => filters.status.includes(ticket.status));
       }
 
       if (filters.priority.length > 0) {
@@ -76,9 +83,13 @@ export default function searchPage() {
 
       if (filters.searchQuery) {
         filtered = filtered.filter(ticket => {
+
           let fieldValue;
-          if (filters.searchField === "user") {
+
+          if ( filters.searchField === "user" ) {
             fieldValue = ticket.user.name;
+          } else if ( filters.searchField === "assigned to" && ticket.assignedUser ) {
+            fieldValue = ticket?.assignedUser?.name;
           } else {
             fieldValue = ticket[filters.searchField];
           }
@@ -125,7 +136,7 @@ export default function searchPage() {
           <div className="flex"> 
             <Sidebar onFiltersChange={setFilters} userRole={user?.role} />
             <div className="flex-1 p-8 bg-white">
-              <RightSideContent tickets={filteredTickets} errorMessage={error} />
+              <RightSideContent tickets={filteredTickets} errorMessage={error} user={user} />
             </div>
           </div>
         </>

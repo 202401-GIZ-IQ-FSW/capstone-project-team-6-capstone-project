@@ -55,7 +55,7 @@ const Navbar = () => {
         </li>
       ) : (
         <li>
-          <Link href="/create">Create</Link>
+          <Link href="/tickets/new-ticket">Create</Link>
         </li>
       )}
       {signedIn === true && (
