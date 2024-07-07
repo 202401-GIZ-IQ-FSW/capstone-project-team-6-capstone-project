@@ -21,6 +21,7 @@ const connectToMongo = async () => {
 
   db.on("error", (err) => {
     console.error("Database connection error: ", err);
+    
   });
 
   // Create the root admin and add it to the database for initial start
