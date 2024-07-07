@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const Ticket = require('../models/ticket');
+const Comment = require('../models/comment');
 
 // Function to filter out empty fields from the request body
 const filterEmptyFields = (data) => {
@@ -77,18 +78,25 @@ const updateProfile = async (req, res) => {
 
 const deleteProfile = async (req, res) => {
   try {
-    const id = req.session?.user._id;
-    const user = await User.findById(id)
+    const userId = req.session?.user._id;
+    const user = await User.findById(userId)
 
     if (!user) {
       return res.status(404).json({error: "User not found"})
     }
-  
+
+    // Find all tickets belonging to the user
+    const userTickets = await Ticket.find({ user: userId });
+
+    // Delete all comments associated with the user's tickets
+    const ticketIds = userTickets.map(ticket => ticket._id);
+    await Comment.deleteMany({ ticket: { $in: ticketIds } });
+
     // Find and delete all tickets belonging to the user
-    await Ticket.deleteMany({ user: id });
+    await Ticket.deleteMany({ user: userId });
 
     // Find and update all tickets assigned to the user
-    await Ticket.updateMany({assignedUser: id}, {$unset: {assignedUser: ""}});
+    await Ticket.updateMany({assignedUser: userId}, {$unset: {assignedUser: ""}});
 
     // Delete user profile
     await user.remove()

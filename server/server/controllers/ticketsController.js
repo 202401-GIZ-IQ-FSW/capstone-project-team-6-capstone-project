@@ -1,4 +1,5 @@
 const Ticket = require('../models/ticket');
+const Comment = require('../models/comment');
 
 // Function to filter out empty fields from the request body
 const filterEmptyFields = (data) => {
@@ -71,21 +72,23 @@ const createTicket = async (req, res) => {
 
 const deleteTicket = async (req, res) => {
   try {
-    const ticket = await Ticket.findById(req.params.id)
-    const roles = ['superAdmin', 'admin', 'supportAgent']
+    const ticket = await Ticket.findById(req.params.id);
+    const roles = ['superAdmin', 'admin', 'supportAgent'];
     const role = req.session?.user.role;
 
     if (!ticket) {
-      return res.status(404).json({error: "Ticket not found"})
+      return res.status(404).json({error: "Ticket not found"});
     }
   
     if (ticket.user._id.toString() !== req.session?.user._id && !roles.includes(role)) {
-      return res.status(403).json({error: "Not Authorized"})
+      return res.status(403).json({error: "Not Authorized"});
     }
+
+    await Comment.deleteMany( { ticket: ticket._id } );
+
+    await ticket.remove();
   
-    await ticket.remove()
-  
-    res.status(200).json({ message: 'Ticket deleted successfully' })
+    res.status(200).json({ message: 'Ticket and comment messages deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

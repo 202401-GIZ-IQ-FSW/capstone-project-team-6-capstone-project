@@ -18,6 +18,9 @@ const ticketSchema = new Schema(
       required: true,
       trim: true
     },
+    imageURL: {
+      type: String,
+    },
     category: {
       type: String,
       required: true,
