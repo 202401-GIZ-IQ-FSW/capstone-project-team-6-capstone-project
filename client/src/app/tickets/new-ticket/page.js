@@ -217,7 +217,7 @@ export default function newTicketPage() {
                       category: e.target.value,
                     })
                   } 
-                  className="w-full px-4 py-2 border bg-gray-100 text-gray-400  border-gray-900 rounded-md focus:outline-none focus:border-blue-500">
+                  className="w-full px-4 py-2 border bg-gray-100 text-gray-700 border-gray-900 rounded-md focus:outline-none focus:border-blue-500">
                   <option value="General Inquiry">General Inquiry</option>
                   <option value="Technical">Technical</option>
                   <option value="Bug Report">Bug Report</option>
@@ -225,10 +225,10 @@ export default function newTicketPage() {
               </div>
 
               <div>
-                <label className="text-gray-600 block mb-1">Image</label>
+                <label className="text-gray-600 block mb-1">Upload Image</label>
                 <Dropzone onDrop={(acceptedFiles) => setImage(acceptedFiles[0])}>
                   {({ getRootProps, getInputProps }) => (
-                    <div {...getRootProps()} className="dropzone border-dashed border-2 border-gray-300 rounded-md p-4">
+                    <div {...getRootProps()} className="dropzone border border-gray-900 rounded-md p-4">
                       <input {...getInputProps()} />
                       <p>Drag and drop an image here, or click to select one</p>
                     </div>
@@ -264,7 +264,7 @@ export default function newTicketPage() {
                 <button
                   type="submit"
                   
-                  className={`bg-gray-800 hover:bg-gray-400 text-gray-400 font-bold py-2 px-4 rounded ${
+                  className={`bg-gray-800 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded ${
                     !handleTicketFormValid() ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                   disabled={!handleTicketFormValid()}

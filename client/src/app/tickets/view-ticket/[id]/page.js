@@ -151,171 +151,190 @@ export default function viewTicketPage({params}) {
       }
       {signedIn === true && 
         <div className="bg-white">
-         <div className="max-w-screen-lg mx-auto px-4 py-8">
-         <div className="max-w-screen-lg mx-auto px-4 py-8">
-  <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-4">
-    <h2 className="text-gray-600 text-lg lg:text-xl font-bold mb-2">
-      Ticket #{ticketFormData?.number}
-    </h2>
-    <div className="space-y-2">
-      <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
-        <h3 className="text-gray-600 text-lg lg:text-xl font-bold mb-2">
-          Created by: {ticketFormData?.user?.name}
-        </h3>
-      </div>
+          <div className="max-w-screen-lg mx-auto px-4 py-8">
 
-      <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
-        <h3 className="text-gray-600 text-lg lg:text-xl font-bold mb-2">
-          Title: {ticketFormData?.title}
-        </h3>
-      </div>
+            <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-4">
 
-      <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
-        <p className="text-gray-600 lg:text-lg font-normal mb-2">
-          <b>Created at:</b> {formatDate(ticketFormData?.createdAt)}
-        </p>
-      </div>
+              <h2 className="text-gray-600 text-lg lg:text-2xl font-bold mb-2">
+                Ticket #{ticketFormData?.number}
+              </h2>
 
-      <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
-        <p className="text-gray-600 lg:text-lg font-normal mb-2">
-          <b>Updated at:</b> {formatDate(ticketFormData?.updatedAt)}
-        </p>
-      </div>
+              <div className="space-y-2">
 
-      <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
-        <p className="text-gray-600 lg:text-lg font-normal mb-2">
-          <b>Category:</b> {ticketFormData?.category}
-        </p>
-      </div>
+                <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
+                  { ( ticketFormData?.user?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticketFormData?.user?.role) ) ) ?
+                    (<Link href={`/users/view-user/${ticketFormData.user._id}`} className="text-gray-600 text-base lg:text-xl font-bold mb-2 hover:underline hover:text-sky-500">
+                      Created By: {ticketFormData.user.name}{user?.role !== "customer" ? " | " + userRoleDisplay(ticketFormData.user.role) : ""}
+                    </Link>)
+                    :
+                    (<h3 className="text-gray-600 text-base lg:text-xl font-bold mb-2">Created By: {ticketFormData.user.name}{user?.role !== "customer" ? " | " + userRoleDisplay(ticketFormData.user.role) : ""}</h3>)
+                  }
+                </div>
 
-      <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
-        <p className="text-gray-600 lg:text-lg font-normal mb-2">
-          <b>Status:</b> {ticketFormData?.status}
-        </p>
-      </div>
+                <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
+                  <h3 className="text-gray-600 text-base lg:text-xl font-bold mb-2">
+                    Title: {ticketFormData?.title}
+                  </h3>
+                </div>
 
-      <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
-        <p className="text-gray-600 lg:text-lg font-normal mb-2">
-          <b>Priority:</b> {ticketFormData?.priority}
-        </p>
-      </div>
+                <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
+                  <p className="text-gray-600 lg:text-lg font-normal mb-2">
+                    <b>Created at:</b> {formatDate(ticketFormData?.createdAt)}
+                  </p>
+                </div>
 
-      <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
-        <p className="text-gray-600 lg:text-lg font-normal mb-2">
-          <b>Description:</b> {ticketFormData?.description}
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
+                <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
+                  <p className="text-gray-600 lg:text-lg font-normal mb-2">
+                    <b>Updated at:</b> {formatDate(ticketFormData?.updatedAt)}
+                  </p>
+                </div>
 
+                <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
+                  <p className="text-gray-600 lg:text-lg font-normal mb-2">
+                    <b>Category:</b> {ticketFormData?.category}
+                  </p>
+                </div>
+
+                <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
+                  <p className="text-gray-600 lg:text-lg font-normal mb-2">
+                    <b>Status:</b> {ticketFormData?.status}
+                  </p>
+                </div>
+
+                <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
+                  <p className="text-gray-600 lg:text-lg font-normal mb-2">
+                    <b>Priority:</b> {ticketFormData?.priority}
+                  </p>
+                </div>
+
+                <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
+                  { ticketFormData?.assignedUser && ( ticketFormData?.assignedUser?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticketFormData?.assignedUser?.role) ) ) ?
+                    (<Link href={`/users/view-user/${ticketFormData.assignedUser?._id}`} className="text-gray-600 lg:text-lg font-normal mb-2 hover:underline hover:text-sky-500">
+                      <b>Assigned To:</b> { ticketFormData?.assignedUser ? `${ticketFormData.assignedUser?.name } | ${userRoleDisplay(ticketFormData.assignedUser?.role)}` : "None" }
+                    </Link>)
+                    :
+                    (<p className="text-gray-600 lg:text-lg font-normal mb-2"><b>Assigned To:</b> { ticketFormData.assignedUser ? `${ticketFormData.assignedUser?.name } | ${userRoleDisplay(ticketFormData.assignedUser?.role)}` : "None" }</p>)
+                  }
+                </div>
+
+                <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
+                  <p className="text-gray-600 lg:text-lg font-normal mb-2">
+                    <b>Description:</b> {ticketFormData?.description}
+                  </p>
+                </div>
+
+              </div>
+
+            </div>
+          
+
+            <p className=" text-gray-600 lg:text-lg font-normal my-2 text-wrap"><b>Change ticket status { roles.includes(user?.role) ? ", priority and assigned user" : "" }</b></p>
             
-            <p className=" text-gray-600 text-lg font-normal my-2 text-wrap"><b>Change ticket status { roles.includes(user?.role) ? ", priority and assigned user" : "" }</b></p>
             {/* Form for updating a ticket */}
             <form className="space-y-4" onSubmit={handleUpdateTicket}>
-            <div className="space-y-4">
+              
+              <div className="space-y-4">
 
-{/* Status field */}
-<div className="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-4">
-  <label className="text-gray-600 block mb-1">Status</label>
-  <select 
-    name="status" 
-    value={ticketFormData.status}
-    onChange={(e) =>
-      setTicketFormData({
-        ...ticketFormData,
-        status: e.target.value,
-      })
-    } 
-    className="w-full px-4 py-2 border bg-gray-400 border-gray-900 rounded-md focus:outline-none focus:border-blue-500"
-  >
-    <option value="Open">Open</option>
-    <option value="In Progress">In Progress</option>
-    <option value="Closed">Closed</option>
-  </select>
-</div>
-
-{/* Priority field - shown only to users with specific roles */}
-{roles.includes(user?.role) && (
-  <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-4">
-    <label className="text-gray-600 block mb-1">Priority</label>
-    <select 
-      name="priority" 
-      value={ticketFormData.priority}
-      onChange={(e) =>
-        setTicketFormData({
-          ...ticketFormData,
-          priority: e.target.value,
-        })
-      } 
-      className="w-full px-4 py-2 border bg-gray-400 border-gray-900 rounded-md focus:outline-none focus:border-blue-500"
-    >
-      <option value="Low">Low</option>
-      <option value="Medium">Medium</option>
-      <option value="High">High</option>
-      <option value="Urgent">Urgent</option>
-      <option value="Critical">Critical</option>
-    </select>
-  </div>
-)}
-
-</div>
-
-
-              {/* Assigned User field */}
-              { roles.includes(user?.role) && ( ticketFormData?.assignedUser?._id === user?._id || !ticketFormData?.assignedUser ) &&
-                <div>
-                  <label className="text-gray-600 block mb-1">Assign to self</label>
+                {/* Status field */}
+                <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-4 text-sm lg:text-base">
+                  <label className="text-gray-600 block mb-1">Status</label>
                   <select 
-                    name="assignToSelf" 
-                    value={ticketFormData.assignToSelf}
+                    name="status" 
+                    value={ticketFormData.status}
                     onChange={(e) =>
                       setTicketFormData({
                         ...ticketFormData,
-                        assignToSelf: e.target.value,
+                        status: e.target.value,
                       })
                     } 
-                    className="w-min px-4 py-2 border bg-gray-100 border-gray-900 rounded-md focus:outline-none focus:border-blue-500">
-                    <option value="yes">Assigned</option>
-                    <option value="no">Not assigned</option>
+                    className="w-full px-4 py-2 border bg-gray-400 border-gray-900 rounded-md focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Closed">Closed</option>
                   </select>
                 </div>
-              }
+
+                {/* Priority field - shown only to users with specific roles */}
+                {roles.includes(user?.role) && (
+                  <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-4 text-sm lg:text-base">
+                    <label className="text-gray-600 block mb-1">Priority</label>
+                    <select 
+                      name="priority" 
+                      value={ticketFormData.priority}
+                      onChange={(e) =>
+                        setTicketFormData({
+                          ...ticketFormData,
+                          priority: e.target.value,
+                        })
+                      } 
+                      className="w-full px-4 py-2 border bg-gray-400 border-gray-900 rounded-md focus:outline-none focus:border-blue-500"
+                    >
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                      <option value="Urgent">Urgent</option>
+                      <option value="Critical">Critical</option>
+                    </select>
+                  </div>
+                )}
+
+                {/* Assigned User field */}
+                { roles.includes(user?.role) && ( ticketFormData?.assignedUser?._id === user?._id || !ticketFormData?.assignedUser ) &&
+                  <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-4 text-sm lg:text-base">
+                    <label className="text-gray-600 block mb-1">Assign to self</label>
+                    <select 
+                      name="assignToSelf" 
+                      value={ticketFormData.assignToSelf}
+                      onChange={(e) =>
+                        setTicketFormData({
+                          ...ticketFormData,
+                          assignToSelf: e.target.value,
+                        })
+                      } 
+                      className="w-full px-4 py-2 border bg-gray-400 border-gray-900 rounded-md focus:outline-none focus:border-blue-500">
+                      <option value="yes">Assigned</option>
+                      <option value="no">Not assigned</option>
+                    </select>
+                  </div>
+                }
+
+              </div>
 
               <div className="w-full">
-                {message && <div className="flex justify-center mb-6 p-2 bg-emerald-300 rounded-md"><br/><p>{message}</p><br/></div>}
-                {error && <div className="flex justify-center mb-6 p-2 bg-red-500 rounded-md"><br/><p>{error}</p><br/></div>}
+                {message && <div className="flex justify-center mb-2 p-2 bg-emerald-300 rounded-md"><br/><p>{message}</p><br/></div>}
+                {error && <div className="flex justify-center mb-2 p-2 bg-red-500 rounded-md"><br/><p>{error}</p><br/></div>}
               </div>
-    
-              <div className="flex justify-start">
+      
+              <div className="flex justify-between py-2 gap-4 text-center">
                 <button
                   type="submit"
-                  className={` bg-gray-600 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded text-sm lg:text-base ${
-                    !handleTicketFormValid() ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                  disabled={!handleTicketFormValid()}
+                  className="bg-gray-600 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
                 >
                   Update Ticket
                 </button>
+
+                <div className="flex gap-4">
+                  {ticketFormData?.user?._id === user?._id && (
+                    <Link href={`/tickets/edit-ticket/${ticketId}`}>
+                      <p className="bg-gray-600 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded text-sm lg:text-base">
+                        Edit Ticket
+                      </p>
+                    </Link>
+                  )}
+
+                  {(ticketFormData?.user?._id === user?._id || roles.includes(user?.role)) && (
+                    <Link href={`/tickets/delete-ticket/${ticketId}`}>
+                      <p className="bg-red-600 hover:bg-red-400 text-white font-bold py-2 px-4 rounded text-sm lg:text-base">
+                        Delete Ticket
+                      </p>
+                    </Link>
+                  )}
+                </div>
               </div>
-              <div className=" py-10 flex mb-6 gap-10">
-  {ticketFormData?.user?._id === user?._id && (
-    <Link href={`/tickets/edit-ticket/${ticketId}`}>
-      <button className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded text-sm lg:text-base">
-        Edit Ticket
-      </button>
-    </Link>
-  )}
-  {(ticketFormData?.user?._id === user?._id || roles.includes(user?.role)) && (
-    <Link href={`/tickets/delete-ticket/${ticketId}`}>
-      <button className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded text-sm lg:text-base">
-        Delete Ticket
-      </button>
-    </Link>
-  )}
-</div>
 
             </form>
+
           </div>
         </div>
       }

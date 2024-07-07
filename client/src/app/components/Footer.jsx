@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
         <div className="mb-4 md:mb-0">
           <h1 className="text-xl font-bold text-black text-center md:text-left">TicketMaster</h1>
-          <p className='text-black '>Your ultimate ticket support solution!</p>
+          <p className='text-black text-center'>Your ultimate ticket support solution!</p>
         </div>
         <div className="text-center md:text-right">
           <Link href="/tickets/new-ticket">
