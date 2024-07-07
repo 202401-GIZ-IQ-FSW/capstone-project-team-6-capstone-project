@@ -9,6 +9,7 @@ server/yarn.lock
 client/yarn.lock
 server/package-lock.json
 client/package-lock.json
+server/upload/images
 
 # testing
 /coverage

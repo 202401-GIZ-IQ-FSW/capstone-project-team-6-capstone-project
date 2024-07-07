@@ -3,6 +3,11 @@ const cors = require("cors");
 const session = require('express-session');
 require("dotenv").config();
 
+const bodyParser = require("body-parser");
+const path = require('path');
+const imageRouter = require('./routes/imageRouter');
+const Ticket = require('./models/ticket');
+
 // Importing Database connection info
 const connectToMongo = require("./db/connection");
 
@@ -15,6 +20,9 @@ const ticketsRouter = require('./routes/ticketsRouter');
 // Importing Middlewares
 const ensureAuthenticated = require('./middlewares/ensureAuthenticated');
 const ensureAdmin = require('./middlewares/ensureAdmin');
+
+const dirname = path.resolve();
+console.log('directory-name 👉️', dirname);
 
 const app = express();
 const port =
@@ -36,6 +44,12 @@ app.use(cors(corsOptions));
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json());
+
+app.use(express.static(path.join(dirname, "public")));
+
 
 // Configure session options
 const sessionOptions = {
@@ -68,6 +82,29 @@ app.use('/user/profile', ensureAuthenticated, profileRouter);
 app.use('/admin', ensureAuthenticated, ensureAdmin, adminRouter);
 // Using Routes for tickets
 app.use('/tickets', ensureAuthenticated, ticketsRouter);
+
+app.use("/imageFiles/:imageId", ensureAuthenticated, async (req, res, next) => {
+
+    const imageId = req.params?.imageId;
+    const loggedUser = req.session?.user;
+    const roles = ['superAdmin', 'admin', 'supportAgent'];
+
+    const ticket = await Ticket.findOne({imageURL: imageId});
+
+    if (!ticket) {
+      return res.status(404).json({error: "Ticket not found", imageURL: imageId})
+    }
+
+    if (ticket?.user?._id.toString() !== loggedUser?._id && !roles.includes(loggedUser?.role) ) {
+      return res.status(403).json({error: "Not authorized to view image"})
+    }
+
+    next();
+
+  }, express.static(path.join(dirname, "/upload/images"))
+);
+
+app.use("/imagesApi", ensureAuthenticated, imageRouter);
 
 app.get("/", (req, res) => {
   if (req.session?.user) { return res.json({ message: `Welcome ${req.session.user?.name}`}); }

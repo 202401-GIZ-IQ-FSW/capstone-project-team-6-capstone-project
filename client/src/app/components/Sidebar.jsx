@@ -24,31 +24,40 @@ const Sidebar = ({ onFiltersChange, userRole }) => {
     Closed: false,
   });
 
+  const [ticketAssignedTo, setTicketAssignedTo] = useState({
+    "Assigned to me": false,
+    None: false,
+  });
+
   const [searchQuery, setSearchQuery] = useState("");
   const [searchField, setSearchField] = useState("title");
 
   useEffect(() => {
     const newFilters = {
-      status: Object.keys(ticketStatus).filter(key => ticketStatus[key]),
+      assignedTo: Object.keys(ticketAssignedTo).filter(key => ticketAssignedTo[key]),
       category: Object.keys(ticketCategories).filter(key => ticketCategories[key]),
+      status: Object.keys(ticketStatus).filter(key => ticketStatus[key]),
       priority: Object.keys(ticketPriority).filter(key => ticketPriority[key]),
       searchQuery,
       searchField,
     };
     // console.log("new filters", newFilters)
     onFiltersChange(newFilters);
-  }, [ticketPriority, ticketCategories, ticketStatus, searchQuery, searchField, onFiltersChange]);
+  }, [ticketAssignedTo, ticketCategories, ticketStatus, ticketPriority, searchQuery, searchField, onFiltersChange]);
 
   const handleCheckboxChange = (section, label, checked) => {
     switch (section) {
-      case 'ticketPriority':
-        setTicketPriority(prev => ({ ...prev, [label]: checked }));
+      case 'ticketAssignedTo':
+        setTicketAssignedTo(prev => ({ ...prev, [label]: checked }));
         break;
       case 'ticketCategories':
         setTicketCategories(prev => ({ ...prev, [label]: checked }));
         break;
       case 'ticketStatus':
         setTicketStatus(prev => ({ ...prev, [label]: checked }));
+        break;
+      case 'ticketPriority':
+        setTicketPriority(prev => ({ ...prev, [label]: checked }));
         break;
       default:
         break;
@@ -71,10 +80,11 @@ const Sidebar = ({ onFiltersChange, userRole }) => {
           onChange={handleSearchFieldChange}
           className="w-full px-4 py-2 border rounded-md mb-2"
         >
-          <option value="title">Title</option>
+          <option value="title">Ticket Title</option>
           {userRole !== "customer" && <option value="user">User</option>}
-          <option value="number">Number</option>
-          <option value="description">Description</option>
+          <option value="assigned to">Assigned To</option>
+          <option value="number">Ticket Number</option>
+          <option value="description">Ticket Description</option>
         </select>
 
         <input
@@ -84,6 +94,16 @@ const Sidebar = ({ onFiltersChange, userRole }) => {
           className="w-full px-4 py-2 border rounded-md"
           placeholder={`Search by ${searchField}`}
         />
+      </div>
+
+      {/* Divider and Ticket Assigned to Section */}
+      <hr className="my-4 border-gray-300" />
+      <div>
+        <h2 className="text-lg font-semibold text-gray-800 mb-2">Assigned to</h2>
+        <div className="space-y-2">
+          <Checkbox label="Assigned to me" checked={ticketAssignedTo["Assigned to me"]} onChange={(checked) => handleCheckboxChange('ticketAssignedTo', 'Assigned to me', checked)} />
+          <Checkbox label="None" checked={ticketAssignedTo.None} onChange={(checked) => handleCheckboxChange('ticketAssignedTo', 'None', checked)} />
+        </div>
       </div>
 
       {/* Divider and Ticket Category Section */}

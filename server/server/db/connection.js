@@ -16,7 +16,7 @@ const connectToMongo = async () => {
   db = mongoose.connection;
 
   db.once("open", () => {
-    console.log("Database connected: ", url);
+    console.log("Database connected: ", url.slice(0, 19));
   });
 
   db.on("error", (err) => {

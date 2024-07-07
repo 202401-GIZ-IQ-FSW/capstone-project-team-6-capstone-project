@@ -1,14 +1,35 @@
 // components/RightSideContent.js
 
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 
-const RightSideContent = ({tickets, errorMessage}) => {
-  
+
+const RightSideContent = ({tickets, errorMessage, user}) => {
+  const router = useRouter();
   const resultsCount = tickets? tickets.length : 0;
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  const userRoleDisplay = (role) => {
+    switch (role) {
+      case 'superAdmin':
+        return 'Super Admin';
+      case 'admin':
+        return 'Admin';
+      case 'supportAgent':
+        return 'Support Agent';
+      case 'customer':
+        return 'Customer';
+      default:
+        return '';
+    }
+  };
+
+  const handleRowClick = (id) => {
+    router.push(`/tickets/view-ticket/${id}`);
   };
 
   return (
@@ -18,39 +39,67 @@ const RightSideContent = ({tickets, errorMessage}) => {
         <h2 className="text-2xl font-bold mt-2 mb-4">Tickets</h2>
      
         {tickets.length > 0 ? tickets?.map((ticket, index) => (
-          <div key={index} className="mb-4 bg-gray-100 border p-4 rounded-md hover:bg-slate-300">
+          <div 
+            key={index} 
+            className="mb-4 bg-gray-100 border p-4 rounded-md hover:bg-slate-300 cursor-pointer"
+            onClick={() => handleRowClick(ticket?._id)} href={`/tickets/view-ticket/${ticket._id}`}
+          >
+            <div className="flex flex-col md:flex-row items-center">
 
-            <Link href={`/tickets/view-ticket/${ticket._id}`}>
-              <div className="flex flex-col md:flex-row items-center">
-  
-                {/* Square image */}
-                <div className="w-full md:w-7/12 lg:w-5/12 h-24 md:h-48 bg-gray-200 rounded-md mb-2 md:mb-0 md:mr-4">
-                </div>
-  
-                <div className='w-3/4 space-y-4 md:space-y-3 lg:space-y-6 mt-2 md:mt-0'>
-                  <p className="text-gray-800 font-bold"># {ticket.number} {ticket.title}</p>
-                  <p className="text-gray-600 ">{ticket.description}</p>
-
-                  <div className="flex flex-col md:flex-row gap-2">
-                    <p className="w-fit border border-slate-400 px-2 py-1 rounded-md text-sm text-gray-800">
-                      {ticket.priority}
-                    </p>
-                    <p className="w-fit border border-slate-400 px-2 py-1 rounded-md text-sm text-gray-800">
-                      {ticket.status}
-                    </p>
-                    <p className="w-fit border border-slate-400 px-2 py-1 rounded-md text-sm text-gray-800">
-                      {ticket.category}
-                    </p>
-                  </div>
-
-                  <div className="text-sm flex flex-col md:flex-row justify-between  gap-2">
-                    <p className="text-gray-600"><b>Created By:</b> {ticket.user.name}</p>
-                    <p className="text-gray-600"><b>Created At:</b> {formatDate(ticket.createdAt)}</p>
-                  </div>
-                </div>
-  
+              {/* Square image */}
+              <div className="z-1 w-full md:w-7/12 lg:w-5/12 h-24 md:h-48 bg-gray-200 rounded-md mb-2 md:mb-0 md:mr-4">
+                <img 
+                  className="w-full h-24 md:h-48 rounded-md text-center cursor-pointer z-1" 
+                  src={ticket?.imageURL ? `http://localhost:3001/imageFiles/${ticket?.imageURL}/${ticket?.imageURL}.jpg` : "/laptop-desk.png"} 
+                  alt={ticket?.imageURL ? "ticket image" : "default site logo"}
+                />
               </div>
-            </Link>
+
+              <div className='w-3/4 space-y-4 md:space-y-3 lg:space-y-5 mt-2 md:mt-0'>
+
+                <div className="flex flex-col md:flex-row justify-between gap-2">
+                  <p className="text-gray-800 font-bold"># {ticket.number} {ticket.title}</p>
+                  <p className="text-gray-600 text-sm"><b>Created At:</b> {formatDate(ticket.createdAt)}</p>
+                </div>
+
+                <p className="text-gray-600">{ticket.description}</p>
+
+                <div className="flex flex-col md:flex-row gap-2">
+                  <p className="w-fit border border-slate-400 px-2 py-1 rounded-md text-sm text-gray-800">
+                    {ticket.priority}
+                  </p>
+                  <p className="w-fit border border-slate-400 px-2 py-1 rounded-md text-sm text-gray-800">
+                    {ticket.status}
+                  </p>
+                  <p className="w-fit border border-slate-400 px-2 py-1 rounded-md text-sm text-gray-800">
+                    {ticket.category}
+                  </p>
+                </div>
+                
+                <div className="text-sm flex flex-col md:flex-row justify-between gap-2">
+
+                  {/* Created By field*/}
+                  { ( ticket?.user?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticket?.user?.role) ) ) ?
+                    (<Link onClick={(e) => e.stopPropagation()} href={`/users/view-user/${ticket.user._id}`} className="text-gray-600 z-1 hover:underline hover:text-sky-500">
+                      <b>Created By:</b> {ticket.user.name}{user?.role !== "customer" ? " | " + userRoleDisplay(ticket.user.role) : ""}
+                    </Link>)
+                    :
+                    (<p className="text-gray-600"><b>Created By:</b> {ticket.user.name}{user?.role !== "customer" ? " | " + userRoleDisplay(ticket.user.role) : ""}</p>)
+                  }
+
+                  {/* Assigned To field*/}
+                  { ticket?.assignedUser && ( ticket?.assignedUser?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticket?.assignedUser?.role) ) ) ?
+                    (<Link onClick={(e) => e.stopPropagation()} href={`/users/view-user/${ticket.assignedUser?._id}`} className="text-gray-600 z-1 hover:underline hover:text-sky-500">
+                      <b>Assigned To:</b> { ticket?.assignedUser ? `${ticket.assignedUser?.name } | ${userRoleDisplay(ticket.assignedUser?.role)}` : "None" }
+                    </Link>)
+                    :
+                    (<p className="text-gray-600"><b>Assigned To:</b> { ticket.assignedUser ? `${ticket.assignedUser?.name } | ${userRoleDisplay(ticket.assignedUser?.role)}` : "None" }</p>)
+                  }
+
+                </div>
+              </div>
+
+            </div>
           </div>
           ))
         :

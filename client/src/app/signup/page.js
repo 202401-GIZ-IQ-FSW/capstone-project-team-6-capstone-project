@@ -119,7 +119,7 @@ export default function SignUp() {
                 </div>
 
                 <div>
-                  <label className="text-gray-800 text-xs lg:text-sm mb-2 block">Password</label>
+                  <label className="text-gray-800 text-xs lg:text-sm mb-2 block">Password *</label>
                   <div className="relative flex items-center">
                     <input value={password} onChange={(e) => setPassword(e.target.value)} name="password" type={showPassword ? "text" : "password"} required className="text-gray-800 bg-white border border-gray-300 w-full text-sm px-10 py-2.5 rounded-md outline-blue-500" placeholder="***************************" />
                     <FontAwesomeIcon icon={faLock} className="w-4 h-4 absolute left-4 text-gray-700"/>
