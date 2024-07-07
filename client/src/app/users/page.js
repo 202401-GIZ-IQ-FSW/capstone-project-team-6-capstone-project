@@ -52,8 +52,8 @@ export default function usersPage() {
 
   if (signedIn === null) {
     return (
-      <div className="flex justify-center items-center m-52">
-        <div className="pageLoader"></div>
+      <div className="bg-white flex justify-center items-center m-52">
+        <div className="bg-white  pageLoader"></div>
       </div>
     );
   }
@@ -71,23 +71,23 @@ export default function usersPage() {
     
     <>
       {signedIn === false && 
-        <div className="px-5 py-40">
-          <div className="flex flex-col items-center justify-center gap-6 lg:text-lg font-semibold">
+        <div className="bg-white px-5 py-40">
+          <div className="bg-white flex flex-col items-center justify-center gap-6 lg:text-lg font-semibold">
             <h1>Only signed in users can view this page</h1>
             <p>Redirecting to sign in page ......</p>
           </div>
         </div>
       }
       { ( signedIn === true && !roles.includes(user?.role) ) && 
-        <div className="px-5 py-40">
-          <div className="flex flex-col items-center justify-center gap-6 lg:text-lg font-semibold">
+        <div className="bg-white px-5 py-40">
+          <div className="bg-white flex flex-col items-center justify-center gap-6 lg:text-lg font-semibold">
             <h1>Only admins can view this page</h1>
             <p>Redirecting to home page ......</p>
           </div>
         </div>
       }
       { ( signedIn === true && roles.includes(user?.role) ) && 
-        <div className="flex justify-center mx-auto px-4 py-4">
+        <div className="bg-white text-gray-900 flex justify-center mx-auto px-4 py-4">
           <div className="flex flex-col items-center gap-1">
 
             <div className="w-screen lg:w-full py-4 px-6">
@@ -100,7 +100,7 @@ export default function usersPage() {
             </div>
 
             { users.length > 0 ? (
-              <div className="w-screen px-6 md:w-full lg:px-6">
+              <div className="text-gray-900 w-screen px-6 md:w-full lg:px-6">
                 <div className="overflow-x-auto rounded-lg border-[#60829d] border-2">
                     <table className="overflow-x-hidden divide-y divide-gray-200">
                       <thead>
