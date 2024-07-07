@@ -80,6 +80,9 @@ export default function editTicketPage({params}) {
 
       if (response.ok) {
         setMessage("Ticket updated successfully");
+        setTimeout(() => {
+          setMessage("");
+        }, 2000);
       } else {
         // Handle server errors
         setError(data.error);

@@ -76,12 +76,8 @@ export default function SignUp() {
             <p className="text-gray-800 text-xs lg:text-sm text-center">Provide your details to get started with support</p>
 
             <form onSubmit={handleSubmit} className=" py-10 px-6 flex flex-col justify-center items-center">
-
               <div className="space-y-6 max-w-md lg:w-full">
-
-                {message && <div className="flex justify-center mb-6 p-2 bg-emerald-300 rounded-md"><br/><p>{message}</p><br/></div>}
-                {error && <div className="flex justify-center mb-6 p-2 bg-red-500 rounded-md"><br/><p>{error}</p><br/></div>}
-
+                
                 <div>
                   <label className="text-gray-800 text-sm mb-2 block">Full name *</label>
                   <div className="relative flex items-center">
@@ -123,7 +119,7 @@ export default function SignUp() {
                 </div>
 
                 <div>
-                  <label className="text-gray-800 text-xs lg:text-sm mb-2 block">Password</label>
+                  <label className="text-gray-800 text-xs lg:text-sm mb-2 block">Password *</label>
                   <div className="relative flex items-center">
                     <input value={password} onChange={(e) => setPassword(e.target.value)} name="password" type={showPassword ? "text" : "password"} required className="text-gray-800 bg-white border border-gray-300 w-full text-sm px-10 py-2.5 rounded-md outline-blue-500" placeholder="***************************" />
                     <FontAwesomeIcon icon={faLock} className="w-4 h-4 absolute left-4 text-gray-700"/>
@@ -161,6 +157,9 @@ export default function SignUp() {
                 <div className="mb-2 text-gray-800 text-xs lg:text-sm">
                   <p>By Signing up you agree to our Terms and Conditions and our Privacy Policy</p>
                 </div>
+                
+                {message && <div className="flex justify-center mb-6 p-2 bg-emerald-300 rounded-md"><br/><p>{message}</p><br/></div>}
+                {error && <div className="flex justify-center mb-6 p-2 bg-red-500 rounded-md"><br/><p>{error}</p><br/></div>}
 
                 <button type="submit" className="w-full py-3 px-4 text-sm lg:text-base tracking-wide rounded-md text-gray-800 font-semibold border-2 hover:bg-slate-400 focus:outline-none">
                   Sign up

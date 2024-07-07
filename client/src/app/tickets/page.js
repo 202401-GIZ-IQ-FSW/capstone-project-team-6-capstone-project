@@ -6,10 +6,11 @@ import Link from "next/link";
 
 
 export default function ticketsPage() {
-  const { signedIn } = useAuth();
+  const { signedIn, user } = useAuth();
   const router = useRouter();
   const [ tickets, setTickets ] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (signedIn === false) {
@@ -21,6 +22,7 @@ export default function ticketsPage() {
 
   useEffect(() => {
     if (signedIn) {
+      setLoading(true);
       setError(""); // Reset error
 
       const fetchTickets = async () => {
@@ -38,6 +40,8 @@ export default function ticketsPage() {
           }
         } catch (error) {
           setError(error.message);
+        } finally {
+          setLoading(false);
         }
       };
 
@@ -45,7 +49,7 @@ export default function ticketsPage() {
     }
   }, [signedIn]);
 
-  if (signedIn === null) {
+  if (signedIn === null || loading) {
     return (
       <div className="bg-white flex justify-center items-center m-52">
         <div className="bg-white pageLoader"></div>
@@ -60,6 +64,21 @@ export default function ticketsPage() {
 
   const handleRowClick = (id) => {
     router.push(`/tickets/view-ticket/${id}`);
+  };
+
+  const userRoleDisplay = (role) => {
+    switch (role) {
+      case 'superAdmin':
+        return 'Super Admin';
+      case 'admin':
+        return 'Admin';
+      case 'supportAgent':
+        return 'Support Agent';
+      case 'customer':
+        return 'Customer';
+      default:
+        return '';
+    }
   };
 
   return (
@@ -89,6 +108,7 @@ export default function ticketsPage() {
               <div className="text-gray-900 w-screen px-6 md:w-full lg:px-6">
                 <div className="overflow-x-auto rounded-lg border-gray-500 border-2">
                     <table className="overflow-x-hidden divide-y divide-gray-200">
+
                       <thead>
                         <tr className="text-xs text-gray-900 lg:text-sm bg-gray-400">
                           <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">no.</th>
@@ -99,6 +119,7 @@ export default function ticketsPage() {
                           <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Category</th>
                           <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Status</th>
                           <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Priority</th>
+                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Assigned to</th>
                           <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Created at</th>
                         </tr>
                       </thead>
@@ -106,19 +127,44 @@ export default function ticketsPage() {
                         {tickets?.map((ticket, index) => (
                           
                           <tr key={index} onClick={() => handleRowClick(ticket?._id)} className="text-xs lg:text-sm hover:bg-gray-300 cursor-pointer">
+                            
                             <td className="text-center px-3 py-4"> {index + 1}</td>
                             <td className="text-center px-3 py-4"># {ticket?.number}</td>
-                            <td className="px-3 py-3">{ticket?.user?.name}</td>
+                            
+                            {/* User field*/}
+                            { ( ticket?.user?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticket?.user?.role) ) ) ?
+                              (<td className="px-3 py-3 z-1">
+                                <Link href={`/users/view-user/${ticket.user._id}`} onClick={(e) => e.stopPropagation()} className="z-1 hover:underline hover:text-sky-500">
+                                  {ticket.user.name}{user?.role !== "customer" ? " | " + userRoleDisplay(ticket.user.role) : ""}
+                                </Link>
+                              </td>)
+                              :
+                              (<td className="px-3 py-3">{ticket.user.name}{user?.role !== "customer" ? " | " + userRoleDisplay(ticket.user.role) : ""}</td>)
+                            }
+
                             <td className="px-3 py-3">{ticket?.title}</td>
                             <td className="px-3 py-3">{ticket?.description}</td>
                             <td className="px-3 py-3">{ticket?.category}</td>
                             <td className="px-3 py-3">{ticket?.status}</td>
                             <td className="px-3 py-3">{ticket?.priority}</td>
-                            <td className="px-3 py-3">{formatDate(ticket?.createdAt)}</td>
-                          </tr>
 
+                            {/* Assigned to field*/}
+                            { ticket?.assignedUser && ( ticket?.assignedUser?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticket?.assignedUser?.role) ) ) ?
+                              (<td className="px-3 py-3 z-1">
+                                <Link href={`/users/view-user/${ticket.assignedUser?._id}`} onClick={(e) => e.stopPropagation()} className="z-1 hover:underline hover:text-sky-500">
+                                  { ticket?.assignedUser ? `${ticket.assignedUser?.name } | ${userRoleDisplay(ticket.assignedUser?.role)}` : "None" }
+                                </Link>
+                              </td>)
+                              :
+                              (<td className="px-3 py-3">{ ticket.assignedUser ? `${ticket.assignedUser?.name } | ${userRoleDisplay(ticket.assignedUser?.role)}` : "None" }</td>)
+                            }
+
+                            <td className="px-3 py-3">{formatDate(ticket?.createdAt)}</td>
+
+                          </tr>
                         ))}
                       </tbody>
+
                     </table>
                   </div>
                 </div>

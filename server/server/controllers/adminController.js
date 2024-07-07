@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const Ticket = require('../models/ticket');
+const Comment = require('../models/comment');
 
 const getUsers = async (req, res) => {
   try {
@@ -33,12 +34,13 @@ const getUser = async (req, res) => {
     const user = await User.findById(req.params.id).select('-password');
 
     if (!user) {
-      return res.status(404).json({error: "User not found"})
+      return res.status(404).json({error: "User not found"});
     }
     
     if (user._id.toString() !== req.session?.user._id && !isSuperAdmin && !roles.includes(user.role)) {
-      return res.status(403).json({error: "Not Authorized, only super admin can view other admins accounts"})
+      return res.status(403).json({error: "Not Authorized, only super admin can view other admins accounts"});
     }
+
     res.status(200).json(user)
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -58,14 +60,24 @@ const deleteUser = async (req, res) => {
       return res.status(404).json({error: "User not found"})
     }
 
-    const isLoggedUser = user._id.toString() === req.session?.user._id
+    const isLoggedUser = user._id.toString() === req.session?.user._id;
 
     if (!isLoggedUser && !isSuperAdmin && !roles.includes(user.role)) {
       return res.status(403).json({error: "Not Authorized, only SuperAdmin can delete other admins"})
     }
 
+    // Find all tickets belonging to the user
+    const userTickets = await Ticket.find({ user: user?._id });
+
+    // Delete all comments associated with the user's tickets
+    const ticketIds = userTickets.map(ticket => ticket._id);
+    await Comment.deleteMany({ ticket: { $in: ticketIds } });
+
     // Find and delete all tickets belonging to the user
-    await Ticket.deleteMany({ user: user._id });
+    await Ticket.deleteMany({ user: user?._id });
+
+    // Find and update all tickets assigned to the user
+    await Ticket.updateMany({assignedUser: user?._id}, {$unset: {assignedUser: ""}});
 
     // Delete user profile
     await user.remove()
@@ -85,70 +97,70 @@ const deleteUser = async (req, res) => {
   }
 };
 
-const createAdmin = async (req, res) => {
-  try {
-    const isSuperAdmin = req.session?.user.role === 'superAdmin';
+// const createAdmin = async (req, res) => {
+//   try {
+//     const isSuperAdmin = req.session?.user.role === 'superAdmin';
 
-    if (!isSuperAdmin) {
-      return res.status(403).json({error: "Not Authorized, only super admin can create admins"})
-    }
+//     if (!isSuperAdmin) {
+//       return res.status(403).json({error: "Not Authorized, only super admin can create admins"})
+//     }
 
-    const { id, role } = req.body;
-    const newRoles = ['admin', 'customer']
+//     const { id, role } = req.body;
+//     const newRoles = ['admin', 'customer']
 
-    if (!id || !role || !newRoles.includes(role)) {
-      return res.status(400).json({ error: 'Please provide a valid id and role must be of admin or customer' });
-    }
+//     if (!id || !role || !newRoles.includes(role)) {
+//       return res.status(400).json({ error: 'Please provide a valid id and role must be of admin or customer' });
+//     }
 
-    const newAdmin = await User.findByIdAndUpdate(
-      id,
-      {role: role},
-      { new: true, select: '-password' }
-    )
+//     const newAdmin = await User.findByIdAndUpdate(
+//       id,
+//       {role: role},
+//       { new: true, select: '-password' }
+//     )
 
-    if (!newAdmin) {
-      return res.status(404).json({error: "User not found"})
-    }
+//     if (!newAdmin) {
+//       return res.status(404).json({error: "User not found"})
+//     }
     
-    res.status(200).json(newAdmin)
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
+//     res.status(200).json(newAdmin)
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// };
 
-const createSupportAgent = async (req, res) => {
-  try {
-    const loggedUserRole = req.session?.user.role;
-    const roles = ['superAdmin', 'admin']
+// const createSupportAgent = async (req, res) => {
+//   try {
+//     const loggedUserRole = req.session?.user.role;
+//     const roles = ['superAdmin', 'admin']
 
-    if (!roles.includes(loggedUserRole)) {
-      return res.status(403).json({error: "Not Authorized, only admins can create support agents"})
-    }
+//     if (!roles.includes(loggedUserRole)) {
+//       return res.status(403).json({error: "Not Authorized, only admins can create support agents"})
+//     }
 
-    const { id, role } = req.body;
-    const newRoles = ['supportAgent', 'customer']
+//     const { id, role } = req.body;
+//     const newRoles = ['supportAgent', 'customer']
 
-    if (!id || !role || !newRoles.includes(role)) {
-      return res.status(400).json({ error: 'Please provide a valid id and role must be of supportAgent or customer' });
-    }
+//     if (!id || !role || !newRoles.includes(role)) {
+//       return res.status(400).json({ error: 'Please provide a valid id and role must be of supportAgent or customer' });
+//     }
 
-    const user = await User.findById(id).select('-password');
+//     const user = await User.findById(id).select('-password');
 
-    if (!user) {
-      return res.status(404).json({error: "User not found"})
-    }
+//     if (!user) {
+//       return res.status(404).json({error: "User not found"})
+//     }
 
-    if (user.role === 'admin' && loggedUserRole !== "superAdmin") {
-      return res.status(403).json({error: "Not Authorized, only superAdmin can change an admin to supportAgent"})
-    }
+//     if (user.role === 'admin' && loggedUserRole !== "superAdmin") {
+//       return res.status(403).json({error: "Not Authorized, only superAdmin can change an admin to supportAgent"})
+//     }
 
-    user.role = role;
-    await user.save();
-    res.status(200).json(user)
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
+//     user.role = role;
+//     await user.save();
+//     res.status(200).json(user)
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// };
 
 const updateUserRole = async (req, res) => {
   try {
@@ -169,21 +181,18 @@ const updateUserRole = async (req, res) => {
       return res.status(404).json({error: "User not found"})
     }
 
-    if (user.role === 'admin' && !superAdminLoggedIn) {
+    if ( ['superAdmin', 'admin'].includes(user.role) && !superAdminLoggedIn ) {
       return res.status(403).json({error: "Not Authorized, only superAdmin can change admin role"})
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      {role: role},
-      { new: true, select: '-password' }
-    )
-
-    if (!updatedUser) {
-      return res.status(404).json({error: "User not found"})
+    if ( role === 'customer' && ['admin', 'supportAgent'].includes(user.role) ) {
+      await Ticket.updateMany({assignedUser: userId}, {$unset: {assignedUser: ""}});
     }
+
+    user.role = role;
+    await user.save();
     
-    res.status(200).json(updatedUser)
+    res.status(200).json(user)
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -193,7 +202,7 @@ module.exports = {
   getUsers,
   getUser,
   deleteUser,
-  createAdmin,
-  createSupportAgent,
+  // createAdmin,
+  // createSupportAgent,
   updateUserRole
 };

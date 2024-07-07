@@ -10,6 +10,7 @@ export default function usersPage() {
   const router = useRouter();
   const [ users, setUsers ] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const roles = ["superAdmin", "admin"];
 
@@ -27,7 +28,9 @@ export default function usersPage() {
 
   useEffect(() => {
     if (signedIn) {
+      setLoading(true);
       setError(""); // Reset error
+
       const fetchUsers = async () => {
         try {
           const response = await fetch('http://localhost:3001/admin/view-users', {
@@ -43,6 +46,8 @@ export default function usersPage() {
           }
         } catch (error) {
           setError(error.message);
+        } finally {
+          setLoading(false);
         }
       };
 
@@ -50,7 +55,7 @@ export default function usersPage() {
     }
   }, [signedIn, user]);
 
-  if (signedIn === null) {
+  if (signedIn === null || loading) {
     return (
       <div className="bg-white flex justify-center items-center m-52">
         <div className="bg-white  pageLoader"></div>
@@ -65,6 +70,21 @@ export default function usersPage() {
 
   const handleRowClick = (id) => {
     router.push(`/users/view-user/${id}`);
+  };
+
+  const userRoleDisplay = (role) => {
+    switch (role) {
+      case 'superAdmin':
+        return 'Super Admin';
+      case 'admin':
+        return 'Admin';
+      case 'supportAgent':
+        return 'Support Agent';
+      case 'customer':
+        return 'Customer';
+      default:
+        return '';
+    }
   };
 
   return (
@@ -91,11 +111,8 @@ export default function usersPage() {
           <div className="flex flex-col items-center gap-1">
 
             <div className="w-screen lg:w-full py-4 px-6">
-              <div className="flex items-center justify-between p-4 rounded-lg border-[#60829d] border-2 gap-4">
+              <div className="text-center p-4 rounded-lg border-[#60829d] border-2">
                 <h1 className="font-bold lg:text-3xl">Users</h1>
-                <Link href="/tickets/new-ticket" className="btn">
-                  New User
-                </Link>
               </div>
             </div>
 
@@ -121,7 +138,7 @@ export default function usersPage() {
                             <td className="px-3 py-3">{user?.name}</td>
                             <td className="px-3 py-3">{user?.username}</td>
                             <td className="px-3 py-3">{user?.email}</td>
-                            <td className="px-3 py-3">{user?.role}</td>
+                            <td className="px-3 py-3">{userRoleDisplay(user?.role)}</td>
                             <td className="px-3 py-3">{formatDate(user?.createdAt)}</td>
                           </tr>
 

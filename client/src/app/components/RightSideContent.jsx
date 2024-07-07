@@ -1,72 +1,111 @@
 // components/RightSideContent.js
 
-import React from 'react';
+import Link from "next/link";
+import { useRouter } from 'next/navigation';
 
-const RightSideContent = () => {
-  // Mock data for demonstration
-  const resultsCount = 20;
-  const foundCards = [
-    {
-      ticketNumber: 'T123',
-      submittedTime: '2 hours ago',
-      status: 'Waiting',
-      attachments: 3,
-      category: 'Technical Issues',
-      description: 'Please assist with login error.',
-      tags: ['Urgent', 'High Priority'],
-      views: 123,
-      ticketCount: 1,
-      issueCount: 1,
-    },
-    // Add more cards as needed
-  ];
+
+const RightSideContent = ({tickets, errorMessage, user}) => {
+  const router = useRouter();
+  const resultsCount = tickets? tickets.length : 0;
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  const userRoleDisplay = (role) => {
+    switch (role) {
+      case 'superAdmin':
+        return 'Super Admin';
+      case 'admin':
+        return 'Admin';
+      case 'supportAgent':
+        return 'Support Agent';
+      case 'customer':
+        return 'Customer';
+      default:
+        return '';
+    }
+  };
+
+  const handleRowClick = (id) => {
+    router.push(`/tickets/view-ticket/${id}`);
+  };
 
   return (
     
     <div className="w-full p-4  border-gray-300 overflow-y-auto bg-white">
         <p className="text-gray-600">{resultsCount} results found for your search</p>
-        <h2 className="text-2xl font-bold mt-2 mb-4">Ticket Priority</h2>
+        <h2 className="text-2xl font-bold mt-2 mb-4">Tickets</h2>
      
-        
-        {foundCards.map((card, index) => (
-          <div key={index} className="mb-4 bg-gray-100 border p-4 rounded-md">
-            <div className="flex items-center mb-2">
-              <div className="w-1/4 h-48 bg-gray-200 rounded-md mr-4"></div> {/* Square image */}
-              <div className='w-3/4'>
-                <p className="text-gray-800 font-bold">{card.ticketNumber}</p>
-                <p className="text-sm text-gray-600">{`Submitted ${card.submittedTime}`}</p>
-                <p className="text-sm text-gray-600">{card.status}</p>
-                <p className="text-sm text-gray-600">{`Attachment files: ${card.attachments}`}</p>
-                <p className="text-gray-800 mb-2">{card.category}</p>
-            <p className="text-gray-600 mb-4">{card.description}</p>
-            <div className="flex space-x-2">
-              {card.tags.map((tag, idx) => (
-                <span
-                  key={idx}
-                  className="border border-gray-300 px-2 py-1 rounded-md text-sm text-gray-800"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
+        {tickets.length > 0 ? tickets?.map((ticket, index) => (
+          <div 
+            key={index} 
+            className="mb-4 bg-gray-100 border p-4 rounded-md hover:bg-slate-300 cursor-pointer"
+            onClick={() => handleRowClick(ticket?._id)} href={`/tickets/view-ticket/${ticket._id}`}
+          >
+            <div className="flex flex-col md:flex-row items-center">
+
+              {/* Square image */}
+              <div className="z-1 w-full md:w-7/12 lg:w-5/12 h-24 md:h-48 bg-gray-200 rounded-md mb-2 md:mb-0 md:mr-4">
+                <img 
+                  className="w-full h-24 md:h-48 rounded-md text-center cursor-pointer z-1" 
+                  src={ticket?.imageURL ? `http://localhost:3001/imageFiles/${ticket?.imageURL}/${ticket?.imageURL}.jpg` : "/laptop-desk.png"} 
+                  alt={ticket?.imageURL ? "ticket image" : "default site logo"}
+                />
               </div>
-            </div>
-           
-            <div className="flex justify-between mt-4">
-              <div className="flex items-center">
-                <span className="text-gray-600 mr-2">{card.views} views</span>
-                <button className="text-blue-500 hover:underline">Update</button>
+
+              <div className='w-3/4 space-y-4 md:space-y-3 lg:space-y-5 mt-2 md:mt-0'>
+
+                <div className="flex flex-col md:flex-row justify-between gap-2">
+                  <p className="text-gray-800 font-bold"># {ticket.number} {ticket.title}</p>
+                  <p className="text-gray-600 text-sm"><b>Created At:</b> {formatDate(ticket.createdAt)}</p>
+                </div>
+
+                <p className="text-gray-600">{ticket.description}</p>
+
+                <div className="flex flex-col md:flex-row gap-2">
+                  <p className="w-fit border border-slate-400 px-2 py-1 rounded-md text-sm text-gray-800">
+                    {ticket.priority}
+                  </p>
+                  <p className="w-fit border border-slate-400 px-2 py-1 rounded-md text-sm text-gray-800">
+                    {ticket.status}
+                  </p>
+                  <p className="w-fit border border-slate-400 px-2 py-1 rounded-md text-sm text-gray-800">
+                    {ticket.category}
+                  </p>
+                </div>
+                
+                <div className="text-sm flex flex-col md:flex-row justify-between gap-2">
+
+                  {/* Created By field*/}
+                  { ( ticket?.user?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticket?.user?.role) ) ) ?
+                    (<Link onClick={(e) => e.stopPropagation()} href={`/users/view-user/${ticket.user._id}`} className="text-gray-600 z-1 hover:underline hover:text-sky-500">
+                      <b>Created By:</b> {ticket.user.name}{user?.role !== "customer" ? " | " + userRoleDisplay(ticket.user.role) : ""}
+                    </Link>)
+                    :
+                    (<p className="text-gray-600"><b>Created By:</b> {ticket.user.name}{user?.role !== "customer" ? " | " + userRoleDisplay(ticket.user.role) : ""}</p>)
+                  }
+
+                  {/* Assigned To field*/}
+                  { ticket?.assignedUser && ( ticket?.assignedUser?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticket?.assignedUser?.role) ) ) ?
+                    (<Link onClick={(e) => e.stopPropagation()} href={`/users/view-user/${ticket.assignedUser?._id}`} className="text-gray-600 z-1 hover:underline hover:text-sky-500">
+                      <b>Assigned To:</b> { ticket?.assignedUser ? `${ticket.assignedUser?.name } | ${userRoleDisplay(ticket.assignedUser?.role)}` : "None" }
+                    </Link>)
+                    :
+                    (<p className="text-gray-600"><b>Assigned To:</b> { ticket.assignedUser ? `${ticket.assignedUser?.name } | ${userRoleDisplay(ticket.assignedUser?.role)}` : "None" }</p>)
+                  }
+
+                </div>
               </div>
-              <div className="flex items-center">
-                <p className="text-gray-600 mr-2">{card.ticketCount} ticket, {card.issueCount} issue</p>
-                <button className="text-blue-500 border border-gray-900 px-2 py-1 rounded-md hover:underline">View Options</button>
-              </div>
+
             </div>
           </div>
-          
-        ))}
+          ))
+        :
+          <p className="font-semibold">{errorMessage ? errorMessage : "No Tickets Found"}</p>
+        }
       </div>
-  
   );
 };
 

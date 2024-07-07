@@ -10,6 +10,7 @@ export default function viewTicketPage({params}) {
   const router = useRouter();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const ticketId = params.id; 
   const roles = ["superAdmin", "admin", "supportAgent"];
@@ -17,6 +18,7 @@ export default function viewTicketPage({params}) {
   const [ticketFormData, setTicketFormData] = useState({
     status: "",
     priority: "",
+    assignToSelf: "no"
   });
 
   useEffect(() => {
@@ -34,6 +36,8 @@ export default function viewTicketPage({params}) {
   useEffect(() => {
     if (signedIn) {
       setError(""); // Reset error
+      setLoading(true);
+      
       const fetchTicket = async () => {
         try {
           const response = await fetch(`http://localhost:3001/tickets/${ticketId}`, {
@@ -43,20 +47,25 @@ export default function viewTicketPage({params}) {
           const data = await response.json();
 
           if (response.ok) {
-            setTicketFormData(data);
+            setTicketFormData({
+              ...data, 
+              assignToSelf: ( data?.assignedUser?._id === user?._id ) ? "yes" : "no" 
+            });
           } else {
             setError(data.error);
           }
         } catch (error) {
             setError(error);
+        } finally {
+          setLoading(false); 
         }
       };
 
       fetchTicket();
     }
-  }, [signedIn]);
+  }, [signedIn, ticketId, user]);
 
-  if (signedIn === null) {
+  if (signedIn === null || loading) {
     return (
       <div className="flex justify-center items-center m-52">
         <div className="pageLoader"></div>
@@ -70,7 +79,7 @@ export default function viewTicketPage({params}) {
     setError(""); // Reset error
 
     try {
-      const response = await fetch(`http://localhost:3001/tickets/status-priority/${ticketId}`, {
+      const response = await fetch(`http://localhost:3001/tickets/status-priority-assigned/${ticketId}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -82,7 +91,14 @@ export default function viewTicketPage({params}) {
       const data = await response.json();
 
       if (response.ok) {
+        setTicketFormData({
+          ...data, // Update ticketFormData with the new data from the server
+          assignToSelf: data?.assignedUser?._id === user?._id ? "yes" : "no"
+        });
         setMessage("Ticket updated successfully");
+        setTimeout(() => {
+          setMessage("");
+        }, 2000);
       } else {
         // Handle server errors
         setError(data.error);
@@ -90,20 +106,29 @@ export default function viewTicketPage({params}) {
     } catch (error) {
       setError(error);
     }
-
-    console.log("Updating ticket:", ticketFormData);
+    // console.log("Updating ticket:", ticketFormData);
   }
 
-  function handleTicketFormValid() {
-    return (
-      ticketFormData.status.trim() !== "" &&
-      ticketFormData.priority.trim() !== ""
-    );
-  }
+  // console.log("ticketFormData", ticketFormData)
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  const userRoleDisplay = (role) => {
+    switch (role) {
+      case 'superAdmin':
+        return 'Super Admin';
+      case 'admin':
+        return 'Admin';
+      case 'supportAgent':
+        return 'Support Agent';
+      case 'customer':
+        return 'Customer';
+      default:
+        return '';
+    }
   };
 
   return (
@@ -185,7 +210,7 @@ export default function viewTicketPage({params}) {
 </div>
 
             
-            <p className=" text-gray-600 text-lg font-normal my-2 text-wrap"><b>Change ticket status { roles.includes(user?.role) ? " and priority" : "" }</b></p>
+            <p className=" text-gray-600 text-lg font-normal my-2 text-wrap"><b>Change ticket status { roles.includes(user?.role) ? ", priority and assigned user" : "" }</b></p>
             {/* Form for updating a ticket */}
             <form className="space-y-4" onSubmit={handleUpdateTicket}>
             <div className="space-y-4">
@@ -236,6 +261,26 @@ export default function viewTicketPage({params}) {
 
 </div>
 
+
+              {/* Assigned User field */}
+              { roles.includes(user?.role) && ( ticketFormData?.assignedUser?._id === user?._id || !ticketFormData?.assignedUser ) &&
+                <div>
+                  <label className="text-gray-600 block mb-1">Assign to self</label>
+                  <select 
+                    name="assignToSelf" 
+                    value={ticketFormData.assignToSelf}
+                    onChange={(e) =>
+                      setTicketFormData({
+                        ...ticketFormData,
+                        assignToSelf: e.target.value,
+                      })
+                    } 
+                    className="w-min px-4 py-2 border bg-gray-100 border-gray-900 rounded-md focus:outline-none focus:border-blue-500">
+                    <option value="yes">Assigned</option>
+                    <option value="no">Not assigned</option>
+                  </select>
+                </div>
+              }
 
               <div className="w-full">
                 {message && <div className="flex justify-center mb-6 p-2 bg-emerald-300 rounded-md"><br/><p>{message}</p><br/></div>}

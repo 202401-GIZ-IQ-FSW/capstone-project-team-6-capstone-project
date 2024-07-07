@@ -8,21 +8,24 @@ const ticketSchema = new Schema(
       required: true
     },
     title: {
-        type: String,
-        required: true,
-        maxlength: 80,
-        trim: true // Removes whitespace from both ends of a string
+      type: String,
+      required: true,
+      maxlength: 80,
+      trim: true // Removes whitespace from both ends of a string
     },
     description: {
       type: String,
       required: true,
       trim: true
     },
+    imageURL: {
+      type: String,
+    },
     category: {
-        type: String,
-        required: true,
-        enum: ['General Inquiry', 'Technical', 'Bug Report'],
-        default: 'General Inquiry'
+      type: String,
+      required: true,
+      enum: ['General Inquiry', 'Technical', 'Bug Report'],
+      default: 'General Inquiry'
     },
     status: {
       type: String,
@@ -31,34 +34,38 @@ const ticketSchema = new Schema(
       default: 'Open',
     },
     priority: {
-        type: String,
-        required: true,
-        enum: ['Low', 'Medium', 'High', 'Urgent', 'Critical'],
-        default: 'Low'
+      type: String,
+      required: true,
+      enum: ['Low', 'Medium', 'High', 'Urgent', 'Critical'],
+      default: 'Low'
     },
     user: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: 'User',
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'User',
+    },
+    assignedUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
     },
   },
   { timestamps: true }
 );
 
-function autoPopulateUser(next) {
+function autoPopulateUsers(next) {
   this.populate({
-    path: 'user',
+    path: 'user assignedUser',
     select: '-password'
   });
   next();
 }
 
 ticketSchema
-    .pre('findOne', autoPopulateUser)
-    .pre('find', autoPopulateUser)
-    .pre('findById', autoPopulateUser)
-    .pre('findOneAndUpdate', autoPopulateUser)
-    .pre('save', autoPopulateUser);
+  .pre('findOne', autoPopulateUsers)
+  .pre('find', autoPopulateUsers)
+  .pre('findById', autoPopulateUsers)
+  .pre('findOneAndUpdate', autoPopulateUsers)
+  .pre('save', autoPopulateUsers);
 
 // Middleware to set the ticket number before validation
 ticketSchema.pre('validate', async function(next) {
