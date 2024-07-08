@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../../components/AuthContext";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
-
+import Comments from "../../../components/Comments";
 
 export default function viewTicketPage({params}) {
   const { signedIn, user } = useAuth();
@@ -11,6 +11,7 @@ export default function viewTicketPage({params}) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [image, setImage] = useState(null);
 
   const ticketId = params.id; 
   const roles = ["superAdmin", "admin", "supportAgent"];
@@ -115,6 +116,19 @@ export default function viewTicketPage({params}) {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+
+  function extractImageId(rawImageUrl) {
+    if (!rawImageUrl.includes("drive.google.com")) {
+      return rawImageUrl;
+    }
+    const regex = /\/d\/([a-zA-Z0-9_-]+)\//;
+    const match = rawImageUrl.match(regex);
+    if (match && match[1]) {
+      return "http://localhost:3001/image/" + match[1];
+    } else {
+      console.log('Invalid Google Drive URL');
+    }
+  }
 
   const userRoleDisplay = (role) => {
     switch (role) {
@@ -334,7 +348,26 @@ export default function viewTicketPage({params}) {
               </div>
 
             </form>
+            
+            {/* Image Section */}
+            { ticketFormData?.imageURL &&
+              <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3 my-2">
+                <a href={ticketFormData.imageURL} target="_blank" rel="noopener noreferrer" className="rounded-lg">
+                  <img src={ticketFormData?.imageURL? extractImageId(ticketFormData.imageURL) : ""}
+                    className="rounded-lg lg:h-[35rem] w-full"
+                    title="Click for the larger version."
+                    alt="image for ticket problem"
+                  />
+                </a>
+              </div>
+            }
 
+            {/* Comments Section */}
+            <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-4 mt-4">
+              <h2 className="lg:text-2xl font-bold mt-2 mb-4">Comments</h2>
+                <Comments ticketId={ticketId} signedIn={signedIn} user={user} ticket={ticketFormData} />
+            </div>
+            
           </div>
         </div>
       }

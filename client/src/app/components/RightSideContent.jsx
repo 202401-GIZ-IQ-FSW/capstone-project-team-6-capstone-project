@@ -32,6 +32,19 @@ const RightSideContent = ({tickets, errorMessage, user}) => {
     router.push(`/tickets/view-ticket/${id}`);
   };
 
+  function extractImageId(rawImageUrl) {
+    if (!rawImageUrl.includes("drive.google.com")) {
+      return rawImageUrl;
+    }
+    const regex = /\/d\/([a-zA-Z0-9_-]+)\//;
+    const match = rawImageUrl.match(regex);
+    if (match && match[1]) {
+      return "http://localhost:3001/image/" + match[1];
+    } else {
+      console.log('Invalid Google Drive URL');
+    }
+  }
+
   return (
     
     <div className="w-full p-4  border-gray-300 overflow-y-auto bg-white">
@@ -46,13 +59,23 @@ const RightSideContent = ({tickets, errorMessage, user}) => {
           >
             <div className="flex flex-col md:flex-row items-center">
 
-              {/* Square image */}
-              <div className="z-1 w-full md:w-7/12 lg:w-5/12 h-24 md:h-48 bg-gray-200 rounded-md mb-2 md:mb-0 md:mr-4">
-                <img 
-                  className="w-full h-24 md:h-48 rounded-md text-center cursor-pointer z-1" 
-                  src={ticket?.imageURL ? `http://localhost:3001/imageFiles/${ticket?.imageURL}/${ticket?.imageURL}.jpg` : "/laptop-desk.png"} 
-                  alt={ticket?.imageURL ? "ticket image" : "default site logo"}
-                />
+              {/* Image */}
+              <div className="text-center z-1 w-full md:w-7/12 lg:w-5/12 h-24 md:h-48 bg-gray-200 rounded-md mb-2 md:mb-0 md:mr-4">
+                {ticket?.imageURL ? 
+                  <a href={ticket?.imageURL} onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className="rounded-lg text-center">
+                    <img src={ticket?.imageURL? extractImageId(ticket.imageURL) : ""}
+                      className="w-full h-24 md:h-48 rounded-md text-center"
+                      title="Click for the larger version."
+                      alt="image for ticket problem"
+                    />
+                  </a>
+                :
+                  <img 
+                    className="w-full h-24 md:h-48 rounded-md text-center" 
+                    src="/laptop-desk.png"
+                    alt="default site logo"
+                  />
+                }
               </div>
 
               <div className='w-3/4 space-y-4 md:space-y-3 lg:space-y-5 mt-2 md:mt-0'>

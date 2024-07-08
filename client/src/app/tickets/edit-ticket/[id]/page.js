@@ -14,7 +14,8 @@ export default function editTicketPage({params}) {
   const [ticketFormData, setTicketFormData] = useState({
     title: "",
     description: "",
-    category: "General Inquiry"
+    category: "General Inquiry",
+    imageURL: ""
   });
 
   useEffect(() => {
@@ -94,13 +95,14 @@ export default function editTicketPage({params}) {
     console.log("Updating ticket:", ticketFormData);
   }
 
-  function handleTicketFormValid() {
-    return (
-      ticketFormData.title.trim() !== "" &&
-      ticketFormData.description.trim() !== "" &&
-      ticketFormData.category.trim() !== ""
-    );
-  }
+  // function handleTicketFormValid() {
+  //   return (
+  //     ticketFormData.title?.trim() !== "" &&
+  //     ticketFormData.description?.trim() !== "" &&
+  //     ticketFormData.category?.trim() !== "" && 
+  //     ticketFormData.imageURL?.trim() !== ""
+  //   );
+  // }
 
   return (
     <>
@@ -160,6 +162,21 @@ export default function editTicketPage({params}) {
                   }
                 />
               </div>
+
+              {/* Image URL field */}
+              <div>
+                <label className="text-gray-600 block mb-1">Image URL</label>
+                <input
+                  type="text"
+                  name="imageURL"
+                  placeholder="Provide an image of the problem if any using image url"
+                  className="input-field w-full px-4 py-2 border bg-gray-100 border-gray-900 rounded-md focus:outline-none focus:border-blue-500"
+                  value={ticketFormData.imageURL}
+                  onChange={(e) =>
+                    setTicketFormData({ ...ticketFormData, imageURL: e.target.value })
+                  }
+                />
+              </div>
     
               {/* Category field */}
               <div>
@@ -180,18 +197,18 @@ export default function editTicketPage({params}) {
                 </select>
               </div>
 
+              {/* Ticket Server Messages */}
               <div className="w-full pt-2">
                 {message && <div className="flex justify-center mb-6 p-2 bg-emerald-300 rounded-md"><br/><p>{message}</p><br/></div>}
                 {error && <div className="flex justify-center mb-6 p-2 bg-red-500 rounded-md"><br/><p>{error}</p><br/></div>}
               </div>
-    
+
+              {/* Create Ticket button */}
               <div className="flex justify-end">
                 <button
                   type="submit"
-                  className={`bg-blue hover:bg-gray-400 text-white font-bold py-2 px-4 rounded ${
-                    !handleTicketFormValid() ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                  disabled={!handleTicketFormValid()}
+                  className={`bg-blue hover:bg-gray-400 text-white font-bold py-2 px-4 rounded`}
+                  // disabled={!handleTicketFormValid()}
                 >
                   Update Ticket
                 </button>

@@ -98,8 +98,8 @@ const deleteTicket = async (req, res) => {
 const updateTicket = async (req, res) => {
   try {
     const ticket = await Ticket.findById(req.params.id)
-    const { title, description, category } = req.body;
-    const newData = { title, description, category };
+    const { title, description, category, imageURL } = req.body;
+    const newData = { title, description, category, imageURL };
 
     if (!ticket) {
       return res.status(404).json({error: "Ticket not found"})
@@ -109,17 +109,17 @@ const updateTicket = async (req, res) => {
       return res.status(403).json({error: "Not Authorized"})
     }
 
-    // Filter out empty fields
-    const filteredData = filterEmptyFields(newData);
+    // // Filter out empty fields
+    // const filteredData = filterEmptyFields(newData);
 
-    // Check if there is any data left to update
-    if (Object.keys(filteredData).length === 0) {
-      return res.status(400).json({ error: 'Please provide data to update like title' });
-    }
+    // // Check if there is any data left to update
+    // if (Object.keys(filteredData).length === 0) {
+    //   return res.status(400).json({ error: 'Please provide data to update like title' });
+    // }
 
     const updatedTicket = await Ticket.findByIdAndUpdate(
       req.params.id,
-      filteredData,
+      newData,
       { new: true }
     )
   
