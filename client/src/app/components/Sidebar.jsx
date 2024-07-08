@@ -95,17 +95,7 @@ const Sidebar = ({ onFiltersChange, userRole }) => {
           placeholder={`Search by ${searchField}`}
         />
       </div>
-
-      {/* Divider and Ticket Assigned to Section */}
-      <hr className="my-4 border-gray-300" />
-      <div>
-        <h2 className="text-lg font-semibold text-gray-800 mb-2">Assigned to</h2>
-        <div className="space-y-2">
-          <Checkbox label="Assigned to me" checked={ticketAssignedTo["Assigned to me"]} onChange={(checked) => handleCheckboxChange('ticketAssignedTo', 'Assigned to me', checked)} />
-          <Checkbox label="None" checked={ticketAssignedTo.None} onChange={(checked) => handleCheckboxChange('ticketAssignedTo', 'None', checked)} />
-        </div>
-      </div>
-
+      
       {/* Divider and Ticket Category Section */}
       <hr className="my-4 border-gray-300" />
       <div>
@@ -138,6 +128,16 @@ const Sidebar = ({ onFiltersChange, userRole }) => {
           <Checkbox label="High" checked={ticketPriority.High} onChange={(checked) => handleCheckboxChange('ticketPriority', 'High', checked)} />
           <Checkbox label="Urgent" checked={ticketPriority.Urgent} onChange={(checked) => handleCheckboxChange('ticketPriority', 'Urgent', checked)} />
           <Checkbox label="Critical" checked={ticketPriority.Critical} onChange={(checked) => handleCheckboxChange('ticketPriority', 'Critical', checked)} />
+        </div>
+      </div>
+
+      {/* Divider and Ticket Assigned to Section */}
+      <hr className="my-4 border-gray-300" />
+      <div>
+        <h2 className="text-lg font-semibold text-gray-800 mb-2">Assigned to</h2>
+        <div className="space-y-2">
+          {userRole !== "customer" && <Checkbox label="Assigned to me" checked={ticketAssignedTo["Assigned to me"]} onChange={(checked) => handleCheckboxChange('ticketAssignedTo', 'Assigned to me', checked)} />}
+          <Checkbox label="None" checked={ticketAssignedTo.None} onChange={(checked) => handleCheckboxChange('ticketAssignedTo', 'None', checked)} />
         </div>
       </div>
 

@@ -3,10 +3,12 @@ const cors = require("cors");
 const session = require('express-session');
 require("dotenv").config();
 
-const bodyParser = require("body-parser");
-const path = require('path');
-const imageRouter = require('./routes/imageRouter');
-const Ticket = require('./models/ticket');
+const axios = require("axios");
+
+// const bodyParser = require("body-parser");
+// const path = require('path');
+// const imageRouter = require('./routes/imageRouter');
+// const Ticket = require('./models/ticket');
 
 // Importing Database connection info
 const connectToMongo = require("./db/connection");
@@ -21,8 +23,8 @@ const ticketsRouter = require('./routes/ticketsRouter');
 const ensureAuthenticated = require('./middlewares/ensureAuthenticated');
 const ensureAdmin = require('./middlewares/ensureAdmin');
 
-const dirname = path.resolve();
-console.log('directory-name 👉️', dirname);
+// const dirname = path.resolve();
+// console.log('directory-name 👉️', dirname);
 
 const app = express();
 const port =
@@ -42,14 +44,12 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-
 // app.use(bodyParser.urlencoded({ extended: false }));
 // app.use(bodyParser.json());
+// app.use(express.static(path.join(dirname, "public")));
 
-app.use(express.static(path.join(dirname, "public")));
-
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 // Configure session options
 const sessionOptions = {
@@ -83,28 +83,49 @@ app.use('/admin', ensureAuthenticated, ensureAdmin, adminRouter);
 // Using Routes for tickets
 app.use('/tickets', ensureAuthenticated, ticketsRouter);
 
-app.use("/imageFiles/:imageId", ensureAuthenticated, async (req, res, next) => {
+app.get("/image/:id", ensureAuthenticated, async (req, res) => {
+  const fileId = req.params.id;
+  const driveUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
 
-    const imageId = req.params?.imageId;
-    const loggedUser = req.session?.user;
-    const roles = ['superAdmin', 'admin', 'supportAgent'];
-
-    const ticket = await Ticket.findOne({imageURL: imageId});
-
-    if (!ticket) {
-      return res.status(404).json({error: "Ticket not found", imageURL: imageId})
+  try {
+    const response = await axios.get(driveUrl, {
+      responseType: "arraybuffer",
+    });
+    if (response.status === 200) {
+      res.set("Content-Type", response.headers["content-type"]);
+      res.send(response.data);
+    } else {
+      console.error(`Failed to fetch image. Status code: ${response.status}`);
+      res.status(response.status).send(`Failed to fetch image. Status code: ${response.status}`);
     }
+  } catch (error) {
+    console.error("Error fetching the image:", error.message);
+    res.status(500).send("Error fetching the image");
+  }
+});
 
-    if (ticket?.user?._id.toString() !== loggedUser?._id && !roles.includes(loggedUser?.role) ) {
-      return res.status(403).json({error: "Not authorized to view image"})
-    }
+// app.use("/imageFiles/:imageId", ensureAuthenticated, async (req, res, next) => {
 
-    next();
+//     const imageId = req.params?.imageId;
+//     const loggedUser = req.session?.user;
+//     const roles = ['superAdmin', 'admin', 'supportAgent'];
 
-  }, express.static(path.join(dirname, "/upload/images"))
-);
+//     const ticket = await Ticket.findOne({imageURL: imageId});
 
-app.use("/imagesApi", ensureAuthenticated, imageRouter);
+//     if (!ticket) {
+//       return res.status(404).json({error: "Ticket not found", imageURL: imageId})
+//     }
+
+//     if (ticket?.user?._id.toString() !== loggedUser?._id && !roles.includes(loggedUser?.role) ) {
+//       return res.status(403).json({error: "Not authorized to view image"})
+//     }
+
+//     next();
+
+//   }, express.static(path.join(dirname, "/upload/images"))
+// );
+
+// app.use("/imagesApi", ensureAuthenticated, imageRouter);
 
 app.get("/", (req, res) => {
   if (req.session?.user) { return res.json({ message: `Welcome ${req.session.user?.name}`}); }
