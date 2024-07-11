@@ -1,21 +1,34 @@
-"use client";
-import { useState, useEffect } from "react";
+"use client"
+import { useState, useEffect } from 'react';
+import Sidebar from '../components/Sidebar';
+import RightSideContent from '../components/RightSideContent';
 import { useAuth } from "../components/AuthContext";
 import { useRouter } from 'next/navigation';
-import Link from "next/link";
+import TicketsTable from '../components/TicketsTable';
 
 
 export default function ticketsPage() {
   const { signedIn, user } = useAuth();
   const router = useRouter();
-  const [ tickets, setTickets ] = useState([]);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [hideSearch, setHideSearch] = useState(true);
+  const [tableView, setTableView] = useState(false);
+  const [tickets, setTickets] = useState([]);
+  const [filteredTickets, setFilteredTickets] = useState([]);
+  const [filters, setFilters] = useState({
+    assignedTo: [],
+    category: [],
+    status: [],
+    priority: [],
+    searchQuery: "",
+    searchField: "title"
+  });
 
   useEffect(() => {
     if (signedIn === false) {
       setTimeout(() => {
-        router.push('/signin');
+        router.push('/signin'); // Adjust the path as needed
       }, 1000);
     }
   }, [router, signedIn]);
@@ -35,6 +48,7 @@ export default function ticketsPage() {
 
           if (response.ok) {
             setTickets(data);
+            setFilteredTickets(data);
           } else {
             setError(data.error);
           }
@@ -49,6 +63,60 @@ export default function ticketsPage() {
     }
   }, [signedIn]);
 
+  useEffect(() => {
+    const applyFilters = () => {
+      let filtered = tickets;
+
+      if (filters.assignedTo.length > 0) {
+        filtered = filtered.filter(ticket => filters.assignedTo.includes(
+          ticket.assignedUser?.name === user?.name ? "Assigned to me" : !ticket.assignedUser ? "None" : ""
+        ));
+      }
+
+      if (filters.category.length > 0) {
+        filtered = filtered.filter(ticket => filters.category.includes(ticket.category));
+      }
+
+      if (filters.status.length > 0) {
+        filtered = filtered.filter(ticket => filters.status.includes(ticket.status));
+      }
+
+      if (filters.priority.length > 0) {
+        filtered = filtered.filter(ticket => filters.priority.includes(ticket.priority));
+      }
+
+      if (filters.searchQuery) {
+        filtered = filtered.filter(ticket => {
+
+          let fieldValue;
+
+          if ( filters.searchField === "user" ) {
+            fieldValue = ticket.user.name;
+          } else if ( filters.searchField === "assigned to" && ticket.assignedUser ) {
+            fieldValue = ticket?.assignedUser?.name;
+          } else {
+            fieldValue = ticket[filters.searchField];
+          }
+          
+          const query = filters.searchQuery.toLowerCase();
+
+          if (typeof fieldValue === 'string') {
+            return fieldValue.toLowerCase().includes(query);
+          } else if (typeof fieldValue === 'number') {
+            return fieldValue.toString().includes(query);
+          }
+
+          return false;
+        });
+      }
+
+      setFilteredTickets(filtered);
+    };
+
+    applyFilters();
+    // console.log("filters", filters)
+  }, [filters, tickets]);
+
   if (signedIn === null || loading) {
     return (
       <div className="flex justify-center items-center m-52">
@@ -56,30 +124,6 @@ export default function ticketsPage() {
       </div>
     );
   }
-
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-
-  const handleRowClick = (id) => {
-    router.push(`/tickets/view-ticket/${id}`);
-  };
-
-  const userRoleDisplay = (role) => {
-    switch (role) {
-      case 'superAdmin':
-        return 'Super Admin';
-      case 'admin':
-        return 'Admin';
-      case 'supportAgent':
-        return 'Support Agent';
-      case 'customer':
-        return 'Customer';
-      default:
-        return '';
-    }
-  };
 
   return (
     <>
@@ -91,90 +135,67 @@ export default function ticketsPage() {
           </div>
         </div>
       }
-      { signedIn === true && 
-        <div className="flex justify-center mx-auto px-4 py-4">
-          <div className="flex flex-col items-center gap-1">
-
-            <div className="w-screen lg:w-full py-4 px-6">
-              <div className="flex items-center justify-between p-4 rounded-lg border-gray-500 border-2 gap-4">
-                <h1 className="font-bold lg:text-3xl">Tickets</h1>
-                <Link href="/tickets/new-ticket" className="btn">
-                  New ticket
-                </Link>
-              </div>
-            </div>
-
-            { tickets.length > 0 ? (
-              <div className="w-screen px-6 md:w-full lg:px-6">
-                <div className="overflow-x-auto rounded-lg border-gray-500 border-2">
-                    <table className="overflow-x-hidden divide-y divide-gray-200">
-
-                      <thead>
-                        <tr className="text-xs lg:text-sm bg-gray-400">
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">no.</th>
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Ticket</th>
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">User name</th>
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Title</th>
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Description</th>
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Category</th>
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Status</th>
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Priority</th>
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Assigned to</th>
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Created at</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {tickets?.map((ticket, index) => (
-                          
-                          <tr key={index} onClick={() => handleRowClick(ticket?._id)} className="text-xs lg:text-sm hover:bg-gray-300 cursor-pointer">
-                            
-                            <td className="text-center px-3 py-4"> {index + 1}</td>
-                            <td className="text-center px-3 py-4"># {ticket?.number}</td>
-                            
-                            {/* User field*/}
-                            { ( ticket?.user?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticket?.user?.role) ) ) ?
-                              (<td className="px-3 py-3 z-1">
-                                <Link href={`/users/view-user/${ticket.user._id}`} onClick={(e) => e.stopPropagation()} className="z-1 hover:underline hover:text-sky-500">
-                                  {ticket.user.name}{user?.role !== "customer" ? " | " + userRoleDisplay(ticket.user.role) : ""}
-                                </Link>
-                              </td>)
-                              :
-                              (<td className="px-3 py-3">{ticket.user.name}{user?.role !== "customer" ? " | " + userRoleDisplay(ticket.user.role) : ""}</td>)
-                            }
-
-                            <td className="px-3 py-3">{ticket?.title}</td>
-                            <td className="px-3 py-3">{ticket?.description}</td>
-                            <td className="px-3 py-3">{ticket?.category}</td>
-                            <td className="px-3 py-3">{ticket?.status}</td>
-                            <td className="px-3 py-3">{ticket?.priority}</td>
-
-                            {/* Assigned to field*/}
-                            { ticket?.assignedUser && ( ticket?.assignedUser?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticket?.assignedUser?.role) ) ) ?
-                              (<td className="px-3 py-3 z-1">
-                                <Link href={`/users/view-user/${ticket.assignedUser?._id}`} onClick={(e) => e.stopPropagation()} className="z-1 hover:underline hover:text-sky-500">
-                                  { ticket?.assignedUser ? `${ticket.assignedUser?.name } | ${userRoleDisplay(ticket.assignedUser?.role)}` : "None" }
-                                </Link>
-                              </td>)
-                              :
-                              (<td className="px-3 py-3">{ ticket.assignedUser ? `${ticket.assignedUser?.name } | ${userRoleDisplay(ticket.assignedUser?.role)}` : "None" }</td>)
-                            }
-
-                            <td className="px-3 py-3">{formatDate(ticket?.createdAt)}</td>
-
-                          </tr>
-                        ))}
-                      </tbody>
-
-                    </table>
-                  </div>
+      {signedIn === true && 
+        <>
+          {/* View For Mobile and Tablet */}
+          <div className="flex xl:hidden">
+            {/* Search Sidebar */}
+            {!hideSearch && 
+              <div className="flex justify-center w-full bg-gray-50">
+                <div className="bg-gray-100 h-auto w-auto flex flex-col justify-center py-4 px-4 space-y-4 my-4 mx-4 drop-shadow-lg rounded-lg">
+                  <Sidebar onFiltersChange={setFilters} userRole={user?.role} />
+                  {/* Button for Search */}
+                  <button className="btn border-gray-900" onClick={ () => setHideSearch(true) }>Search</button>
                 </div>
-            ) : (
-              <p className="m-10 font-semibold">{error}</p>
-            )}
-
+              </div>
+            }
+            {/* Tickets View */}
+            {hideSearch && 
+              <div className="flex-1 w-screen xl:w-auto pt-6 pl-2 pr-2 bg-white">
+                <div className="flex flex-row pl-4 pr-4 gap-2">
+                  {/* Button for Search */}
+                  <button className="btn w-1/2 border-gray-900" onClick={ () => setHideSearch(false) }>Search</button>
+                  {/* Button for Table View */}
+                  <button className="btn w-1/2 border-gray-900" onClick={ () => setTableView(!tableView) }>
+                    {tableView ? "Card View" : "Table View"}
+                  </button>
+                </div>
+                { !tableView ?
+                    // Card View
+                    <RightSideContent tickets={filteredTickets} errorMessage={error} user={user} />
+                  :
+                  // Table View
+                    <TicketsTable tickets={filteredTickets} errorMessage={error} user={user} />
+                }
+              </div>
+            }
           </div>
-        </div>
+
+          {/* View For Laptop and Desktop */}
+          <div className="hidden xl:flex">
+            {/* Search Sidebar */}
+            <div className="bg-gray-100 h-full w-2/12 flex flex-col p-4 pt-6 space-y-4">
+              <Sidebar onFiltersChange={setFilters} userRole={user?.role} />
+            </div>
+            {/* Tickets View */}
+            <div className="flex-1 pt-6 pl-2 pr-4 bg-white">
+              <div className="pl-4 pr-4">
+                {/* Button for Table View */}
+                <button className="btn w-full border-gray-900" onClick={ () => setTableView(!tableView) }>
+                  {tableView ? "Card View" : "Table View"}
+                </button>
+              </div>
+              { !tableView ? 
+                  // Card View
+                  <RightSideContent tickets={filteredTickets} errorMessage={error} user={user} />
+                :
+                  // Table View
+                  <TicketsTable tickets={filteredTickets} errorMessage={error} user={user} />
+              }
+            </div>
+          </div>
+        </>
       }
     </>
-  )
+  );
 }

@@ -169,7 +169,7 @@ export default function editTicketPage({params}) {
                 <input
                   type="text"
                   name="imageURL"
-                  placeholder="Provide an image of the problem if any using image url"
+                  placeholder="Provide an image of the problem if any using google drive public image url only"
                   className="input-field w-full px-4 py-2 border bg-gray-100 border-gray-900 rounded-md focus:outline-none focus:border-blue-500"
                   value={ticketFormData.imageURL}
                   onChange={(e) =>

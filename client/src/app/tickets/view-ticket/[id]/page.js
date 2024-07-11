@@ -4,6 +4,9 @@ import { useAuth } from "../../../components/AuthContext";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import Comments from "../../../components/Comments";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faBriefcase, faUserCog } from '@fortawesome/free-solid-svg-icons';
+
 
 export default function viewTicketPage({params}) {
   const { signedIn, user } = useAuth();
@@ -177,11 +180,41 @@ export default function viewTicketPage({params}) {
 
                 <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
                   { ( ticketFormData?.user?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticketFormData?.user?.role) ) ) ?
-                    (<Link href={`/users/view-user/${ticketFormData.user._id}`} className="text-gray-600 text-base lg:text-xl font-bold mb-2 hover:underline hover:text-sky-500">
-                      Created By: {ticketFormData.user.name}{user?.role !== "customer" ? " | " + userRoleDisplay(ticketFormData.user.role) : ""}
-                    </Link>)
+                      (<Link href={`/users/view-user/${ticketFormData.user._id}`} className="text-gray-600 group gap-2 text-base lg:text-xl font-bold mb-2 hover:text-sky-500 flex flex-row">
+                        <p>Created By: </p>
+                        <div className="flex md:flex-row flex-col gap-2">
+                          <p> {ticketFormData.user.name}</p>
+                          {user?.role !== "customer" &&
+                            <p className="hidden md:flex">|</p>}
+                          {user?.role !== "customer" && 
+                            <p className="flex items-center gap-2">
+                              <span>{userRoleDisplay(ticketFormData.user.role)}</span>
+                              {ticketFormData?.user?.role === "customer" &&
+                                <FontAwesomeIcon icon={faUser} className="text-gray-500 group-hover:text-sky-500" />}
+                              {ticketFormData?.user?.role !== "customer" &&
+                                <FontAwesomeIcon icon={faUserCog} className="text-gray-500 group-hover:text-sky-500" />}
+                            </p>
+                          }
+                        </div>
+                      </Link>)
                     :
-                    (<h3 className="text-gray-600 text-base lg:text-xl font-bold mb-2">Created By: {ticketFormData.user.name}{user?.role !== "customer" ? " | " + userRoleDisplay(ticketFormData.user.role) : ""}</h3>)
+                      (<div className="text-gray-600 text-base lg:text-xl font-bold mb-2 flex flex-row gap-2">
+                        <p>Created By: </p>
+                        <div className="flex flex-col md:flex-row gap-2">
+                          <p> {ticketFormData.user.name}</p>
+                          {user?.role !== "customer" &&
+                            <p className="hidden md:flex">|</p>}
+                          {user?.role !== "customer" && 
+                            <p className="flex items-center gap-2">
+                              <span>{userRoleDisplay(ticketFormData.user.role)}</span>
+                              {ticketFormData?.user?.role === "customer" && 
+                                <FontAwesomeIcon icon={faUser} className="text-gray-500" />}
+                              {ticketFormData?.user?.role !== "customer" && 
+                                <FontAwesomeIcon icon={faUserCog} className="text-gray-500" />}
+                            </p>
+                          }
+                        </div>
+                      </div>)
                   }
                 </div>
 
@@ -222,12 +255,33 @@ export default function viewTicketPage({params}) {
                 </div>
 
                 <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
-                  { ticketFormData?.assignedUser && ( ticketFormData?.assignedUser?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticketFormData?.assignedUser?.role) ) ) ?
-                    (<Link href={`/users/view-user/${ticketFormData.assignedUser?._id}`} className="text-gray-600 lg:text-lg font-normal mb-2 hover:underline hover:text-sky-500">
-                      <b>Assigned To:</b> { ticketFormData?.assignedUser ? `${ticketFormData.assignedUser?.name } | ${userRoleDisplay(ticketFormData.assignedUser?.role)}` : "None" }
-                    </Link>)
-                    :
-                    (<p className="text-gray-600 lg:text-lg font-normal mb-2"><b>Assigned To:</b> { ticketFormData.assignedUser ? `${ticketFormData.assignedUser?.name } | ${userRoleDisplay(ticketFormData.assignedUser?.role)}` : "None" }</p>)
+                  { ticketFormData?.assignedUser && 
+                    ( ticketFormData?.assignedUser?._id === user?._id || 
+                      user?.role === "superAdmin" || 
+                      ( user?.role === "admin" && 
+                      !["admin", "superAdmin"].includes(ticketFormData?.assignedUser?.role) ) ) 
+                      ?
+                        (<Link href={`/users/view-user/${ticketFormData.assignedUser?._id}`} className="text-gray-600 group gap-2 lg:text-lg font-normal mb-2 flex flex-row hover:text-sky-500 transition-colors duration-200">
+                          <p><b>Assigned To:</b></p>
+                          { ticketFormData?.assignedUser &&
+                            (<div className="flex md:flex-row flex-col gap-2">
+                              <p>{ticketFormData.assignedUser?.name}</p>
+                              <p className="hidden md:flex">|</p>
+                              <p>{userRoleDisplay(ticketFormData.assignedUser?.role)} <FontAwesomeIcon icon={faUserCog} className="text-gray-500 group-hover:text-sky-500 transition-colors duration-200" /></p>
+                            </div>)
+                          || "None" }
+                        </Link>)
+                      :
+                        (<div className="text-gray-600 lg:text-lg font-normal mb-2 gap-2 flex flex-row">
+                          <p><b>Assigned To:</b></p> 
+                          { ticketFormData.assignedUser &&
+                            (<div className="flex md:flex-row flex-col gap-2" >
+                              <p>{ticketFormData.assignedUser?.name}</p>
+                              <p className="hidden md:flex">|</p>
+                              <p>{userRoleDisplay(ticketFormData.assignedUser?.role)} <FontAwesomeIcon icon={faUserCog} className="text-gray-500" /></p>
+                            </div>)
+                          || "None" }
+                        </div>)
                   }
                 </div>
 
@@ -238,7 +292,6 @@ export default function viewTicketPage({params}) {
                 </div>
 
               </div>
-
             </div>
           
 
@@ -351,20 +404,25 @@ export default function viewTicketPage({params}) {
             
             {/* Image Section */}
             { ticketFormData?.imageURL &&
-              <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3 my-2">
-                <a href={ticketFormData.imageURL} target="_blank" rel="noopener noreferrer" className="rounded-lg">
-                  <img src={ticketFormData?.imageURL? extractImageId(ticketFormData.imageURL) : ""}
-                    className="rounded-lg lg:h-[35rem] w-full"
-                    title="Click for the larger version."
-                    alt="image for ticket problem"
-                  />
-                </a>
+              <div className="bg-gray-200 border border-gray-600 rounded-lg my-6">
+                <p className="lg:text-xl mb-4 p-4 font-bold bg-gray-400 text-gray-800 overflow-hidden rounded-t-lg">
+                  Ticket Attachment: 
+                </p>
+                <div className="mx-4 mb-2">
+                  <a href={ticketFormData.imageURL} target="_blank" rel="noopener noreferrer">
+                    <img src={ticketFormData?.imageURL? extractImageId(ticketFormData.imageURL) : ""}
+                      className=" rounded-lg lg:h-[35rem] w-full border border-gray-900 p-2 text-center text-gray-600"
+                      title="Click for the larger version."
+                      alt="ticket attachment image"
+                    />
+                  </a>
+                </div>
               </div>
             }
 
             {/* Comments Section */}
             <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-4 mt-4">
-              <h2 className="lg:text-2xl font-bold mt-2 mb-4">Comments</h2>
+              <h2 className="lg:text-2xl font-bold mt-2 mb-4 text-gray-600">Comments</h2>
                 <Comments ticketId={ticketId} signedIn={signedIn} user={user} ticket={ticketFormData} />
             </div>
             

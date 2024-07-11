@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faUserCog } from '@fortawesome/free-solid-svg-icons';
 
 
 const RightSideContent = ({tickets, errorMessage, user}) => {
@@ -47,10 +49,11 @@ const RightSideContent = ({tickets, errorMessage, user}) => {
 
   return (
     
-    <div className="w-full p-4  border-gray-300 overflow-y-auto bg-white">
-        <p className="text-gray-600">{resultsCount} results found for your search</p>
-        <h2 className="text-2xl font-bold mt-2 mb-4">Tickets</h2>
-     
+    <div className="w-full p-4 border-gray-300 overflow-y-auto bg-white">
+        
+        <h2 className="text-lg lg:text-2xl font-bold ">Tickets</h2>
+        <p className="text-gray-600 mt-2 mb-4 text-sm lg:text-base">{resultsCount} results found for your search</p>
+
         {tickets.length > 0 ? tickets?.map((ticket, index) => (
           <div 
             key={index} 
@@ -60,18 +63,18 @@ const RightSideContent = ({tickets, errorMessage, user}) => {
             <div className="flex flex-col md:flex-row items-center">
 
               {/* Image */}
-              <div className="text-center z-1 w-full md:w-7/12 lg:w-5/12 h-24 md:h-48 bg-gray-200 rounded-md mb-2 md:mb-0 md:mr-4">
+              <div className="text-center z-1 w-full md:w-7/12 lg:w-5/12 md:h-48 bg-gray-200 rounded-md mb-2 md:mb-0 md:mr-4">
                 {ticket?.imageURL ? 
                   <a href={ticket?.imageURL} onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className="rounded-lg text-center">
                     <img src={ticket?.imageURL? extractImageId(ticket.imageURL) : ""}
-                      className="w-full h-24 md:h-48 rounded-md text-center"
+                      className="w-full h-40 md:h-48 rounded-md text-center"
                       title="Click for the larger version."
                       alt="image for ticket problem"
                     />
                   </a>
                 :
                   <img 
-                    className="w-full h-24 md:h-48 rounded-md text-center" 
+                    className="w-full h-40 md:h-48 rounded-md text-center" 
                     src="/laptop-desk.png"
                     alt="default site logo"
                   />
@@ -99,24 +102,70 @@ const RightSideContent = ({tickets, errorMessage, user}) => {
                   </p>
                 </div>
                 
-                <div className="text-sm flex flex-col md:flex-row justify-between gap-2">
+                <div className="text-sm flex flex-col gap-2">
 
                   {/* Created By field*/}
                   { ( ticket?.user?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticket?.user?.role) ) ) ?
-                    (<Link onClick={(e) => e.stopPropagation()} href={`/users/view-user/${ticket.user._id}`} className="text-gray-600 z-1 hover:underline hover:text-sky-500">
-                      <b>Created By:</b> {ticket.user.name}{user?.role !== "customer" ? " | " + userRoleDisplay(ticket.user.role) : ""}
+                    (<Link onClick={(e) => e.stopPropagation()} href={`/users/view-user/${ticket.user._id}`} className="text-gray-600 gap-1 z-1 hover:text-sky-500 group flex flex-col md:flex-row">
+                      <p><b>Created By:</b></p>
+                      <div className="flex flex-row gap-1">
+                        <p> {ticket.user.name}</p>
+                        {user?.role !== "customer" && 
+                          <p>|</p>}
+                        {user?.role !== "customer" && 
+                         <p className="flex items-center gap-1">
+                          <span>{userRoleDisplay(ticket.user.role)}</span>
+                          {ticket?.user?.role === "customer" &&
+                            <FontAwesomeIcon icon={faUser} className="text-gray-500 group-hover:text-sky-500" />}
+                          {ticket?.user?.role !== "customer" &&
+                            <FontAwesomeIcon icon={faUserCog} className="text-gray-500 group-hover:text-sky-500" />}
+                         </p>
+                        }
+                      </div>
                     </Link>)
                     :
-                    (<p className="text-gray-600"><b>Created By:</b> {ticket.user.name}{user?.role !== "customer" ? " | " + userRoleDisplay(ticket.user.role) : ""}</p>)
+                    (<div className="text-gray-600 flex flex-col md:flex-row gap-1">
+                      <p><b>Created By:</b></p> 
+                      <div className="flex flex-row gap-1">
+                        <p> {ticket.user.name}</p>
+                        {user?.role !== "customer" &&
+                          <p>|</p>}
+                        {user?.role !== "customer" &&  
+                          <p className="flex items-center gap-1">
+                            <span>{userRoleDisplay(ticket.user.role)}</span>
+                            {ticket?.user?.role === "customer" && 
+                              <FontAwesomeIcon icon={faUser} className="text-gray-500" />}
+                            {ticket?.user?.role !== "customer" && 
+                              <FontAwesomeIcon icon={faUserCog} className="text-gray-500" />}
+                          </p>
+                        }
+                      </div>
+                    </div>)
                   }
 
                   {/* Assigned To field*/}
                   { ticket?.assignedUser && ( ticket?.assignedUser?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticket?.assignedUser?.role) ) ) ?
-                    (<Link onClick={(e) => e.stopPropagation()} href={`/users/view-user/${ticket.assignedUser?._id}`} className="text-gray-600 z-1 hover:underline hover:text-sky-500">
-                      <b>Assigned To:</b> { ticket?.assignedUser ? `${ticket.assignedUser?.name } | ${userRoleDisplay(ticket.assignedUser?.role)}` : "None" }
+                    (<Link onClick={(e) => e.stopPropagation()} href={`/users/view-user/${ticket.assignedUser?._id}`} className="text-gray-600 group gap-1 z-1 hover:text-sky-500 flex flex-col md:flex-row">
+                      <p><b>Assigned To:</b> </p>
+                      { ticket?.assignedUser && 
+                        <div className="flex flex-row  gap-1">
+                          <p>{ticket.assignedUser?.name }</p>
+                          <p>|</p> 
+                          <p>{userRoleDisplay(ticket.assignedUser?.role)} <FontAwesomeIcon icon={faUserCog} className="text-gray-500 group-hover:text-sky-500" /></p>
+                        </div>
+                      || "None" }
                     </Link>)
                     :
-                    (<p className="text-gray-600"><b>Assigned To:</b> { ticket.assignedUser ? `${ticket.assignedUser?.name } | ${userRoleDisplay(ticket.assignedUser?.role)}` : "None" }</p>)
+                    (<div className="text-gray-600 gap-1 flex flex-col md:flex-row">
+                      <p><b>Assigned To:</b></p> 
+                      { ticket.assignedUser &&
+                        <div className="flex flex-row gap-1">
+                          <p>{ticket.assignedUser?.name }</p>
+                          <p>|</p>
+                          <p>{userRoleDisplay(ticket.assignedUser?.role)} <FontAwesomeIcon icon={faUserCog} className="text-gray-500" /></p>
+                        </div>
+                      || "None" }
+                    </div>)
                   }
 
                 </div>
