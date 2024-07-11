@@ -121,9 +121,9 @@ const Comments = ({ ticketId, signedIn, user, ticket }) => {
   };
 
   function extractImageId(rawImageUrl) {
-    if (!rawImageUrl.includes("drive.google.com")) {
-      return rawImageUrl;
-    }
+    // if (!rawImageUrl.includes("drive.google.com")) {
+    //   return rawImageUrl;
+    // }
     const regex = /\/d\/([a-zA-Z0-9_-]+)\//;
     const match = rawImageUrl.match(regex);
     if (match && match[1]) {
@@ -190,8 +190,8 @@ const Comments = ({ ticketId, signedIn, user, ticket }) => {
             <div className="flex justify-between mb-3 pb-1 gap-4 text-sm lg:text-base border-b-2 border-gray-400">
 
               {/* User Name */}
-              { comment?.user?._id === user?._id || user?.role === "superAdmin" || (user?.role === "admin" && !["admin", "superAdmin"].includes(comment?.user?.role)) ? (
-                <Link href={`/users/view-user/${ticket.user._id}`} className="text-gray-600 lg:text-lg font-bold hover:text-sky-500 group">
+              { comment?.user && ( comment?.user?._id === user?._id || user?.role === "superAdmin" || (user?.role === "admin" && !["admin", "superAdmin"].includes(comment?.user?.role))) ? (
+                <Link href={`/users/view-user/${comment?.user?._id}`} className="text-gray-600 lg:text-lg font-bold hover:text-sky-500 group">
                   {comment.user?.name || "Support"} 
                   {/* {comment.user && user?.role !== "customer" ? " | " : ""} */}
                   {comment.user && user?.role !== "customer" && (
@@ -322,7 +322,7 @@ export const EditDeleteButtons = ({user, comment, handleEditComment, handleDelet
       {/* Delete Comment Button */}
       <button
         type="button"
-        onClick={() => handleDeleteComment(comment._id)}
+        onClick={() => handleDeleteComment(comment?._id)}
         className=" text-white font-bold py-1 px-1 rounded text-sm lg:text-base"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="w-4 lg:w-5 fill-red-500 hover:fill-red-700" viewBox="0 0 24 24">
