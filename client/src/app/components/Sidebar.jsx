@@ -69,7 +69,7 @@ const Sidebar = ({ onFiltersChange, userRole }) => {
   const handleSearchFieldChange = (e) => setSearchField(e.target.value);
 
   return (
-    <div className="bg-gray-100 h-full w-4/12 md:w-3/12 flex flex-col p-4 space-y-4">
+    < >
 
       {/* Search Section */}
       <div>
@@ -141,7 +141,7 @@ const Sidebar = ({ onFiltersChange, userRole }) => {
         </div>
       </div>
 
-    </div>
+    </>
   );
 };
 

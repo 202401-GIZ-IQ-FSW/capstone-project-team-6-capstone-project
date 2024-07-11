@@ -38,6 +38,7 @@ body {
   }
 }
 
+/* <div className="navLoader"></div> */
 .navLoader {
   height: 5px;
   width: full;
@@ -52,7 +53,7 @@ body {
   100% {background-position: 250% 0, 250% 0}
 }
 
-/* HTML: <div class="loader"></div> */
+/* <div class="pageLoader"></div> */
 .pageLoader {
   width: 50px;
   padding: 8px;

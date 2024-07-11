@@ -52,7 +52,7 @@ export default function SignOut() {
   }, [router, setSignedIn, setUser]);
 
   return (
-    <div className="flex justify-center my-20 mx-6">
+    <div className="bg-gray-50 w-full flex justify-center py-20 px-6">
       {message && 
         <div className="h-40 flex flex-col font-semibold text-center">
           <h1>Signing out...</h1>

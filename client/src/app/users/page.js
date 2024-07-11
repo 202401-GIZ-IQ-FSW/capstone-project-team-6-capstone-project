@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../components/AuthContext";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
+import UsersSearch from '../components/UsersSearch';
+import UsersTable from '../components/UsersTable';
 
 
 export default function usersPage() {
@@ -11,6 +13,14 @@ export default function usersPage() {
   const [ users, setUsers ] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [hideSearch, setHideSearch] = useState(true);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [filters, setFilters] = useState({
+    role: [],
+    gender: [],
+    searchQuery: "",
+    searchField: "name"
+  });
 
   const roles = ["superAdmin", "admin"];
 
@@ -41,6 +51,7 @@ export default function usersPage() {
 
           if (response.ok) {
             setUsers(data);
+            setFilteredUsers(data);
           } else {
             setError(data.error);
           }
@@ -55,6 +66,42 @@ export default function usersPage() {
     }
   }, [signedIn, user]);
 
+  useEffect(() => {
+    const applyFilters = () => {
+      let filtered = users;
+
+      if (filters.role.length > 0) {
+        filtered = filtered.filter(user => filters.role.includes(user.role));
+      }
+
+      if (filters.gender.length > 0) {
+        filtered = filtered.filter(user => filters.gender.includes(user.gender));
+      }
+
+      if (filters.searchQuery) {
+        filtered = filtered.filter(user => {
+
+          const fieldValue = user[filters.searchField];
+          
+          const query = filters.searchQuery.toLowerCase();
+
+          if (typeof fieldValue === 'string') {
+            return fieldValue.toLowerCase().includes(query);
+          } else if (typeof fieldValue === 'number') {
+            return fieldValue.toString().includes(query);
+          }
+
+          return false;
+        });
+      }
+
+      setFilteredUsers(filtered);
+    };
+
+    applyFilters();
+    // console.log("filters", filters)
+  }, [filters, users]);
+
   if (signedIn === null || loading) {
     return (
       <div className="flex justify-center items-center m-52">
@@ -63,32 +110,7 @@ export default function usersPage() {
     );
   }
 
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-
-  const handleRowClick = (id) => {
-    router.push(`/users/view-user/${id}`);
-  };
-
-  const userRoleDisplay = (role) => {
-    switch (role) {
-      case 'superAdmin':
-        return 'Super Admin';
-      case 'admin':
-        return 'Admin';
-      case 'supportAgent':
-        return 'Support Agent';
-      case 'customer':
-        return 'Customer';
-      default:
-        return '';
-    }
-  };
-
   return (
-    
     <>
       {signedIn === false && 
         <div className="px-5 py-40">
@@ -107,52 +129,44 @@ export default function usersPage() {
         </div>
       }
       { ( signedIn === true && roles.includes(user?.role) ) && 
-        <div className="flex justify-center mx-auto px-4 py-4">
-          <div className="flex flex-col items-center gap-1">
-
-            <div className="w-screen lg:w-full py-4 px-6">
-              <div className="text-center p-4 rounded-lg border-[#60829d] border-2">
-                <h1 className="font-bold lg:text-3xl">Users</h1>
-              </div>
+        <>
+            {/* View For Mobile and Tablet */}
+            <div className="flex xl:hidden">
+                {/* Search Sidebar */}
+                {!hideSearch && 
+                    <div className="flex justify-center w-full bg-gray-50">
+                    <div className="bg-gray-100 h-auto w-auto flex flex-col justify-center py-4 px-4 space-y-4 my-4 mx-4 drop-shadow-lg rounded-lg">
+                        <UsersSearch onFiltersChange={setFilters} loggedUserRole={user?.role} />
+                        {/* Button for Search */}
+                        <button className="btn border-gray-900" onClick={ () => setHideSearch(true) }>Search</button>
+                    </div>
+                    </div>
+                }
+                {/* Users View */}
+                {hideSearch && 
+                    <div className="flex-1 w-screen xl:w-auto pt-6 pl-2 pr-2 bg-white">
+                        <div className="flex flex-row pl-4 pr-4 gap-2">
+                            {/* Button for Search */}
+                            <button className="btn w-full border-gray-900" onClick={ () => setHideSearch(false) }>Search</button>
+                        </div>
+                        {/* Users Table */}
+                        <UsersTable users={filteredUsers} errorMessage={error} user={user} />
+                    </div>
+                }
             </div>
 
-            { users.length > 0 ? (
-              <div className="w-screen px-6 md:w-full lg:px-6">
-                <div className="overflow-x-auto rounded-lg border-[#60829d] border-2">
-                    <table className="overflow-x-hidden divide-y divide-gray-200">
-                      <thead>
-                        <tr className="text-xs lg:text-sm bg-[#60829d]">
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">No.</th>
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Name</th>
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Username</th>
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Email</th>
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Role</th>
-                          <th className="px-3 py-3 text-left font-medium uppercase tracking-wider">Created at</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {users?.map((user, index) => (
-                          
-                          <tr key={index} onClick={() => handleRowClick(user?._id)} className="text-xs lg:text-sm hover:bg-gray-300 cursor-pointer">
-                            <td className="text-center px-3 py-4">{index+1}</td>
-                            <td className="px-3 py-3">{user?.name}</td>
-                            <td className="px-3 py-3">{user?.username}</td>
-                            <td className="px-3 py-3">{user?.email}</td>
-                            <td className="px-3 py-3">{userRoleDisplay(user?.role)}</td>
-                            <td className="px-3 py-3">{formatDate(user?.createdAt)}</td>
-                          </tr>
-
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+            {/* View For Laptop and Desktop */}
+            <div className="hidden xl:flex">
+                {/* Search Sidebar */}
+                <div className="bg-gray-100 h-full w-2/12 flex flex-col p-4 pt-6 space-y-4">
+                    <UsersSearch onFiltersChange={setFilters} loggedUserRole={user?.role} />
                 </div>
-            ) : (
-              <p className="m-10 font-semibold">{error}</p>
-            )}
-
-          </div>
-        </div>
+                {/* Users Table */}
+                <div className="flex-1 pt-6 pl-2 pr-4 bg-white">
+                    <UsersTable users={filteredUsers} errorMessage={error} user={user} />
+                </div>
+            </div>
+        </>
       }
     </>
 

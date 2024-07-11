@@ -4,12 +4,16 @@ import Sidebar from '../components/Sidebar';
 import RightSideContent from '../components/RightSideContent';
 import { useAuth } from "../components/AuthContext";
 import { useRouter } from 'next/navigation';
+import TicketsTable from '../components/TicketsTable';
+
 
 export default function searchPage() {
   const { signedIn, user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [hideSearch, setHideSearch] = useState(true);
+  const [tableView, setTableView] = useState(false);
   const [tickets, setTickets] = useState([]);
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [filters, setFilters] = useState({
@@ -133,10 +137,61 @@ export default function searchPage() {
       }
       {signedIn === true && 
         <>
-          <div className="flex"> 
-            <Sidebar onFiltersChange={setFilters} userRole={user?.role} />
-            <div className="flex-1 p-8 bg-white">
-              <RightSideContent tickets={filteredTickets} errorMessage={error} user={user} />
+          {/* View For Mobile and Tablet */}
+          <div className="flex xl:hidden">
+            {/* Search Sidebar */}
+            {!hideSearch && 
+              <div className="flex justify-center w-full bg-gray-50">
+                <div className="bg-gray-100 h-auto w-auto flex flex-col justify-center py-4 px-4 space-y-4 my-4 mx-4 drop-shadow-lg rounded-lg">
+                  <Sidebar onFiltersChange={setFilters} userRole={user?.role} />
+                  {/* Button for Search */}
+                  <button className="btn border-gray-900" onClick={ () => setHideSearch(true) }>Search</button>
+                </div>
+              </div>
+            }
+            {/* Tickets View */}
+            {hideSearch && 
+              <div className="flex-1 w-screen xl:w-auto pt-6 pl-2 pr-2 bg-white">
+                <div className="flex flex-row pl-4 pr-4 gap-2">
+                  {/* Button for Search */}
+                  <button className="btn w-1/2 border-gray-900" onClick={ () => setHideSearch(false) }>Search</button>
+                  {/* Button for Table View */}
+                  <button className="btn w-1/2 border-gray-900" onClick={ () => setTableView(!tableView) }>
+                    {tableView ? "Card View" : "Table View"}
+                  </button>
+                </div>
+                { !tableView ?
+                    // Card View
+                    <RightSideContent tickets={filteredTickets} errorMessage={error} user={user} />
+                  :
+                  // Table View
+                    <TicketsTable tickets={filteredTickets} errorMessage={error} user={user} />
+                }
+              </div>
+            }
+          </div>
+
+          {/* View For Laptop and Desktop */}
+          <div className="hidden xl:flex">
+            {/* Search Sidebar */}
+            <div className="bg-gray-100 h-full w-2/12 flex flex-col p-4 pt-6 space-y-4">
+              <Sidebar onFiltersChange={setFilters} userRole={user?.role} />
+            </div>
+            {/* Tickets View */}
+            <div className="flex-1 pt-6 pl-2 pr-4 bg-white">
+              <div className="pl-4 pr-4">
+                {/* Button for Table View */}
+                <button className="btn w-full border-gray-900" onClick={ () => setTableView(!tableView) }>
+                  {tableView ? "Card View" : "Table View"}
+                </button>
+              </div>
+              { !tableView ? 
+                  // Card View
+                  <RightSideContent tickets={filteredTickets} errorMessage={error} user={user} />
+                :
+                  // Table View
+                  <TicketsTable tickets={filteredTickets} errorMessage={error} user={user} />
+              }
             </div>
           </div>
         </>

@@ -85,19 +85,20 @@ const updateComment = async (req, res) => {
       }
 
       const { message, imageURL } = req.body;
-      const newData = { message, imageURL } ;
 
       // Filter out empty fields
-      const filteredData = filterEmptyFields(newData);
+      const filteredMessage = filterEmptyFields(message);
   
       // Check if there is any data left to update
-      if (Object.keys(filteredData).length === 0) {
+      if (Object.keys(filteredMessage).length === 0) {
         return res.status(400).json({ error: 'Please provide data to update like message or imageURL' });
       }
-  
+
+      const newData = { filteredMessage, imageURL } ;
+
       const updatedComment = await Comment.findByIdAndUpdate(
         req.params.id,
-        filteredData,
+        newData,
         { new: true }
       )
     

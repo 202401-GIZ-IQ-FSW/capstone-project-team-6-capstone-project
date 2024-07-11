@@ -7,7 +7,7 @@ import Link from 'next/link';
 export default function App() {
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="bg-gray-100">
       <div className="container mx-auto p-4 md:p-8">
 
         <div className="bg-white p-8 lg:p-20 mx-auto rounded-lg shadow-md">
@@ -33,7 +33,7 @@ export default function App() {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mt-8 lg:mt-12">
 
-          <div className="bg-white p-6 rounded-lg shadow-md flex flex-row items-center lg:justify-around justify-evenly">
+          <div className="bg-white p-6 rounded-lg shadow-md flex flex-row items-end lg:justify-around justify-evenly gap-1">
             <div className="flex flex-col">
               <p className="text-gray-600 text-base lg:text-lg">Ticket activity</p>
               <h2 className="text-2xl lg:text-4xl font-bold">10K+</h2>
@@ -41,7 +41,7 @@ export default function App() {
               <FontAwesomeIcon icon={faUsers} className="text-gray-800 text-4xl lg:text-5xl mt-2 lg:mt-4" />
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md flex flex-row items-center lg:justify-around justify-evenly">
+          <div className="bg-white p-6 rounded-lg shadow-md flex flex-row items-end lg:justify-around justify-evenly gap-1">
             <div className="flex flex-col">
               <p className="text-gray-600 text-base lg:text-lg">Tickets submitted</p>
               <h2 className="text-2xl lg:text-4xl font-bold">100K+</h2>
@@ -49,7 +49,7 @@ export default function App() {
             <FontAwesomeIcon icon={faTicketAlt} className="text-gray-800 text-4xl lg:text-6xl mt-2 lg:mt-4" />
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md flex flex-row items-center lg:justify-around justify-evenly">
+          <div className="bg-white p-6 rounded-lg shadow-md flex flex-row items-end lg:justify-around justify-evenly gap-1">
             <div className="flex flex-col">
               <p className="text-gray-600 text-base lg:text-lg">Tickets resolved</p>
               <h2 className="text-2xl lg:text-4xl font-bold">500K+</h2>
@@ -57,7 +57,7 @@ export default function App() {
             <FontAwesomeIcon icon={faArrowUp} className="text-gray-800 text-4xl lg:text-6xl mt-2 lg:mt-4" />
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md flex flex-row items-center lg:justify-around justify-evenly">
+          <div className="bg-white p-6 rounded-lg shadow-md flex flex-row items-end lg:justify-around justify-evenly gap-1">
             <div className="flex flex-col">
               <p className="text-gray-600 text-base lg:text-lg">Get help now</p>
               <h2 className="text-2xl lg:text-4xl font-bold">Support</h2>
