@@ -24,6 +24,8 @@ export default function ticketsPage() {
     searchQuery: "",
     searchField: "title"
   });
+  const [sortField, setSortField] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
     if (signedIn === false) {
@@ -65,7 +67,7 @@ export default function ticketsPage() {
 
   useEffect(() => {
     const applyFilters = () => {
-      let filtered = tickets;
+      let filtered = [...tickets];
 
       if (filters.assignedTo.length > 0) {
         filtered = filtered.filter(ticket => filters.assignedTo.includes(
@@ -110,12 +112,28 @@ export default function ticketsPage() {
         });
       }
 
+      filtered = filtered.sort((a, b) => {
+        let aValue = a[sortField];
+        let bValue = b[sortField];
+
+        if (typeof aValue === 'string') {
+          aValue = aValue.toLowerCase();
+          bValue = bValue.toLowerCase();
+        }
+
+        if (sortOrder === 'asc') {
+          return aValue > bValue ? 1 : -1;
+        } else {
+          return aValue < bValue ? 1 : -1;
+        }
+      });
+
       setFilteredTickets(filtered);
     };
 
     applyFilters();
     // console.log("filters", filters)
-  }, [filters, tickets]);
+  }, [filters, tickets, sortField, sortOrder]);
 
   if (signedIn === null || loading) {
     return (
@@ -124,6 +142,15 @@ export default function ticketsPage() {
       </div>
     );
   }
+
+  const handleSortChange = (field) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
 
   return (
     <>
@@ -143,7 +170,13 @@ export default function ticketsPage() {
             {!hideSearch && 
               <div className="flex justify-center w-full bg-gray-50">
                 <div className="bg-gray-100 h-auto w-auto flex flex-col justify-center py-4 px-4 space-y-4 my-4 mx-4 drop-shadow-lg rounded-lg">
-                  <Sidebar onFiltersChange={setFilters} userRole={user?.role} />
+                  <Sidebar 
+                    onFiltersChange={setFilters} 
+                    userRole={user?.role} 
+                    onSortChange={handleSortChange}
+                    sortField={sortField}
+                    sortOrder={sortOrder}
+                  />
                   {/* Button for Search */}
                   <button className="btn border-gray-900" onClick={ () => setHideSearch(true) }>Search</button>
                 </div>
@@ -174,8 +207,14 @@ export default function ticketsPage() {
           {/* View For Laptop and Desktop */}
           <div className="hidden xl:flex">
             {/* Search Sidebar */}
-            <div className="bg-gray-100 h-full w-2/12 flex flex-col p-4 pt-6 space-y-4">
-              <Sidebar onFiltersChange={setFilters} userRole={user?.role} />
+            <div className="bg-gray-100 h-full w-[18%] flex flex-col p-4 pt-6 space-y-4">
+              <Sidebar 
+                onFiltersChange={setFilters} 
+                userRole={user?.role} 
+                onSortChange={handleSortChange}
+                sortField={sortField}
+                sortOrder={sortOrder}
+              />
             </div>
             {/* Tickets View */}
             <div className="flex-1 pt-6 pl-2 pr-4 bg-white">

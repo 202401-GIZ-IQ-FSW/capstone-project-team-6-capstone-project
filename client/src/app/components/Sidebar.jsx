@@ -1,8 +1,11 @@
 // components/Sidebar.js
 
 import { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretUp, faCaretDown} from '@fortawesome/free-solid-svg-icons';
 
-const Sidebar = ({ onFiltersChange, userRole }) => {
+
+const Sidebar = ({ onFiltersChange, userRole, onSortChange, sortField, sortOrder }) => {
  
   const [ticketPriority, setTicketPriority] = useState({
     Low: false,
@@ -64,6 +67,8 @@ const Sidebar = ({ onFiltersChange, userRole }) => {
     }
   };
 
+  // console.log("sort", sortOrder, sortField)
+
   const handleSearchChange = (e) => setSearchQuery(e.target.value);
 
   const handleSearchFieldChange = (e) => setSearchField(e.target.value);
@@ -80,11 +85,11 @@ const Sidebar = ({ onFiltersChange, userRole }) => {
           onChange={handleSearchFieldChange}
           className="w-full px-4 py-2 border rounded-md mb-2"
         >
-          <option value="title">Ticket Title</option>
-          {userRole !== "customer" && <option value="user">User</option>}
+          <option value="title">Title</option>
+          <option value="number">Number</option>
+          <option value="description">Description</option>
+          {userRole !== "customer" && <option value="user">Created By</option>}
           <option value="assigned to">Assigned To</option>
-          <option value="number">Ticket Number</option>
-          <option value="description">Ticket Description</option>
         </select>
 
         <input
@@ -95,7 +100,18 @@ const Sidebar = ({ onFiltersChange, userRole }) => {
           placeholder={`Search by ${searchField}`}
         />
       </div>
-      
+
+      {/* Divider and Ticket Sorting Section */}
+      <hr className="my-4 border-gray-300" />
+      <div className="space-y-4">
+      {/* Sorting Buttons */}
+        <div className="space-y-2">
+          <SortButton text="Created At" field="createdAt" sortField={sortField} sortOrder={sortOrder} onSortChange={onSortChange} />
+          <SortButton text="Title" field="title" sortField={sortField} sortOrder={sortOrder} onSortChange={onSortChange} />
+          <SortButton text="Number" field="number" sortField={sortField} sortOrder={sortOrder} onSortChange={onSortChange} />
+        </div>
+      </div>
+
       {/* Divider and Ticket Category Section */}
       <hr className="my-4 border-gray-300" />
       <div>
@@ -157,6 +173,19 @@ const Checkbox = ({ label, checked, onChange }) => {
       />
       <span className="ml-2 text-sm text-gray-700">{label}</span>
     </label>
+  );
+};
+
+// SortButton component
+const SortButton = ({ text, field, sortField, sortOrder, onSortChange }) => {
+  return (
+    <button className="btn px-2 min-h-10 h-10 w-full flex justify-between border border-gray-600" onClick={() => onSortChange(field)}>
+      <p>{text}</p>
+      <p className='flex flex-col'>
+        <FontAwesomeIcon icon={faCaretUp} className={sortField === field ? (sortOrder === 'asc' ? 'text-gray-600' : 'text-gray-400') : 'text-gray-400'} />
+        <FontAwesomeIcon icon={faCaretDown} className={sortField === field ? (sortOrder === 'desc' ? 'text-gray-600' : 'text-gray-400') : 'text-gray-400'} />
+      </p>
+    </button>
   );
 };
 

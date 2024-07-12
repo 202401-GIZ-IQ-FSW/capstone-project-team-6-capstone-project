@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faBriefcase, faUserCog } from '@fortawesome/free-solid-svg-icons';
+import StatusIcons from "./StatusIcons";
 
 
 const Comments = ({ ticketId, signedIn, user, ticket }) => {
@@ -199,9 +200,9 @@ const Comments = ({ ticketId, signedIn, user, ticket }) => {
                       <br />
                       {userRoleDisplay(comment.user?.role)}{" "}
                       {comment.user.role !== "customer" &&
-                        <FontAwesomeIcon icon={faUserCog} className="text-gray-500 group-hover:text-sky-500" />}
+                        <StatusIcons field={comment.user?.role} className="text-gray-500 group-hover:text-sky-500" />}
                       {comment.user.role === "customer" &&
-                        <FontAwesomeIcon icon={faUser} className="text-gray-500 group-hover:text-sky-500" />}
+                        <StatusIcons field={comment.user?.role} className="text-gray-500 group-hover:text-sky-500" />}
                     </span>
                   )}
                 </Link>
@@ -214,9 +215,9 @@ const Comments = ({ ticketId, signedIn, user, ticket }) => {
                       <br />
                       {userRoleDisplay(comment.user?.role)}{" "}
                       {comment.user.role !== "customer" &&
-                        <FontAwesomeIcon icon={faUserCog} className="text-gray-500" />}
+                        <StatusIcons field={comment.user?.role} className="text-gray-500" />}
                       {comment.user.role === "customer" &&
-                        <FontAwesomeIcon icon={faUser} className="text-gray-500" />}
+                        <StatusIcons field={comment.user?.role} className="text-gray-500" />}
                     </span>
                   )}
                 </p>

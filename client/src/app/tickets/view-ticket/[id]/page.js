@@ -6,6 +6,7 @@ import Link from "next/link";
 import Comments from "../../../components/Comments";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faUserCog } from '@fortawesome/free-solid-svg-icons';
+import StatusIcons from "@/app/components/StatusIcons";
 
 
 export default function viewTicketPage({params}) {
@@ -189,9 +190,9 @@ export default function viewTicketPage({params}) {
                             <p className="flex items-center gap-2">
                               <span>{userRoleDisplay(ticketFormData.user.role)}</span>
                               {ticketFormData?.user?.role === "customer" &&
-                                <FontAwesomeIcon icon={faUser} className="text-gray-500 group-hover:text-sky-500" />}
+                                <StatusIcons field={ticketFormData.user.role} className="text-gray-500 group-hover:text-sky-500" />}
                               {ticketFormData?.user?.role !== "customer" &&
-                                <FontAwesomeIcon icon={faUserCog} className="text-gray-500 group-hover:text-sky-500" />}
+                                <StatusIcons field={ticketFormData.user.role} className="text-gray-500 group-hover:text-sky-500" />}
                             </p>
                           }
                         </div>
@@ -207,9 +208,9 @@ export default function viewTicketPage({params}) {
                             <p className="flex items-center gap-2">
                               <span>{userRoleDisplay(ticketFormData.user.role)}</span>
                               {ticketFormData?.user?.role === "customer" && 
-                                <FontAwesomeIcon icon={faUser} className="text-gray-500" />}
+                                <StatusIcons field={ticketFormData.user.role} className="text-gray-500" />}
                               {ticketFormData?.user?.role !== "customer" && 
-                                <FontAwesomeIcon icon={faUserCog} className="text-gray-500" />}
+                                <StatusIcons field={ticketFormData.user.role} className="text-gray-500" />}
                             </p>
                           }
                         </div>
@@ -266,7 +267,7 @@ export default function viewTicketPage({params}) {
                             (<div className="flex md:flex-row flex-col gap-2">
                               <p>{ticketFormData.assignedUser?.name}</p>
                               <p className="hidden md:flex">|</p>
-                              <p>{userRoleDisplay(ticketFormData.assignedUser?.role)} <FontAwesomeIcon icon={faUserCog} className="text-gray-500 group-hover:text-sky-500 transition-colors duration-200" /></p>
+                              <p>{userRoleDisplay(ticketFormData.assignedUser?.role)} <StatusIcons field={ticketFormData.assignedUser?.role} className="text-gray-500 group-hover:text-sky-500 transition-colors duration-200" /></p>
                             </div>)
                           || "None" }
                         </Link>)
@@ -277,7 +278,7 @@ export default function viewTicketPage({params}) {
                             (<div className="flex md:flex-row flex-col gap-2" >
                               <p>{ticketFormData.assignedUser?.name}</p>
                               <p className="hidden md:flex">|</p>
-                              <p>{userRoleDisplay(ticketFormData.assignedUser?.role)} <FontAwesomeIcon icon={faUserCog} className="text-gray-500" /></p>
+                              <p>{userRoleDisplay(ticketFormData.assignedUser?.role)} <StatusIcons field={ticketFormData.assignedUser?.role} className="text-gray-500" /></p>
                             </div>)
                           || "None" }
                         </div>)
