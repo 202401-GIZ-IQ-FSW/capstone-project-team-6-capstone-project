@@ -36,9 +36,9 @@ const RightSideContent = ({tickets, errorMessage, user}) => {
   };
 
   function extractImageId(rawImageUrl) {
-    if (!rawImageUrl.includes("drive.google.com")) {
-      return rawImageUrl;
-    }
+    // if (!rawImageUrl.includes("drive.google.com")) {
+    //   return rawImageUrl;
+    // }
     const regex = /\/d\/([a-zA-Z0-9_-]+)\//;
     const match = rawImageUrl.match(regex);
     if (match && match[1]) {

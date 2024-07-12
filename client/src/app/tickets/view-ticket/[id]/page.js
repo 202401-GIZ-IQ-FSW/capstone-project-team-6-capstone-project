@@ -15,7 +15,6 @@ export default function viewTicketPage({params}) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [image, setImage] = useState(null);
 
   const ticketId = params.id; 
   const roles = ["superAdmin", "admin", "supportAgent"];
@@ -122,9 +121,9 @@ export default function viewTicketPage({params}) {
   };
 
   function extractImageId(rawImageUrl) {
-    if (!rawImageUrl.includes("drive.google.com")) {
-      return rawImageUrl;
-    }
+    // if (!rawImageUrl.includes("drive.google.com")) {
+    //   return rawImageUrl;
+    // }
     const regex = /\/d\/([a-zA-Z0-9_-]+)\//;
     const match = rawImageUrl.match(regex);
     if (match && match[1]) {
