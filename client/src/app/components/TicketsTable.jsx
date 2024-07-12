@@ -45,7 +45,7 @@ export default function TicketsTable({tickets, errorMessage, user}) {
                                 <th className="px-2 py-3">no.</th>
                                 <th className="px-2 py-3">Ticket</th>                          
                                 <th className="px-2 py-3">Title</th>
-                                <th className="px-2 py-3">Description</th>
+                                {/* <th className="px-2 py-3">Description</th> */}
                                 <th className="px-2 py-3">Category</th>
                                 <th className="px-2 py-3">Status</th>
                                 <th className="px-2 py-3">Priority</th>
@@ -64,7 +64,7 @@ export default function TicketsTable({tickets, errorMessage, user}) {
                                     <td className="text-center px-2 py-4"> {index + 1}</td>
                                     <td className="text-center px-2 py-4"># {ticket?.number}</td>
                                     <td className="px-2 py-3">{ticket?.title}</td>
-                                    <td className="px-2 py-3">{ticket?.description}</td>
+                                    {/* <td className="px-2 py-3">{ticket?.description}</td> */}
                                     <td className="px-2 py-3">{ticket?.category}</td>
                                     <td className="px-2 py-3">{ticket?.status}</td>
                                     <td className="px-2 py-3">{ticket?.priority}</td>

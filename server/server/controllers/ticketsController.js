@@ -2,15 +2,15 @@ const Ticket = require('../models/ticket');
 const Comment = require('../models/comment');
 
 // Function to filter out empty fields from the request body
-// const filterEmptyFields = (data) => {
-//   const filteredData = {};
-//   for (const key in data) {
-//     if (data[key] !== "") {
-//       filteredData[key] = data[key];
-//     }
-//   }
-//   return filteredData;
-// };
+const filterEmptyFields = (data) => {
+  const filteredData = {};
+  for (const key in data) {
+    if (data[key] !== "") {
+      filteredData[key] = data[key];
+    }
+  }
+  return filteredData;
+};
 
 const getTickets = async (req, res) => {
   try {

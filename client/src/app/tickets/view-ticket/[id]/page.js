@@ -51,10 +51,16 @@ export default function viewTicketPage({params}) {
           const data = await response.json();
 
           if (response.ok) {
-            setTicketFormData({
-              ...data, 
-              assignToSelf: ( data?.assignedUser?._id === user?._id ) ? "yes" : "no" 
-            });
+
+            if (user?.role ===  "customer") {
+              setTicketFormData(data);
+            } else {
+              setTicketFormData({
+                ...data, 
+                assignToSelf: ( data?.assignedUser?._id === user?._id ) ? "yes" : "no" 
+              });
+            }
+
           } else {
             setError(data.error);
           }
@@ -89,16 +95,22 @@ export default function viewTicketPage({params}) {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(ticketFormData)
+        body: JSON.stringify(user?.role === "customer" ? {status: "Open"} : ticketFormData)
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setTicketFormData({
-          ...data, // Update ticketFormData with the new data from the server
-          assignToSelf: data?.assignedUser?._id === user?._id ? "yes" : "no"
-        });
+
+        if (user?.role ===  "customer") {
+          setTicketFormData(data);
+        } else {
+          setTicketFormData({
+            ...data, // Update ticketFormData with the new data from the server
+            assignToSelf: ( data?.assignedUser?._id === user?._id ) ? "yes" : "no" 
+          });
+        }
+
         setMessage("Ticket updated successfully");
         setTimeout(() => {
           setMessage("");
@@ -295,7 +307,11 @@ export default function viewTicketPage({params}) {
             </div>
           
 
-            <p className=" text-gray-600 lg:text-lg font-normal my-2 text-wrap"><b>Change ticket status { roles.includes(user?.role) ? ", priority and assigned user" : "" }</b></p>
+            { roles.includes(user?.role) &&
+              <p className=" text-gray-600 lg:text-lg font-normal my-2 text-wrap">
+                <b>Change ticket status, priority and assigned user</b>
+              </p>
+            }
             
             {/* Form for updating a ticket */}
             <form className="space-y-4" onSubmit={handleUpdateTicket}>
@@ -303,24 +319,26 @@ export default function viewTicketPage({params}) {
               <div className="space-y-4">
 
                 {/* Status field */}
-                <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-4 text-sm lg:text-base">
-                  <label className="text-gray-600 block mb-1">Status</label>
-                  <select 
-                    name="status" 
-                    value={ticketFormData.status}
-                    onChange={(e) =>
-                      setTicketFormData({
-                        ...ticketFormData,
-                        status: e.target.value,
-                      })
-                    } 
-                    className="w-full px-4 py-2 border bg-gray-400 border-gray-900 rounded-md focus:outline-none focus:border-blue-500"
-                  >
-                    <option value="Open">Open</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Closed">Closed</option>
-                  </select>
-                </div>
+                { roles.includes(user?.role) &&
+                  <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-4 text-sm lg:text-base">
+                    <label className="text-gray-600 block mb-1">Status</label>
+                    <select 
+                      name="status" 
+                      value={ticketFormData.status}
+                      onChange={(e) =>
+                        setTicketFormData({
+                          ...ticketFormData,
+                          status: e.target.value,
+                        })
+                      } 
+                      className="w-full px-4 py-2 border bg-gray-400 border-gray-900 rounded-md focus:outline-none focus:border-blue-500"
+                    >
+                      <option value="Open">Open</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Closed">Closed</option>
+                    </select>
+                  </div>
+                }
 
                 {/* Priority field - shown only to users with specific roles */}
                 {roles.includes(user?.role) && (
@@ -374,14 +392,30 @@ export default function viewTicketPage({params}) {
               </div>
       
               <div className="flex justify-between py-2 gap-4 text-center">
-                <button
-                  type="submit"
-                  className="bg-gray-600 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
-                >
-                  Update Ticket
-                </button>
 
-                <div className="flex gap-4">
+                { (user?.role === "customer" && ticketFormData?.status === "Closed") &&
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // setTicketFormData({ ...ticketFormData, status: "Open" });
+                      handleUpdateTicket(new Event('submit'));
+                    }}
+                    className="bg-gray-600 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
+                  >
+                    Re-Open Ticket
+                  </button>
+                }
+
+                { roles.includes(user?.role) &&
+                  <button
+                    type="submit"
+                    className="bg-gray-600 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
+                  >
+                    Update Ticket
+                  </button>
+                }
+
+                <div className={`flex justify-end gap-4 ${user?.role === "customer" && ticketFormData?.status !== "Closed" ? "w-full" : ""}`}>
                   {ticketFormData?.user?._id === user?._id && (
                     <Link href={`/tickets/edit-ticket/${ticketId}`}>
                       <p className="bg-gray-600 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded text-sm lg:text-base">
@@ -398,6 +432,7 @@ export default function viewTicketPage({params}) {
                     </Link>
                   )}
                 </div>
+
               </div>
 
             </form>

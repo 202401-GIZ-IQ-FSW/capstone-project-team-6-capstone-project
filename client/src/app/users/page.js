@@ -101,9 +101,15 @@ export default function usersPage() {
         let aValue = a[sortField];
         let bValue = b[sortField];
 
-        if (typeof aValue === 'string') {
-          aValue = aValue.toLowerCase();
-          bValue = bValue.toLowerCase();
+        // Convert age fields to a number if they exist, otherwise set them to a very high or very low value
+        if (sortField === 'age') {
+          aValue = aValue ? aValue : (sortOrder === 'asc' ? Number.MAX_SAFE_INTEGER : Number.MIN_SAFE_INTEGER);
+          bValue = bValue ? bValue : (sortOrder === 'asc' ? Number.MAX_SAFE_INTEGER : Number.MIN_SAFE_INTEGER);
+        } else {
+          if (typeof aValue === 'string') {
+            aValue = aValue.toLowerCase();
+            bValue = bValue.toLowerCase();
+          }
         }
 
         if (sortOrder === 'asc') {

@@ -63,8 +63,8 @@ export default function UsersTable({users, errorMessage, user}) {
                             <td className="px-1 py-3">{user?.username}</td>
                             <td className="px-1 py-3">{user?.email}</td>
                             <td className="px-1 py-3">{userRoleDisplay(user?.role)}</td>
-                            <td className="px-1 py-3 text-center">{user?.age || "N/A"}</td>
-                            <td className="px-1 py-3 text-center">{user?.phone || "N/A"}</td>
+                            <td className="px-1 py-3 text-center">{user?.age || "-"}</td>
+                            <td className="px-1 py-3 text-center">{user?.phone || "-"}</td>
                             <td className="px-1 py-3">{formatDate(user?.createdAt)}</td>
                             </tr>
 
