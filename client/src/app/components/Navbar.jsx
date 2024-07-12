@@ -161,22 +161,25 @@ const Navbar = () => {
           )}
           {signedIn === true && (
             <div className="relative">
-              <button
+              <div
                 onClick={toggleShowSignOut}
-                className={`btn flex items-center ${showSignOut? "rounded-b-none border-gray-800" : ""}`}
+                className={`bg-gray-50 p-2 text-sm lg:text-base hover:bg-gray-300 rounded-lg flex flex-row items-center cursor-pointer ${showSignOut? "border border-b-0 rounded-b-none border-gray-800" : ""}`}
               >
-                <span>{user?.name}</span> {/* Display user's name */}
+                <p>{user?.name}</p> {/* Display user's name */}
                 <FontAwesomeIcon icon={faCaretDown} className="text-gray-500 ml-2" /> {/* Carrot down icon */}
-              </button>
+              </div>
+              {showSignOut && 
+                <div className="flex justify-center bg-gray-50 border-x border-gray-600 ">
+                  <hr className="border rounded-full border-gray-400 w-full text-center"/>
+                </div> 
+              }
               {showSignOut && (
-                <ul className="absolute right-0 w-full z-10">
-                  <li>
-                    <Link onClick={toggleShowSignOut} href="/signout" className="btn border-gray-800 w-full rounded-t-none">
-                      <p>Sign Out</p>
-                      <FontAwesomeIcon icon={faSignOutAlt} className="ml-2" />
-                    </Link>
-                  </li>
-                </ul>
+                <div className="absolute right-0 w-full z-1 text-sm lg:text-base">
+                  <Link onClick={toggleShowSignOut} href="/signout" className="bg-gray-50 p-2 flex flex-row items-center justify-center hover:bg-gray-300 rounded-lg cursor-pointer border border-gray-800 w-full border-t-0 rounded-t-none">
+                    <p>Sign Out</p>
+                    <FontAwesomeIcon icon={faSignOutAlt} className="pl-2 pt-1" />
+                  </Link>
+                </div>
               )}
           </div>
           )}

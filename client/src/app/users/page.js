@@ -22,7 +22,7 @@ export default function usersPage() {
     searchField: "name"
   });
   const [sortField, setSortField] = useState("createdAt");
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   const roles = ["superAdmin", "admin"];
 

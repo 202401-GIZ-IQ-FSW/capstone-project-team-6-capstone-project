@@ -8,12 +8,14 @@ const getUsers = async (req, res) => {
     let users;
 
     if (role === "superAdmin") {
-      users = await User.find({role: {$ne: 'superAdmin'}}).select('-password');
+      users = await User.find({role: {$ne: 'superAdmin'}}).select('-password').sort({ createdAt: -1 });
+
       if (!users || users.length === 0) {
         return res.status(404).json({error: "Can't find or there aren't any admins, support agents or customers accounts"})
       }
     } else {
-      users = await User.find({role: {$nin: ['superAdmin', 'admin']}}).select('-password');
+      users = await User.find({role: {$nin: ['superAdmin', 'admin']}}).select('-password').sort({ createdAt: -1 });
+      
       if (!users || users.length === 0) {
         return res.status(404).json({error: "Can't find or there aren't any customers or support agents accounts"})
       }

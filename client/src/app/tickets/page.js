@@ -25,7 +25,7 @@ export default function ticketsPage() {
     searchField: "title"
   });
   const [sortField, setSortField] = useState("createdAt");
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   useEffect(() => {
     if (signedIn === false) {
