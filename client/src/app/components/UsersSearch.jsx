@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretUp, faCaretDown} from '@fortawesome/free-solid-svg-icons';
 
 
-const UsersSearch = ({ onFiltersChange, loggedUserRole }) => {
+const UsersSearch = ({ onFiltersChange, loggedUserRole, onSortChange, sortField, sortOrder }) => {
 
   const [userRole, setUserRole] = useState({
     superAdmin: false,
@@ -64,7 +66,6 @@ const UsersSearch = ({ onFiltersChange, loggedUserRole }) => {
           <option value="username">Username</option>
           <option value="age">Age</option>
           <option value="phone">Phone</option>
-          <option value="country">Country</option>
         </select>
 
         <input
@@ -74,6 +75,18 @@ const UsersSearch = ({ onFiltersChange, loggedUserRole }) => {
           className="w-full px-4 py-2 border rounded-md"
           placeholder={`Search by ${searchField}`}
         />
+      </div>
+
+      {/* Divider and User Sorting Section */}
+      <hr className="my-4 border-gray-300" />
+      <div className="space-y-4">
+      {/* Sorting Buttons */}
+        <div className="space-y-2">
+          <SortButton text="Created At" field="createdAt" sortField={sortField} sortOrder={sortOrder} onSortChange={onSortChange} />
+          <SortButton text="Name" field="name" sortField={sortField} sortOrder={sortOrder} onSortChange={onSortChange} />
+          <SortButton text="Email" field="email" sortField={sortField} sortOrder={sortOrder} onSortChange={onSortChange} />
+          <SortButton text="Age" field="age" sortField={sortField} sortOrder={sortOrder} onSortChange={onSortChange} />
+        </div>
       </div>
       
       {/* Divider and User Role Section */}
@@ -117,6 +130,19 @@ const Checkbox = ({ label, checked, onChange }) => {
       />
       <span className="ml-2 text-sm text-gray-700">{label}</span>
     </label>
+  );
+};
+
+// SortButton component
+const SortButton = ({ text, field, sortField, sortOrder, onSortChange }) => {
+  return (
+    <button className="btn px-2 min-h-10 h-10 w-full flex justify-between border border-gray-600" onClick={() => onSortChange(field)}>
+      <p>{text}</p>
+      <p className='flex flex-col'>
+        <FontAwesomeIcon icon={faCaretUp} className={sortField === field ? (sortOrder === 'asc' ? 'text-gray-600' : 'text-gray-400') : 'text-gray-400'} />
+        <FontAwesomeIcon icon={faCaretDown} className={sortField === field ? (sortOrder === 'desc' ? 'text-gray-600' : 'text-gray-400') : 'text-gray-400'} />
+      </p>
+    </button>
   );
 };
 

@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faUserCog } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faUserCog, faUserGear} from '@fortawesome/free-solid-svg-icons';
+import StatusIcons from "./StatusIcons";
 
 
 const RightSideContent = ({tickets, errorMessage, user}) => {
@@ -63,42 +64,46 @@ const RightSideContent = ({tickets, errorMessage, user}) => {
             <div className="flex flex-col md:flex-row items-center">
 
               {/* Image */}
-              <div className="text-center z-1 w-full md:w-7/12 lg:w-5/12 md:h-48 bg-gray-200 rounded-md mb-2 md:mb-0 md:mr-4">
+              <div className="text-center z-1 w-full md:w-7/12 lg:w-5/12 md:h-48 lg:h-56 bg-gray-200 rounded-md mb-2 md:mb-0 md:mr-4">
                 {ticket?.imageURL ? 
                   <a href={ticket?.imageURL} onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className="rounded-lg text-center">
                     <img src={ticket?.imageURL? extractImageId(ticket.imageURL) : ""}
-                      className="w-full h-40 md:h-48 rounded-md text-center"
+                      className="w-full h-40 md:h-48 lg:h-56 rounded-md text-center"
                       title="Click for the larger version."
                       alt="image for ticket problem"
                     />
                   </a>
                 :
                   <img 
-                    className="w-full h-40 md:h-48 rounded-md text-center" 
+                    className="w-full h-40 md:h-48 lg:h-56 rounded-md text-center" 
                     src="/laptop-desk.png"
                     alt="default site logo"
                   />
                 }
               </div>
 
-              <div className='w-3/4 space-y-4 md:space-y-3 lg:space-y-5 mt-2 md:mt-0'>
+              <div className='w-3/4 space-y-4 md:space-y-3 lg:space-y-4 mt-2 md:mt-0'>
 
                 <div className="flex flex-col md:flex-row justify-between gap-2">
                   <p className="text-gray-800 font-bold"># {ticket.number} {ticket.title}</p>
                   <p className="text-gray-600 text-sm"><b>Created At:</b> {formatDate(ticket.createdAt)}</p>
                 </div>
 
-                <p className="text-gray-600">{ticket.description}</p>
+                
+                <p className="text-gray-600 pb-2 md:py-3 lg:pb-4 lg:pt-3 min-w-20 md:max-w-sm lg:max-w-[37rem] xl:max-w-[38rem] overflow-clip overflow-ellipsis whitespace-nowrap">
+                  {ticket.description}
+                </p>
+                
 
                 <div className="flex flex-col md:flex-row gap-2">
                   <p className="w-fit border border-slate-400 px-2 py-1 rounded-md text-sm text-gray-800">
-                    {ticket.priority}
+                    <StatusIcons field={ticket.priority} /> {ticket.priority}
                   </p>
                   <p className="w-fit border border-slate-400 px-2 py-1 rounded-md text-sm text-gray-800">
-                    {ticket.status}
+                    <StatusIcons field={ticket.status} /> {ticket.status}
                   </p>
                   <p className="w-fit border border-slate-400 px-2 py-1 rounded-md text-sm text-gray-800">
-                    {ticket.category}
+                    <StatusIcons field={ticket.category} /> {ticket.category}
                   </p>
                 </div>
                 
@@ -116,9 +121,9 @@ const RightSideContent = ({tickets, errorMessage, user}) => {
                          <p className="flex items-center gap-1">
                           <span>{userRoleDisplay(ticket.user.role)}</span>
                           {ticket?.user?.role === "customer" &&
-                            <FontAwesomeIcon icon={faUser} className="text-gray-500 group-hover:text-sky-500" />}
+                            <StatusIcons field={ticket?.user?.role} className="text-gray-500 group-hover:text-sky-500" />}
                           {ticket?.user?.role !== "customer" &&
-                            <FontAwesomeIcon icon={faUserCog} className="text-gray-500 group-hover:text-sky-500" />}
+                            <StatusIcons field={ticket?.user?.role} className="text-gray-500 group-hover:text-sky-500" />}
                          </p>
                         }
                       </div>
@@ -134,9 +139,9 @@ const RightSideContent = ({tickets, errorMessage, user}) => {
                           <p className="flex items-center gap-1">
                             <span>{userRoleDisplay(ticket.user.role)}</span>
                             {ticket?.user?.role === "customer" && 
-                              <FontAwesomeIcon icon={faUser} className="text-gray-500" />}
+                              <StatusIcons field={ticket?.user?.role} className="text-gray-500" />}
                             {ticket?.user?.role !== "customer" && 
-                              <FontAwesomeIcon icon={faUserCog} className="text-gray-500" />}
+                              <StatusIcons field={ticket?.user?.role} className="text-gray-500" />}
                           </p>
                         }
                       </div>
@@ -151,18 +156,18 @@ const RightSideContent = ({tickets, errorMessage, user}) => {
                         <div className="flex flex-row  gap-1">
                           <p>{ticket.assignedUser?.name }</p>
                           <p>|</p> 
-                          <p>{userRoleDisplay(ticket.assignedUser?.role)} <FontAwesomeIcon icon={faUserCog} className="text-gray-500 group-hover:text-sky-500" /></p>
+                          <p>{userRoleDisplay(ticket?.assignedUser?.role)} <StatusIcons field={ticket?.assignedUser?.role} className="text-gray-500 group-hover:text-sky-500" /></p>
                         </div>
                       || "None" }
                     </Link>)
                     :
                     (<div className="text-gray-600 gap-1 flex flex-col md:flex-row">
                       <p><b>Assigned To:</b></p> 
-                      { ticket.assignedUser &&
+                      { ticket?.assignedUser &&
                         <div className="flex flex-row gap-1">
                           <p>{ticket.assignedUser?.name }</p>
                           <p>|</p>
-                          <p>{userRoleDisplay(ticket.assignedUser?.role)} <FontAwesomeIcon icon={faUserCog} className="text-gray-500" /></p>
+                          <p>{userRoleDisplay(ticket?.assignedUser?.role)} <StatusIcons field={ticket?.assignedUser?.role} className="text-gray-500" /></p>
                         </div>
                       || "None" }
                     </div>)

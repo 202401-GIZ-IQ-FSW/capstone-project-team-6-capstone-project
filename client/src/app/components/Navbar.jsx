@@ -3,12 +3,15 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Search from "./Search";
 import { useAuth } from "./AuthContext";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretDown, faSignOutAlt} from '@fortawesome/free-solid-svg-icons';
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { signedIn, user } = useAuth();
   // const [isClient, setIsClient] = useState(false);
   const roles = ["superAdmin", "admin"];
+  const [showSignOut, setShowSignOut] = useState(false);
 
   // useEffect(() => {
   //   setIsClient(true);
@@ -16,6 +19,10 @@ const Navbar = () => {
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const toggleShowSignOut = () => {
+    setShowSignOut(!showSignOut);
   };
 
   // if (!isClient) {
@@ -153,9 +160,25 @@ const Navbar = () => {
             </Link>
           )}
           {signedIn === true && (
-            <Link href="/signout" className="btn">
-              Sign Out
-            </Link>
+            <div className="relative">
+              <button
+                onClick={toggleShowSignOut}
+                className={`btn flex items-center ${showSignOut? "rounded-b-none border-gray-800" : ""}`}
+              >
+                <span>{user?.name}</span> {/* Display user's name */}
+                <FontAwesomeIcon icon={faCaretDown} className="text-gray-500 ml-2" /> {/* Carrot down icon */}
+              </button>
+              {showSignOut && (
+                <ul className="absolute right-0 w-full z-10">
+                  <li>
+                    <Link onClick={toggleShowSignOut} href="/signout" className="btn border-gray-800 w-full rounded-t-none">
+                      <p>Sign Out</p>
+                      <FontAwesomeIcon icon={faSignOutAlt} className="ml-2" />
+                    </Link>
+                  </li>
+                </ul>
+              )}
+          </div>
           )}
         </div>
         

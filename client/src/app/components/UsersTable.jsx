@@ -42,26 +42,30 @@ export default function UsersTable({users, errorMessage, user}) {
                     <table className="w-screen xl:w-full divide-y divide-gray-200">
                         
                         <thead>
-                        <tr className="text-xs lg:text-sm bg-gray-400 text-gray-800 align-top text-left font-medium uppercase tracking-wider">
-                            <th className="px-3 py-3 ">No.</th>
-                            <th className="px-3 py-3 ">Name</th>
-                            <th className="px-3 py-3 ">Username</th>
-                            <th className="px-3 py-3 ">Email</th>
-                            <th className="px-3 py-3 ">Role</th>
-                            <th className="px-3 py-3 ">Created at</th>
+                        <tr className="text-xs lg:text-sm bg-gray-400 text-gray-800 align-top text-center font-medium uppercase tracking-wider">
+                            <th className="px-1 py-3 text-center">No.</th>
+                            <th className="px-1 py-3">Name</th>
+                            <th className="px-1 py-3">Username</th>
+                            <th className="px-1 py-3">Email</th>
+                            <th className="px-1 py-3">Role</th>
+                            <th className="px-1 py-3 text-center">Age</th>
+                            <th className="px-1 py-3 text-center">Phone</th>
+                            <th className="px-1 py-3">Created at</th>
                         </tr>
                         </thead>
 
                         <tbody className="bg-white divide-y divide-gray-200">
                         {users?.map((user, index) => (
                             
-                            <tr key={index} onClick={() => handleRowClick(user?._id)} className="text-xs lg:text-sm hover:bg-gray-300 cursor-pointer">
-                            <td className="text-center px-3 py-4">{index+1}</td>
-                            <td className="px-3 py-3">{user?.name}</td>
-                            <td className="px-3 py-3">{user?.username}</td>
-                            <td className="px-3 py-3">{user?.email}</td>
-                            <td className="px-3 py-3">{userRoleDisplay(user?.role)}</td>
-                            <td className="px-3 py-3">{formatDate(user?.createdAt)}</td>
+                            <tr key={index} onClick={() => handleRowClick(user?._id)} className="text-nowrap text-center text-xs lg:text-sm hover:bg-gray-300 cursor-pointer">
+                            <td className="text-center px-1 py-4">{index+1}</td>
+                            <td className="px-1 py-3">{user?.name}</td>
+                            <td className="px-1 py-3">{user?.username}</td>
+                            <td className="px-1 py-3">{user?.email}</td>
+                            <td className="px-1 py-3">{userRoleDisplay(user?.role)}</td>
+                            <td className="px-1 py-3 text-center">{user?.age || "N/A"}</td>
+                            <td className="px-1 py-3 text-center">{user?.phone || "N/A"}</td>
+                            <td className="px-1 py-3">{formatDate(user?.createdAt)}</td>
                             </tr>
 
                         ))}

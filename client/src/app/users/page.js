@@ -21,6 +21,8 @@ export default function usersPage() {
     searchQuery: "",
     searchField: "name"
   });
+  const [sortField, setSortField] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("asc");
 
   const roles = ["superAdmin", "admin"];
 
@@ -68,7 +70,7 @@ export default function usersPage() {
 
   useEffect(() => {
     const applyFilters = () => {
-      let filtered = users;
+      let filtered = [...users];
 
       if (filters.role.length > 0) {
         filtered = filtered.filter(user => filters.role.includes(user.role));
@@ -95,12 +97,28 @@ export default function usersPage() {
         });
       }
 
+      filtered = filtered.sort((a, b) => {
+        let aValue = a[sortField];
+        let bValue = b[sortField];
+
+        if (typeof aValue === 'string') {
+          aValue = aValue.toLowerCase();
+          bValue = bValue.toLowerCase();
+        }
+
+        if (sortOrder === 'asc') {
+          return aValue > bValue ? 1 : -1;
+        } else {
+          return aValue < bValue ? 1 : -1;
+        }
+      });
+
       setFilteredUsers(filtered);
     };
 
     applyFilters();
     // console.log("filters", filters)
-  }, [filters, users]);
+  }, [filters, users, sortField, sortOrder]);
 
   if (signedIn === null || loading) {
     return (
@@ -109,6 +127,15 @@ export default function usersPage() {
       </div>
     );
   }
+
+  const handleSortChange = (field) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
 
   return (
     <>
@@ -134,24 +161,30 @@ export default function usersPage() {
             <div className="flex xl:hidden">
                 {/* Search Sidebar */}
                 {!hideSearch && 
-                    <div className="flex justify-center w-full bg-gray-50">
-                    <div className="bg-gray-100 h-auto w-auto flex flex-col justify-center py-4 px-4 space-y-4 my-4 mx-4 drop-shadow-lg rounded-lg">
-                        <UsersSearch onFiltersChange={setFilters} loggedUserRole={user?.role} />
-                        {/* Button for Search */}
-                        <button className="btn border-gray-900" onClick={ () => setHideSearch(true) }>Search</button>
-                    </div>
-                    </div>
+                  <div className="flex justify-center w-full bg-gray-50">
+                  <div className="bg-gray-100 h-auto w-auto flex flex-col justify-center py-4 px-4 space-y-4 my-4 mx-4 drop-shadow-lg rounded-lg">
+                      <UsersSearch 
+                        onFiltersChange={setFilters} 
+                        loggedUserRole={user?.role} 
+                        onSortChange={handleSortChange}
+                        sortField={sortField}
+                        sortOrder={sortOrder}
+                      />
+                      {/* Button for Search */}
+                      <button className="btn border-gray-900" onClick={ () => setHideSearch(true) }>Search</button>
+                  </div>
+                  </div>
                 }
                 {/* Users View */}
                 {hideSearch && 
-                    <div className="flex-1 w-screen xl:w-auto pt-6 pl-2 pr-2 bg-white">
-                        <div className="flex flex-row pl-4 pr-4 gap-2">
-                            {/* Button for Search */}
-                            <button className="btn w-full border-gray-900" onClick={ () => setHideSearch(false) }>Search</button>
-                        </div>
-                        {/* Users Table */}
-                        <UsersTable users={filteredUsers} errorMessage={error} user={user} />
-                    </div>
+                  <div className="flex-1 w-screen xl:w-auto pt-6 pl-2 pr-2 bg-white">
+                      <div className="flex flex-row pl-4 pr-4 gap-2">
+                          {/* Button for Search */}
+                          <button className="btn w-full border-gray-900" onClick={ () => setHideSearch(false) }>Search</button>
+                      </div>
+                      {/* Users Table */}
+                      <UsersTable users={filteredUsers} errorMessage={error} user={user} />
+                  </div>
                 }
             </div>
 
@@ -159,7 +192,13 @@ export default function usersPage() {
             <div className="hidden xl:flex">
                 {/* Search Sidebar */}
                 <div className="bg-gray-100 h-full w-2/12 flex flex-col p-4 pt-6 space-y-4">
-                    <UsersSearch onFiltersChange={setFilters} loggedUserRole={user?.role} />
+                    <UsersSearch 
+                      onFiltersChange={setFilters} 
+                      loggedUserRole={user?.role} 
+                      onSortChange={handleSortChange}
+                      sortField={sortField}
+                      sortOrder={sortOrder}
+                    />
                 </div>
                 {/* Users Table */}
                 <div className="flex-1 pt-6 pl-2 pr-4 bg-white">
