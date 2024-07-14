@@ -17,6 +17,7 @@ export default function viewUserPage({ params }) {
 
   const [userFormData, setUserFormData] = useState({
     role: "",
+    status: ""
   });
 
   useEffect(() => {
@@ -64,6 +65,7 @@ export default function viewUserPage({ params }) {
           const data = await response.json();
 
           if (response.ok) {
+            console.log("user", data)
             setUserFormData(data);
             setAdminViewingAdmin(false);
           } else {
@@ -93,7 +95,7 @@ export default function viewUserPage({ params }) {
     );
   }
 
-  const handleUpdateUser = async (event) => {
+  const handleUpdateUserRole = async (event) => {
     event.preventDefault();
     setMessage(""); // Reset message
     setError(""); // Reset error
@@ -127,6 +129,42 @@ export default function viewUserPage({ params }) {
     }
 
     // console.log("Updating user role:", userFormData);
+  };
+
+  const handleUpdateUserStatus = async (event) => {
+    event.preventDefault();
+    setMessage(""); // Reset message
+    setError(""); // Reset error
+
+    try {
+      const response = await fetch(
+        `http://localhost:3001/admin/update-user-status/${userId}`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userFormData),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage("User status updated successfully");
+        setTimeout(() => {
+          setMessage("");
+        }, 2000);
+      } else {
+        // Handle server errors
+        setError(data.error);
+      }
+    } catch (error) {
+      setError(error);
+    }
+
+    // console.log("Updating user status:", userFormData);
   };
 
   const formatDate = (dateString) => {
@@ -259,7 +297,13 @@ export default function viewUserPage({ params }) {
 
                   <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
                     <p className="text-gray-600 lg:text-lg font-normal mb-2">
-                      <b>Account Type:</b> {userRoleDisplay(userFormData.role)}
+                      <b>Account Type:</b> {userRoleDisplay(userFormData?.role)}
+                    </p>
+                  </div>
+
+                  <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
+                    <p className="text-gray-600 lg:text-lg font-normal mb-2">
+                      <b>Account Status:</b> {userFormData?.status}
                     </p>
                   </div>
 
@@ -267,18 +311,19 @@ export default function viewUserPage({ params }) {
               </div>
             </div>
 
+            {/* Change User Status */}
             { ( (user?.role === "superAdmin" && user?._id !== userId) ||
                 (user?.role === "admin" && !roles.includes(userFormData?.role))) && (
-                <p className=" text-gray-600 lg:text-lg font-normal my-2 text-wrap">
+                <p className=" text-gray-600 lg:text-lg font-normal mt-6 mb-2 text-wrap">
                   <b>Change User Role</b>
                 </p>
             )}
 
-            {/* Form for updating user role */}
+            {/* Form for updating User Role */}
             { ( (user?.role === "superAdmin" && user?._id !== userId) ||
                 (user?.role === "admin" && !roles.includes(userFormData?.role))
               ) && (
-                <form className="space-y-4" onSubmit={handleUpdateUser}>
+                <form className="space-y-4" onSubmit={handleUpdateUserRole}>
                   {/* Role field */}
                   <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 text-sm lg:text-lg">
                     <label className="text-gray-600 block mb-1">Role</label>
@@ -300,19 +345,6 @@ export default function viewUserPage({ params }) {
                       <option value="customer">Customer</option>
                     </select>
 
-                    <div className="mt-4">
-                      {message && (
-                        <div className="flex justify-center mb-2 p-2 bg-emerald-300 rounded-md">
-                          <p className="text-gray-800">{message}</p>
-                        </div>
-                      )}
-                      {error && (
-                        <div className="flex justify-center mb-2 p-2 bg-red-500 rounded-md">
-                          <p className="text-gray-900">{error}</p>
-                        </div>
-                      )}
-                    </div>
-
                     <div className="flex justify-start mt-4">
                       <button
                         type="submit"
@@ -321,6 +353,72 @@ export default function viewUserPage({ params }) {
                         Update User Role
                       </button>
                     </div>
+                    
+                  </div>
+
+                </form>
+              )
+            }
+
+            {message && (
+              <div className="mb-0 mt-7 bg-gray-100 border border-gray-300 rounded-lg p-4 text-sm lg:text-lg">
+                <div className="flex justify-center p-2 bg-emerald-300 rounded-md">
+                  <p className="text-gray-800">{message}</p>
+                </div>
+              </div>
+            )}
+            {error && (
+              <div className="mb-0 mt-6 bg-gray-100 border border-gray-300 rounded-lg p-4 text-sm lg:text-lg">
+                <div className="flex justify-center p-2 bg-red-500 rounded-md">
+                  <p className="text-gray-900">{error}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Change User Status */}
+            { ( (user?.role === "superAdmin" && user?._id !== userId) ||
+                (user?.role === "admin" && !roles.includes(userFormData?.role))) && (
+                <p className=" text-gray-600 lg:text-lg font-normal mt-6 mb-2 text-wrap">
+                  <b>Change User Status</b>
+                </p>
+            )}
+
+            {/* Form for updating User Status */}
+            { ( (user?.role === "superAdmin" && user?._id !== userId) ||
+                (user?.role === "admin" && !roles.includes(userFormData?.role))
+              ) && (
+                <form className="space-y-4" onSubmit={handleUpdateUserStatus}>
+                  {/* Status field */}
+                  <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 text-sm lg:text-lg">
+                    <label className="text-gray-600 block mb-1">Status</label>
+                    <select
+                      name="status"
+                      value={userFormData.status}
+                      onChange={(e) =>
+                        setUserFormData({
+                          ...userFormData,
+                          status: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2 border bg-gray-400 border-gray-900 rounded-md focus:outline-none focus:border-blue-500"
+                    >
+                      {/* {user?.role === "superAdmin" && (
+                        <option value="admin">Admin</option>
+                      )} */}
+                      <option value="Active">Active</option>
+                      <option value="Pending">Pending</option>
+                      <option value="Blocked">Blocked</option>
+                    </select>
+
+                    <div className="flex justify-start mt-4">
+                      <button
+                        type="submit"
+                        className="bg-blue hover:bg-gray-400 text-gray-900 font-bold py-2 px-4 rounded"
+                      >
+                        Update User Status
+                      </button>
+                    </div>
+                    
                   </div>
 
                 </form>

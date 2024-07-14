@@ -2,9 +2,9 @@ import { useRouter } from 'next/navigation';
 import Link from "next/link";
 
 
-export default function UsersTable({users, errorMessage, user}) {
+export default function UsersTable({users, filteredUsers, errorMessage, user}) {
   const router = useRouter();
-  const resultsCount = users? users.length : 0;
+  const resultsCount = filteredUsers? filteredUsers.length : 0;
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
@@ -31,12 +31,12 @@ export default function UsersTable({users, errorMessage, user}) {
   };
 
   return (
-    <div className="p-4 xl:pt-0 border-gray-300 overflow-y-auto bg-white">
-        <h2 className="text-lg lg:text-2xl font-bold ">Users</h2>
+    <div className="p-4 pt-0 border-gray-300 overflow-y-auto bg-white">
+        <h2 className="text-lg lg:text-2xl font-bold text-gray-800">Users</h2>
         <p className="text-gray-600 mt-2 mb-4 text-sm lg:text-base">{resultsCount} results found for your search</p>
 
         { users.length > 0 ? (
-            <div className="">
+            <div className="mb-4">
                 <div className="overflow-x-auto rounded-lg border-gray-500 border-2">
                     
                     <table className="w-screen xl:w-full divide-y divide-gray-200">
@@ -50,6 +50,7 @@ export default function UsersTable({users, errorMessage, user}) {
                             <th className="px-1 py-3">Role</th>
                             <th className="px-1 py-3 text-center">Age</th>
                             <th className="px-1 py-3 text-center">Phone</th>
+                            <th className="px-1 py-3 text-center">Status</th>
                             <th className="px-1 py-3">Created at</th>
                         </tr>
                         </thead>
@@ -65,6 +66,7 @@ export default function UsersTable({users, errorMessage, user}) {
                             <td className="px-1 py-3">{userRoleDisplay(user?.role)}</td>
                             <td className="px-1 py-3 text-center">{user?.age || "-"}</td>
                             <td className="px-1 py-3 text-center">{user?.phone || "-"}</td>
+                            <td className="px-1 py-3">{user?.status}</td>
                             <td className="px-1 py-3">{formatDate(user?.createdAt)}</td>
                             </tr>
 

@@ -7,9 +7,9 @@ import { faUser, faUserCog, faUserGear} from '@fortawesome/free-solid-svg-icons'
 import StatusIcons from "./StatusIcons";
 
 
-const RightSideContent = ({tickets, errorMessage, user}) => {
+const RightSideContent = ({tickets, filteredTickets, errorMessage, user}) => {
   const router = useRouter();
-  const resultsCount = tickets? tickets.length : 0;
+  const resultsCount = filteredTickets ? filteredTickets.length : 0;
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
@@ -55,7 +55,7 @@ const RightSideContent = ({tickets, errorMessage, user}) => {
         <h2 className="text-lg lg:text-2xl font-bold ">Tickets</h2>
         <p className="text-gray-600 mt-2 mb-4 text-sm lg:text-base">{resultsCount} results found for your search</p>
 
-        {tickets.length > 0 ? tickets?.map((ticket, index) => (
+        {tickets.length > 0 ? tickets.map((ticket, index) => (
           <div 
             key={index} 
             className="mb-4 bg-gray-100 border p-4 rounded-md hover:bg-slate-300 cursor-pointer"
@@ -110,16 +110,16 @@ const RightSideContent = ({tickets, errorMessage, user}) => {
                 <div className="text-sm flex flex-col gap-2">
 
                   {/* Created By field*/}
-                  { ( ticket?.user?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticket?.user?.role) ) ) ?
-                    (<Link onClick={(e) => e.stopPropagation()} href={`/users/view-user/${ticket.user._id}`} className="text-gray-600 gap-1 z-1 hover:text-sky-500 group flex flex-col md:flex-row">
+                  { ( ticket.user?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticket.user?.role) ) ) ?
+                    (<Link onClick={(e) => e.stopPropagation()} href={`/users/view-user/${ticket.user?._id}`} className="text-gray-600 gap-1 z-1 hover:text-sky-500 group flex flex-col md:flex-row">
                       <p><b>Created By:</b></p>
                       <div className="flex flex-row gap-1">
-                        <p> {ticket.user.name}</p>
+                        <p> {ticket.user?.name}</p>
                         {user?.role !== "customer" && 
                           <p>|</p>}
                         {user?.role !== "customer" && 
                          <p className="flex items-center gap-1">
-                          <span>{userRoleDisplay(ticket.user.role)}</span>
+                          <span>{userRoleDisplay(ticket.user?.role)}</span>
                           {ticket?.user?.role === "customer" &&
                             <StatusIcons field={ticket?.user?.role} className="text-gray-500 group-hover:text-sky-500" />}
                           {ticket?.user?.role !== "customer" &&
@@ -132,12 +132,12 @@ const RightSideContent = ({tickets, errorMessage, user}) => {
                     (<div className="text-gray-600 flex flex-col md:flex-row gap-1">
                       <p><b>Created By:</b></p> 
                       <div className="flex flex-row gap-1">
-                        <p> {ticket.user.name}</p>
+                        <p> {ticket.user?.name}</p>
                         {user?.role !== "customer" &&
                           <p>|</p>}
                         {user?.role !== "customer" &&  
                           <p className="flex items-center gap-1">
-                            <span>{userRoleDisplay(ticket.user.role)}</span>
+                            <span>{userRoleDisplay(ticket.user?.role)}</span>
                             {ticket?.user?.role === "customer" && 
                               <StatusIcons field={ticket?.user?.role} className="text-gray-500" />}
                             {ticket?.user?.role !== "customer" && 

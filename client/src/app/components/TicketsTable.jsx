@@ -2,9 +2,9 @@ import { useRouter } from 'next/navigation';
 import Link from "next/link";
 
 
-export default function TicketsTable({tickets, errorMessage, user}) {
+export default function TicketsTable({tickets, filteredTickets, errorMessage, user}) {
   const router = useRouter();
-  const resultsCount = tickets? tickets.length : 0;
+  const resultsCount = filteredTickets? filteredTickets.length : 0;
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
@@ -32,16 +32,16 @@ export default function TicketsTable({tickets, errorMessage, user}) {
 
   return (
     <div className="p-4 border-gray-300 overflow-y-auto bg-white">
-        <h2 className="text-lg lg:text-2xl font-bold ">Tickets</h2>
+        <h2 className="text-lg lg:text-2xl font-bold text-gray-800">Tickets</h2>
         <p className="text-gray-600 mt-2 mb-4 text-sm lg:text-base">{resultsCount} results found for your search</p>
 
         { tickets.length > 0 ? (
-            <div className="">
+            <div className="mb-4">
                 <div className="overflow-x-auto rounded-lg border-gray-500 border-2">
                     <table className="w-screen xl:w-full divide-y divide-gray-200">
 
                         <thead>
-                            <tr className="text-xs lg:text-sm bg-gray-400 text-gray-800 align-top text-left font-medium uppercase tracking-wider">
+                            <tr className="text-xs lg:text-sm bg-gray-400 text-gray-800 align-top text-center font-medium uppercase tracking-wider">
                                 <th className="px-2 py-3">no.</th>
                                 <th className="px-2 py-3">Ticket</th>                          
                                 <th className="px-2 py-3">Title</th>
@@ -50,7 +50,7 @@ export default function TicketsTable({tickets, errorMessage, user}) {
                                 <th className="px-2 py-3">Status</th>
                                 <th className="px-2 py-3">Priority</th>
                                 <th className="px-2 py-3 text-center">Created By</th>
-                                {user?.role !== "customer" && <th className="px-2 py-3 text-left ">Role</th>}
+                                {user?.role !== "customer" && <th className="px-2 py-3">Role</th>}
                                 <th className="px-2 py-3 text-center">Assigned to</th>
                                 <th className="px-2 py-3">Role</th>
                                 <th className="px-2 py-3">Created at</th>
@@ -59,7 +59,7 @@ export default function TicketsTable({tickets, errorMessage, user}) {
                         <tbody className="bg-white divide-y divide-gray-200">
                             {tickets?.map((ticket, index) => (
                                 
-                                <tr key={index} onClick={() => handleRowClick(ticket?._id)} className="text-xs lg:text-sm hover:bg-gray-300 cursor-pointer">
+                                <tr key={index} onClick={() => handleRowClick(ticket?._id)} className="text-center text-xs lg:text-sm hover:bg-gray-300 cursor-pointer">
                                 
                                     <td className="text-center px-2 py-4"> {index + 1}</td>
                                     <td className="text-center px-2 py-4"># {ticket?.number}</td>

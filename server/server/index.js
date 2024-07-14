@@ -23,6 +23,9 @@ const ticketsRouter = require('./routes/ticketsRouter');
 const ensureAuthenticated = require('./middlewares/ensureAuthenticated');
 const ensureAdmin = require('./middlewares/ensureAdmin');
 
+// Models
+const Allow = require('./models/allow');
+
 // const dirname = path.resolve();
 // console.log('directory-name 👉️', dirname);
 
@@ -83,6 +86,59 @@ app.use('/admin', ensureAuthenticated, ensureAdmin, adminRouter);
 // Using Routes for tickets
 app.use('/tickets', ensureAuthenticated, ticketsRouter);
 
+// Allow All Route
+app.get("/allow-all", ensureAuthenticated, async (req, res) => {
+  try {
+    const role = req.session?.user?.role;
+    if (role !== "superAdmin") {
+      return res.status(403).json({ error: "Not Authorized to view the status of Allow All"});
+    }
+
+    // Check Allow All
+    const allow = await Allow.findOne({ name: "main"});
+    if (!allow) {
+      return res.status(403).json({ error: "Allow All Model Not Found"});
+    }
+    
+    return res.status(200).json(allow)
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Allow All Route
+app.put("/allow-all", ensureAuthenticated, async (req, res) => {
+  try {
+    const role = req.session?.user?.role;
+    if (role !== "superAdmin") {
+      return res.status(403).json({ error: "Not Authorized to change the status of Allow All"});
+    }
+
+    const { allowAll } = req.body;
+    const allowAllValues = ["Yes", "No"];
+
+    if ( !allowAll || !allowAllValues.includes(allowAll) ) {
+      return res.status(400).json({ error: 'Please provide a valid Allow All status must be Yes or No' });
+    }
+
+    // Check Allow All
+    const allow = await Allow.findOne({ name: "main"});
+    if (!allow) {
+      return res.status(403).json({ error: "Allow All Model Not Found"});
+    }
+
+    allow.allowAll = allowAll;
+    await allow.save();
+    
+    return res.status(200).json({ message : `Allow All status changed to ${allow.allowAll} successfully` })
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// view image
 app.get("/image/:id", ensureAuthenticated, async (req, res) => {
   const fileId = req.params.id;
   const driveUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
@@ -95,11 +151,11 @@ app.get("/image/:id", ensureAuthenticated, async (req, res) => {
       res.set("Content-Type", response.headers["content-type"]);
       res.send(response.data);
     } else {
-      console.error(`Failed to fetch image. Status code: ${response.status}`);
+      // console.error(`Failed to fetch image. Status code: ${response.status}`);
       res.status(response.status).send(`Failed to fetch image. Status code: ${response.status}`);
     }
   } catch (error) {
-    console.error("Error fetching the image:", error.message);
+    // console.error("Error fetching the image:", error.message);
     res.status(500).send("Error fetching the image");
   }
 });

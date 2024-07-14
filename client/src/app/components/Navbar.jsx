@@ -8,7 +8,7 @@ import { faCaretDown, faSignOutAlt} from '@fortawesome/free-solid-svg-icons';
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { signedIn, user } = useAuth();
+  const { signedIn, user, loading, setLoading } = useAuth();
   // const [isClient, setIsClient] = useState(false);
   const roles = ["superAdmin", "admin"];
   const [showSignOut, setShowSignOut] = useState(false);
@@ -18,6 +18,11 @@ const Navbar = () => {
   // }, []);
 
   useEffect(() => {
+    // if (signedIn === null) {
+    //   setLoading(true);
+    // } else if (signedIn === false || signedIn === true) {
+    //   setLoading(false);
+    // }
   }, [signedIn, user]);
 
   const toggleDropdown = () => {
@@ -32,7 +37,7 @@ const Navbar = () => {
   //   return <div className="navLoader"></div>;
   // }
 
-  if (signedIn === null) {
+  if (signedIn === null || loading) {
     return <div className="navLoader"></div>;
   }
 

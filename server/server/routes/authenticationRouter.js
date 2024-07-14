@@ -11,7 +11,7 @@ router.post('/login', authenticationController.login);
 router.post('/signup', authenticationController.signup);
 
 // Handles session request
-router.get('/session', authenticationController.getSession);
+router.get('/session', ensureAuthenticated, authenticationController.getSession);
 
 // Handles sign out request
 router.get('/logout', ensureAuthenticated, authenticationController.logout);
