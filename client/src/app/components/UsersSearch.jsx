@@ -11,6 +11,12 @@ const UsersSearch = ({ onFiltersChange, loggedUserRole, onSortChange, sortField,
     supportAgent: false,
     customer: false
   });
+
+  const [userStatus, setUserStatus] = useState({
+    Active: false,
+    Pending: false,
+    Blocked: false,
+  });
   
   const [userGender, setUserGender] = useState({
     Male: false,
@@ -24,18 +30,22 @@ const UsersSearch = ({ onFiltersChange, loggedUserRole, onSortChange, sortField,
   useEffect(() => {
     const newFilters = {
       role: Object.keys(userRole).filter(key => userRole[key]),
+      status: Object.keys(userStatus).filter(key => userStatus[key]),
       gender: Object.keys(userGender).filter(key => userGender[key]),
       searchQuery,
       searchField,
     };
     // console.log("new filters", newFilters)
     onFiltersChange(newFilters);
-  }, [userRole, userGender, searchQuery, searchField, onFiltersChange]);
+  }, [userRole, userStatus, userGender, searchQuery, searchField, onFiltersChange]);
 
   const handleCheckboxChange = (section, label, checked) => {
     switch (section) {
       case 'userRole':
         setUserRole(prev => ({ ...prev, [label]: checked }));
+        break;
+      case 'userStatus':
+        setUserStatus(prev => ({ ...prev, [label]: checked }));
         break;
       case 'userGender':
         setUserGender(prev => ({ ...prev, [label]: checked }));
@@ -50,8 +60,7 @@ const UsersSearch = ({ onFiltersChange, loggedUserRole, onSortChange, sortField,
   const handleSearchFieldChange = (e) => setSearchField(e.target.value);
 
   return (
-    < >
-    
+    <div>
       {/* Search Section */}
       <div>
         <h2 className="text-lg font-semibold text-gray-800 mb-2">Search By</h2>
@@ -83,6 +92,7 @@ const UsersSearch = ({ onFiltersChange, loggedUserRole, onSortChange, sortField,
       {/* Sorting Buttons */}
         <div className="space-y-2">
           <SortButton text="Created At" field="createdAt" sortField={sortField} sortOrder={sortOrder} onSortChange={onSortChange} />
+          <SortButton text="Status" field="status" sortField={sortField} sortOrder={sortOrder} onSortChange={onSortChange} />
           <SortButton text="Name" field="name" sortField={sortField} sortOrder={sortOrder} onSortChange={onSortChange} />
           <SortButton text="Email" field="email" sortField={sortField} sortOrder={sortOrder} onSortChange={onSortChange} />
           <SortButton text="Age" field="age" sortField={sortField} sortOrder={sortOrder} onSortChange={onSortChange} />
@@ -103,9 +113,20 @@ const UsersSearch = ({ onFiltersChange, loggedUserRole, onSortChange, sortField,
         </div>
       </div>
 
-      {/* Divider and User Gender Section */}
+      {/* Divider and User Status Section */}
       <hr className="my-4 border-gray-300" />
       <div>
+        <h2 className="text-lg font-semibold text-gray-800 mb-2">User Status</h2>
+        <div className="space-y-2">
+          <Checkbox label="Active" checked={userStatus.Active} onChange={(checked) => handleCheckboxChange('userStatus', 'Active', checked)} />
+          <Checkbox label="Pending" checked={userStatus.Pending} onChange={(checked) => handleCheckboxChange('userStatus', 'Pending', checked)} />
+          <Checkbox label="Blocked" checked={userStatus.Blocked} onChange={(checked) => handleCheckboxChange('userStatus', 'Blocked', checked)} />
+        </div>
+      </div>
+
+      {/* Divider and User Gender Section */}
+      <hr className="my-4 border-gray-300" />
+      <div className="mb-4">
         <h2 className="text-lg font-semibold text-gray-800 mb-2">User Gender</h2>
         <div className="space-y-2">
           <Checkbox label="Male" checked={userGender.Male} onChange={(checked) => handleCheckboxChange('userGender', 'Male', checked)} />
@@ -114,7 +135,7 @@ const UsersSearch = ({ onFiltersChange, loggedUserRole, onSortChange, sortField,
         </div>
       </div>
 
-    </>
+    </div>
   );
 };
 

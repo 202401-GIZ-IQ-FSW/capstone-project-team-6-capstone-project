@@ -74,6 +74,11 @@ const userSchema = new Schema(
             enum: ['superAdmin', 'admin', 'supportAgent', 'customer'],
             default: 'customer'
         },
+        status: {
+            type: String,
+            enum: ['Active', 'Pending', 'Blocked'],
+            default: 'Pending'
+        },
     },
     { timestamps: true }
 );

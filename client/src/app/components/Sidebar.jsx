@@ -74,7 +74,7 @@ const Sidebar = ({ onFiltersChange, userRole, onSortChange, sortField, sortOrder
   const handleSearchFieldChange = (e) => setSearchField(e.target.value);
 
   return (
-    < >
+    <div>
 
       {/* Search Section */}
       <div>
@@ -149,7 +149,7 @@ const Sidebar = ({ onFiltersChange, userRole, onSortChange, sortField, sortOrder
 
       {/* Divider and Ticket Assigned to Section */}
       <hr className="my-4 border-gray-300" />
-      <div>
+      <div className="mb-4">
         <h2 className="text-lg font-semibold text-gray-800 mb-2">Assigned to</h2>
         <div className="space-y-2">
           {userRole !== "customer" && <Checkbox label="Assigned to me" checked={ticketAssignedTo["Assigned to me"]} onChange={(checked) => handleCheckboxChange('ticketAssignedTo', 'Assigned to me', checked)} />}
@@ -157,7 +157,7 @@ const Sidebar = ({ onFiltersChange, userRole, onSortChange, sortField, sortOrder
         </div>
       </div>
 
-    </>
+    </div>
   );
 };
 

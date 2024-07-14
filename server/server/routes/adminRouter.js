@@ -18,4 +18,7 @@ router.route('/view-user/:id')
 router.route('/update-user-role/:id')
         .put(adminController.updateUserRole);
 
+router.route('/update-user-status/:id')
+        .put(adminController.updateUserStatus);
+
 module.exports = router

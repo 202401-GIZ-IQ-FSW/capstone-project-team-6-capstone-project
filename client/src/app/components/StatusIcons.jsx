@@ -2,6 +2,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     // User Role
     faUserTie, faUserShield, faUserGear, faUser,
+    // User Status
+    faBan,
     // Category
     faQuestionCircle, faGears, faBug,
     // Status
@@ -25,6 +27,14 @@ export default function StatusIcons({ field }) {
             return faUserGear;
       case 'customer':
             return faUser;
+
+      // User Status
+      case 'Active':
+        return faCheckCircle;
+      case 'Pending':
+        return faHourglassHalf;
+      case 'Blocked':
+        return faBan;
 
       // Category
       case 'General Inquiry':

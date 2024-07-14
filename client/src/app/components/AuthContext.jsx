@@ -23,7 +23,10 @@ export const AuthProvider = ({ children }) => {
   //   }
   // );
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
+    setLoading(true);
     const fetchUserSession = async () => {
       try {
         const response = await fetch('http://localhost:3001/user/session', {
@@ -48,6 +51,8 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         // localStorage.removeItem('signedIn');
         // localStorage.removeItem('user');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -55,7 +60,7 @@ export const AuthProvider = ({ children }) => {
   }, [signedIn]);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, signedIn, setSignedIn }}>
+    <AuthContext.Provider value={{ user, setUser, signedIn, setSignedIn, loading, setLoading }}>
       {children}
     </AuthContext.Provider>
   );

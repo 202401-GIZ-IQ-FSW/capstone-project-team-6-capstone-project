@@ -205,11 +205,48 @@ const updateUserRole = async (req, res) => {
   }
 };
 
+const updateUserStatus = async (req, res) => {
+  try {
+    const loggedUserRole = req.session?.user.role;
+    const superAdminLoggedIn = loggedUserRole === 'superAdmin';
+    const userId = req.params.id;
+
+    const { status } = req.body;
+    const statusValues = ["Active", "Pending", "Blocked"]
+
+    if (!status || !statusValues.includes(status)) {
+      return res.status(400).json({ error: 'Please provide a valid status must be of Active, Pending or Blocked' });
+    }
+
+    const user = await User.findById(userId).select('-password');
+
+    if (!user) {
+      return res.status(404).json({error: "User not found"})
+    }
+
+    if ( ['superAdmin', 'admin'].includes(user.role) && !superAdminLoggedIn ) {
+      return res.status(403).json({error: "Not Authorized, only superAdmin can change admin status"})
+    }
+
+    // if ( role === 'customer' && ['admin', 'supportAgent'].includes(user.role) ) {
+    //   await Ticket.updateMany({assignedUser: userId}, {$unset: {assignedUser: ""}});
+    // }
+
+    user.status = status;
+    await user.save();
+    
+    res.status(200).json(user)
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   getUsers,
   getUser,
   deleteUser,
   // createAdmin,
   // createSupportAgent,
-  updateUserRole
+  updateUserRole,
+  updateUserStatus
 };

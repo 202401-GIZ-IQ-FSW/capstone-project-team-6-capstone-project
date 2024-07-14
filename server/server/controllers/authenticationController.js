@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
+const Allow = require('../models/allow');
 
 async function login (req, res) {
     try {
@@ -17,8 +18,24 @@ async function login (req, res) {
         return res.status(400).json({ error: 'Wrong password' });
       }
   
+      // Check Allow All
+      const allow = await Allow.findOne({ name: "main"});
+      if (!allow) {
+        return res.status(403).json({ error: "Not Allowed to sign in"});
+      }
+
+      if (user.status !== "Active" && allow?.allowAll !== "Yes") { 
+
+        if ( user.status === "Pending" ) {
+          return res.status(403).json({ error: "Account is Pending activation"});
+    
+        } else if ( user.status === "Blocked" ) {
+          return res.status(403).json({ error: "Account is Blocked"});
+        }
+      }
+
       // If the user is already signed in don't sign in again
-      if (req.session?.user) {
+      if (req.session?.user?._id === user?._id) {
         return res.status(400).json({ error: 'User is already signed in' });
       }
   
@@ -81,18 +98,20 @@ async function signup (req, res) {
         ...rest
       });
   
-      // Once user record is created, it's a sign up success user details is returned in session
-      // Regenerate session ID is used to prevent session fixation attacks
-      req.session.regenerate((err) => {
-        if (err) {
-          return res.status(500).json({ error: 'Could not regenerate session' });
-        }
-        // Convert the user document to a plain object and delete the password field
-        const userObj = user.toObject();
-        delete userObj.password;
-        req.session.user = userObj;
-        res.status(201).json({ message: 'Sign up success' });
-      });
+      // // Once user record is created, it's a sign up success user details is returned in session
+      // // Regenerate session ID is used to prevent session fixation attacks
+      // req.session.regenerate((err) => {
+      //   if (err) {
+      //     return res.status(500).json({ error: 'Could not regenerate session' });
+      //   }
+      //   // Convert the user document to a plain object and delete the password field
+      //   const userObj = user.toObject();
+      //   delete userObj.password;
+      //   req.session.user = userObj;
+      //   res.status(201).json({ message: 'Sign up success' });
+      // });
+
+      res.status(201).json({ message: 'Sign up success' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -105,7 +124,7 @@ async function getSession (req, res) {
         const user = await User.findById(req.session?.user?._id);
 
         if (!user) {
-          return res.status(400).json({ error: "User is not found signing out" });
+          return res.status(400).json({ error: "User is not found" });
         }
 
         const userObj = user.toObject();
