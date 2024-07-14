@@ -10,6 +10,7 @@ export default function viewUserPage({ params }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [adminViewingAdmin, setAdminViewingAdmin] = useState(false);
 
   const userId = params.id;
   const roles = ["superAdmin", "admin"];
@@ -20,25 +21,29 @@ export default function viewUserPage({ params }) {
 
   useEffect(() => {
     if (signedIn === false) {
+      setLoading(false);
       setTimeout(() => {
         router.push("/signin");
       }, 1000);
     } else if (
       signedIn === true &&
-      userFormData?._id &&
+      (userFormData?._id &&
       userFormData?._id !== user?._id &&
       user?.role !== "superAdmin" &&
       userFormData?.role &&
-      !(user?.role === "admin" && !roles.includes(userFormData?.role))
-    ) {
+      userFormData?.role === "admin") || adminViewingAdmin ) {
       setTimeout(() => {
         router.push("/");
       }, 1000);
     }
-  }, [router, signedIn, user, userFormData]);
+  }, [router, signedIn, user, userFormData, adminViewingAdmin]);
 
   useEffect(() => {
-    if (signedIn) {
+    if (signedIn === true && user._id === userId) {
+      setUserFormData(user);
+      setLoading(false)
+      
+    } else if (signedIn === true) {
       setLoading(true);
 
       const fetchUser = async () => {
@@ -60,8 +65,12 @@ export default function viewUserPage({ params }) {
 
           if (response.ok) {
             setUserFormData(data);
+            setAdminViewingAdmin(false);
           } else {
             setError(data.error);
+            if ( data.error === "Not Authorized, only super admin can view other admins accounts" ) {
+              setAdminViewingAdmin(true);
+            }
           }
         } catch (error) {
           setError(error);
@@ -76,8 +85,10 @@ export default function viewUserPage({ params }) {
 
   if (signedIn === null || loading) {
     return (
-      <div className="flex justify-center items-center m-52">
-        <div className="pageLoader"></div>
+      <div className="h-screen">
+        <div className="flex justify-center items-center m-52">
+          <div className="pageLoader"></div>
+        </div>
       </div>
     );
   }
@@ -115,7 +126,7 @@ export default function viewUserPage({ params }) {
       setError(error);
     }
 
-    console.log("Updating user role:", userFormData);
+    // console.log("Updating user role:", userFormData);
   };
 
   const formatDate = (dateString) => {
@@ -152,23 +163,24 @@ export default function viewUserPage({ params }) {
   return (
     <>
       {signedIn === false && (
-        <div className="px-5 py-40">
+        <div className="h-screen px-5 py-28">
           <div className="flex flex-col items-center justify-center gap-6 lg:text-lg font-semibold">
             <h1>Only signed in users can view this page</h1>
-            <p>Redirecting to sign in page ......</p>
+            <p>Redirecting to sign in page......</p>
           </div>
         </div>
       )}
-      {signedIn === true &&
-        userFormData?._id &&
-        userFormData?._id !== user?._id &&
-        user?.role !== "superAdmin" &&
-        userFormData?.role &&
-        !(user?.role === "admin" && !roles.includes(userFormData?.role)) && (
-          <div className="px-5 py-40">
+      { ( signedIn === true &&
+        ( userFormData?._id &&
+          userFormData?._id !== user?._id &&
+          user?.role !== "superAdmin" &&
+          userFormData?.role &&
+          userFormData?.role === "admin") 
+          || adminViewingAdmin ) && (
+          <div className="h-screen px-5 py-28">
             <div className="flex flex-col items-center justify-center gap-6 lg:text-lg font-semibold">
               <h1>Not Authorized</h1>
-              <p>Redirecting to home page ......</p>
+              <p>Redirecting to home page......</p>
             </div>
           </div>
         )}
@@ -317,7 +329,7 @@ export default function viewUserPage({ params }) {
 
             <div className="py-4 flex justify-end mb-6 gap-4">
               {userFormData?._id === user?._id && (
-                <Link href={`/users/edit-user/${userId}`}>
+                <Link href={`/users/edit-user/${user?._id}`}>
                   <button className="bg-gray-700 hover:opacity-50 text-white font-bold py-2 px-6 rounded text-sm lg:text-base">
                     Edit
                   </button>

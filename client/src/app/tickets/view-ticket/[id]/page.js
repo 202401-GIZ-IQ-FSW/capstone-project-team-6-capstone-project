@@ -15,6 +15,7 @@ export default function viewTicketPage({params}) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [isTicket, setIsTicket] = useState(null);
 
   const ticketId = params.id; 
   const roles = ["superAdmin", "admin", "supportAgent"];
@@ -27,15 +28,17 @@ export default function viewTicketPage({params}) {
 
   useEffect(() => {
     if (signedIn === false) {
+      setLoading(false);
       setTimeout(() => {
         router.push('/signin');
       }, 1000);
-    } else if ( signedIn === true && ticketFormData?.user?._id && ticketFormData?.user?._id !== user?._id && !roles.includes(user?.role) ) {
+    } else if ( signedIn === true && isTicket === false) {
+      // console.log("second if", ticketFormData);
       setTimeout(() => {
         router.push('/tickets');
       }, 1000);
     }
-  }, [router, signedIn, user, ticketFormData]);
+  }, [router, signedIn, user, ticketFormData, isTicket]);
 
   useEffect(() => {
     if (signedIn) {
@@ -51,7 +54,7 @@ export default function viewTicketPage({params}) {
           const data = await response.json();
 
           if (response.ok) {
-
+            setIsTicket(true);
             if (user?.role ===  "customer") {
               setTicketFormData(data);
             } else {
@@ -63,9 +66,11 @@ export default function viewTicketPage({params}) {
 
           } else {
             setError(data.error);
+            setIsTicket(false);
           }
         } catch (error) {
             setError(error);
+            setIsTicket(false);
         } finally {
           setLoading(false); 
         }
@@ -77,8 +82,10 @@ export default function viewTicketPage({params}) {
 
   if (signedIn === null || loading) {
     return (
-      <div className="flex justify-center items-center m-52">
-        <div className="pageLoader"></div>
+      <div className="h-screen">
+        <div className="flex justify-center items-center m-52">
+          <div className="pageLoader"></div>
+        </div>
       </div>
     );
   }
@@ -163,22 +170,22 @@ export default function viewTicketPage({params}) {
   return (
     <>
       {signedIn === false && 
-        <div className="px-5 py-40">
+        <div className="h-screen px-5 py-28">
           <div className="flex flex-col items-center justify-center gap-6 lg:text-lg font-semibold">
             <h1>Only signed in users can view this page</h1>
-            <p>Redirecting to sign in page ......</p>
+            <p>Redirecting to sign in page......</p>
           </div>
         </div>
       }
-      { ( signedIn === true && ticketFormData?.user?._id && ticketFormData?.user?._id !== user._id && !roles.includes(user?.role) ) && 
-        <div className="px-5 py-40">
+      { ( signedIn === true && isTicket === false) && 
+        <div className="h-screen px-5 py-28">
           <div className="flex flex-col items-center justify-center gap-6 lg:text-lg font-semibold">
-            <h1>Users can only view their own tickets</h1>
-            <p>Redirecting to ticket page ......</p>
+            <h1>{error}</h1>
+            <p>Redirecting to ticket page......</p>
           </div>
         </div>
       }
-      {signedIn === true && 
+      { ( signedIn === true && isTicket === true ) &&
         <div className="bg-white">
           <div className="max-w-screen-lg mx-auto px-4 py-8">
 
@@ -192,19 +199,19 @@ export default function viewTicketPage({params}) {
 
                 <div className="bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
                   { ( ticketFormData?.user?._id === user?._id || user?.role === "superAdmin" || ( user?.role === "admin" && !["admin", "superAdmin"].includes(ticketFormData?.user?.role) ) ) ?
-                      (<Link href={`/users/view-user/${ticketFormData.user._id}`} className="text-gray-600 group gap-2 text-base lg:text-xl font-bold mb-2 hover:text-sky-500 flex flex-row">
+                      (<Link href={`/users/view-user/${ticketFormData?.user._id}`} className="text-gray-600 group gap-2 text-base lg:text-xl font-bold mb-2 hover:text-sky-500 flex flex-row">
                         <p>Created By: </p>
                         <div className="flex md:flex-row flex-col gap-2">
-                          <p> {ticketFormData.user.name}</p>
+                          <p> {ticketFormData?.user.name}</p>
                           {user?.role !== "customer" &&
                             <p className="hidden md:flex">|</p>}
                           {user?.role !== "customer" && 
                             <p className="flex items-center gap-2">
-                              <span>{userRoleDisplay(ticketFormData.user.role)}</span>
+                              <span>{userRoleDisplay(ticketFormData?.user?.role)}</span>
                               {ticketFormData?.user?.role === "customer" &&
-                                <StatusIcons field={ticketFormData.user.role} className="text-gray-500 group-hover:text-sky-500" />}
+                                <StatusIcons field={ticketFormData?.user?.role} className="text-gray-500 group-hover:text-sky-500" />}
                               {ticketFormData?.user?.role !== "customer" &&
-                                <StatusIcons field={ticketFormData.user.role} className="text-gray-500 group-hover:text-sky-500" />}
+                                <StatusIcons field={ticketFormData?.user?.role} className="text-gray-500 group-hover:text-sky-500" />}
                             </p>
                           }
                         </div>
@@ -213,16 +220,16 @@ export default function viewTicketPage({params}) {
                       (<div className="text-gray-600 text-base lg:text-xl font-bold mb-2 flex flex-row gap-2">
                         <p>Created By: </p>
                         <div className="flex flex-col md:flex-row gap-2">
-                          <p> {ticketFormData.user.name}</p>
+                          <p> {ticketFormData?.user?.name}</p>
                           {user?.role !== "customer" &&
                             <p className="hidden md:flex">|</p>}
                           {user?.role !== "customer" && 
                             <p className="flex items-center gap-2">
-                              <span>{userRoleDisplay(ticketFormData.user.role)}</span>
+                              <span>{userRoleDisplay(ticketFormData?.user?.role)}</span>
                               {ticketFormData?.user?.role === "customer" && 
-                                <StatusIcons field={ticketFormData.user.role} className="text-gray-500" />}
+                                <StatusIcons field={ticketFormData?.user?.role} className="text-gray-500" />}
                               {ticketFormData?.user?.role !== "customer" && 
-                                <StatusIcons field={ticketFormData.user.role} className="text-gray-500" />}
+                                <StatusIcons field={ticketFormData?.user?.role} className="text-gray-500" />}
                             </p>
                           }
                         </div>
@@ -277,20 +284,20 @@ export default function viewTicketPage({params}) {
                           <p><b>Assigned To:</b></p>
                           { ticketFormData?.assignedUser &&
                             (<div className="flex md:flex-row flex-col gap-2">
-                              <p>{ticketFormData.assignedUser?.name}</p>
+                              <p>{ticketFormData?.assignedUser?.name}</p>
                               <p className="hidden md:flex">|</p>
-                              <p>{userRoleDisplay(ticketFormData.assignedUser?.role)} <StatusIcons field={ticketFormData.assignedUser?.role} className="text-gray-500 group-hover:text-sky-500 transition-colors duration-200" /></p>
+                              <p>{userRoleDisplay(ticketFormData?.assignedUser?.role)} <StatusIcons field={ticketFormData?.assignedUser?.role} className="text-gray-500 group-hover:text-sky-500 transition-colors duration-200" /></p>
                             </div>)
                           || "None" }
                         </Link>)
                       :
                         (<div className="text-gray-600 lg:text-lg font-normal mb-2 gap-2 flex flex-row">
                           <p><b>Assigned To:</b></p> 
-                          { ticketFormData.assignedUser &&
+                          { ticketFormData?.assignedUser &&
                             (<div className="flex md:flex-row flex-col gap-2" >
-                              <p>{ticketFormData.assignedUser?.name}</p>
+                              <p>{ticketFormData?.assignedUser?.name}</p>
                               <p className="hidden md:flex">|</p>
-                              <p>{userRoleDisplay(ticketFormData.assignedUser?.role)} <StatusIcons field={ticketFormData.assignedUser?.role} className="text-gray-500" /></p>
+                              <p>{userRoleDisplay(ticketFormData?.assignedUser?.role)} <StatusIcons field={ticketFormData?.assignedUser?.role} className="text-gray-500" /></p>
                             </div>)
                           || "None" }
                         </div>)
@@ -324,7 +331,7 @@ export default function viewTicketPage({params}) {
                     <label className="text-gray-600 block mb-1">Status</label>
                     <select 
                       name="status" 
-                      value={ticketFormData.status}
+                      value={ticketFormData?.status}
                       onChange={(e) =>
                         setTicketFormData({
                           ...ticketFormData,
@@ -346,7 +353,7 @@ export default function viewTicketPage({params}) {
                     <label className="text-gray-600 block mb-1">Priority</label>
                     <select 
                       name="priority" 
-                      value={ticketFormData.priority}
+                      value={ticketFormData?.priority}
                       onChange={(e) =>
                         setTicketFormData({
                           ...ticketFormData,
@@ -370,7 +377,7 @@ export default function viewTicketPage({params}) {
                     <label className="text-gray-600 block mb-1">Assign to self</label>
                     <select 
                       name="assignToSelf" 
-                      value={ticketFormData.assignToSelf}
+                      value={ticketFormData?.assignToSelf}
                       onChange={(e) =>
                         setTicketFormData({
                           ...ticketFormData,
@@ -444,8 +451,8 @@ export default function viewTicketPage({params}) {
                   Ticket Attachment: 
                 </p>
                 <div className="mx-4 mb-2">
-                  <a href={ticketFormData.imageURL} target="_blank" rel="noopener noreferrer">
-                    <img src={ticketFormData?.imageURL? extractImageId(ticketFormData.imageURL) : ""}
+                  <a href={ticketFormData?.imageURL} target="_blank" rel="noopener noreferrer">
+                    <img src={ticketFormData?.imageURL? extractImageId(ticketFormData?.imageURL) : ""}
                       className=" rounded-lg lg:h-[35rem] w-full border border-gray-900 p-2 text-center text-gray-600"
                       title="Click for the larger version."
                       alt="ticket attachment image"

@@ -17,6 +17,9 @@ const Navbar = () => {
   //   setIsClient(true);
   // }, []);
 
+  useEffect(() => {
+  }, [signedIn, user]);
+
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };

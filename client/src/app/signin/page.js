@@ -63,8 +63,8 @@ export default function SignIn() {
 
   return (
     <main>
-      <div className="bg-gray-50 font-[sans-serif]">
-        <div className="flex flex-col items-center justify-center py-6 px-4">
+      <div className="bg-gray-50 font-[sans-serif] h-screen customBp:h-fit xl:h-fit 2xl:h-screen 2xl:flex 2xl:justify-center 2xl:items-center">
+        <div className="flex flex-col items-center justify-center py-6 px-4 2xl:w-screen">
           <div className="max-w-md w-full">
             <div className="p-8 rounded-2xl bg-white shadow">
               <h1 className="text-gray-800 text-center text-2xl lg:text-4xl font-bold pb-2">Sign in</h1>

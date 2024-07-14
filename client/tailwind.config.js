@@ -1,4 +1,7 @@
 /** @type {import('tailwindcss').Config} */
+
+const defaultTheme = require('tailwindcss/defaultTheme')
+
 module.exports = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -18,6 +21,10 @@ module.exports = {
         "secondary": "#555",
         "prigmayBG": "#FCFCFC"
       }
+    },
+    screens: {
+      'customBp': {'raw': '(max-height: 500px),(max-width:300px)'},
+      ...defaultTheme.screens,
     },
   },
   plugins: [require('daisyui'),],

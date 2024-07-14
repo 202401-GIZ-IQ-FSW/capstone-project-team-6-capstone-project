@@ -29,6 +29,7 @@ export default function ticketsPage() {
 
   useEffect(() => {
     if (signedIn === false) {
+      setLoading(false);
       setTimeout(() => {
         router.push('/signin'); // Adjust the path as needed
       }, 1000);
@@ -63,7 +64,7 @@ export default function ticketsPage() {
 
       fetchTickets();
     }
-  }, [signedIn]);
+  }, [signedIn, user]);
 
   useEffect(() => {
     const applyFilters = () => {
@@ -137,8 +138,10 @@ export default function ticketsPage() {
 
   if (signedIn === null || loading) {
     return (
-      <div className="flex justify-center items-center m-52">
-        <div className="pageLoader"></div>
+      <div className='h-screen'>
+        <div className="flex justify-center items-center m-52">
+          <div className="pageLoader"></div>
+        </div>
       </div>
     );
   }
@@ -155,10 +158,10 @@ export default function ticketsPage() {
   return (
     <>
       {signedIn === false && 
-        <div className="px-5 py-40">
+        <div className="h-screen px-5 py-28">
           <div className="flex flex-col items-center justify-center gap-6 lg:text-lg font-semibold">
             <h1>Only signed in users can view this page</h1>
-            <p>Redirecting to sign in page ......</p>
+            <p>Redirecting to sign in page......</p>
           </div>
         </div>
       }

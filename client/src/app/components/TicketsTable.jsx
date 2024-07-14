@@ -38,7 +38,7 @@ export default function TicketsTable({tickets, errorMessage, user}) {
         { tickets.length > 0 ? (
             <div className="">
                 <div className="overflow-x-auto rounded-lg border-gray-500 border-2">
-                    <table className="divide-y divide-gray-200">
+                    <table className="w-screen xl:w-full divide-y divide-gray-200">
 
                         <thead>
                             <tr className="text-xs lg:text-sm bg-gray-400 text-gray-800 align-top text-left font-medium uppercase tracking-wider">

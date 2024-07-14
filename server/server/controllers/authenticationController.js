@@ -102,6 +102,16 @@ async function getSession (req, res) {
   // console.log("getSession session", req.session?.user)
   try {
       if (req.session?.user) {
+        const user = await User.findById(req.session?.user?._id);
+
+        if (!user) {
+          return res.status(400).json({ error: "User is not found signing out" });
+        }
+
+        const userObj = user.toObject();
+        delete userObj.password;
+        req.session.user = userObj;
+
         return res.status(200).json({ user: req.session.user });
       } else {
         return res.status(403).json({ error: "User is not signed in" });

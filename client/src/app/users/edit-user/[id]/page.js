@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 
 export default function editUserPage({params}) {
-  const { signedIn, user } = useAuth();
+  const { signedIn, user, setUser } = useAuth();
   const router = useRouter();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -27,15 +27,19 @@ export default function editUserPage({params}) {
       setTimeout(() => {
         router.push('/signin');
       }, 1000);
-    } else if ( signedIn === true && userFormData?._id && userFormData?._id !== user?._id ) {
-      setTimeout(() => {
-        router.push('/');
-      }, 1000);
     }
-  }, [router, signedIn, user, userFormData]);
+  }, [router, signedIn, user]);
 
   useEffect(() => {
-    if (signedIn) {
+    if (signedIn === true && user._id === userId) {
+
+      if (user.dateOfBirth) {
+        user.dateOfBirth = new Date(user.dateOfBirth).toISOString().split('T')[0]; // Format date to yyyy-mm-dd
+      };
+      setUserFormData(user);
+
+    } else if (signedIn === true) {
+
       const fetchUser = async () => {
         try {
           const response = await fetch(`http://localhost:3001/user/profile`, {
@@ -59,16 +63,18 @@ export default function editUserPage({params}) {
 
       fetchUser();
     }
-  }, [signedIn]);
+  }, [signedIn, user]);
 
   if (signedIn === null) {
     return (
-      <div className="flex justify-center items-center m-52">
-        <div className="pageLoader"></div>
+      <div className="h-screen">
+        <div className="flex justify-center items-center m-52">
+          <div className="pageLoader"></div>
+        </div>
       </div>
     );
   }
-  
+
   const handleUpdateUser = async (event) => {
     event.preventDefault();
     setMessage(""); // Reset message
@@ -87,6 +93,12 @@ export default function editUserPage({params}) {
       const data = await response.json();
 
       if (response.ok) {
+        if (data.dateOfBirth) {
+          data.dateOfBirth = new Date(data.dateOfBirth).toISOString().split('T')[0]; // Format date to yyyy-mm-dd
+        }
+        setUser(data);
+        setUserFormData(data);
+
         setMessage("User updated successfully");
         setTimeout(() => {
           setMessage("");
@@ -99,24 +111,16 @@ export default function editUserPage({params}) {
       setError(error);
     }
     
-    console.log("Updating User:", userFormData);
+    // console.log("Updating User:", userFormData);
   }
 
   return (
     <>
       {signedIn === false && 
-        <div className="px-5 py-40">
+        <div className="h-screen px-5 py-28">
           <div className="flex flex-col items-center justify-center gap-6 lg:text-lg font-semibold">
             <h1>Only signed in users can view this page</h1>
-            <p>Redirecting to sign in page ......</p>
-          </div>
-        </div>
-      }
-      { ( signedIn === true && userFormData?._id && userFormData?._id !== user?._id ) && 
-        <div className="px-5 py-40">
-          <div className="flex flex-col items-center justify-center gap-6 lg:text-lg font-semibold">
-            <h1>User can only edit their own account</h1>
-            <p>Redirecting to home page ......</p>
+            <p>Redirecting to sign in page......</p>
           </div>
         </div>
       }

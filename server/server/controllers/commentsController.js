@@ -1,4 +1,5 @@
 const Comment = require('../models/comment');
+const Ticket = require('../models/ticket');
 
 // Function to filter out empty fields from the request body
 // const filterEmptyFields = (data) => {
@@ -53,6 +54,20 @@ const getComment = async (req, res) => {
 
 const createComment = async (req, res) => {
   try {
+    const loggedUser = req.session?.user;
+
+    const ticketId = req.ticketId.toString();
+    
+    const ticket = await Ticket.findOne( { _id: ticketId } );
+
+    if (!ticket) {
+      return res.status(404).json({error: "Ticket not found"});
+    }
+
+    if ( loggedUser.role === "customer" && ticket?.user?._id.toString() !== loggedUser._id ) {
+      return res.status(403).json({error: "Not authorized to comment"});
+    }
+
     const commentData = req.body;
 
     if (!commentData) {

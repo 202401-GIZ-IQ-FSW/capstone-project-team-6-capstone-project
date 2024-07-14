@@ -42,7 +42,7 @@ const getTicket = async (req, res) => {
       return res.status(404).json({error: "Ticket not found"})
     }
     if (ticket.user._id.toString() !== req.session?.user._id && !roles.includes(role) ) {
-      return res.status(403).json({error: "Not Authorized"})
+      return res.status(403).json({error: "Not Authorized to view ticket"})
     }
     res.status(200).json(ticket)
   } catch (err) {
