@@ -14,6 +14,8 @@ const Comments = ({ ticketId, signedIn, user, ticket }) => {
   const [editCommentImage, setEditCommentImage] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [commentServerMessage, setCommentServerMessage] = useState({commentId: "", message: ""});
+  const [commentServerError, setCommentServerError] = useState({commentId: "", error: ""});
   const [loading, setLoading] = useState(true);
 
   const roles = ["superAdmin", "admin"];
@@ -25,6 +27,8 @@ const Comments = ({ ticketId, signedIn, user, ticket }) => {
   }, [signedIn, ticketId, user]);
 
   const fetchComments = async () => {
+    setMessage(""); // Reset message
+    setError(""); // Reset error
 
     try {
       const response = await fetch(`http://localhost:3001/tickets/${ticketId}/comments`, {
@@ -35,6 +39,7 @@ const Comments = ({ ticketId, signedIn, user, ticket }) => {
         setComments(data);
         setMessage(data.message);
       } else {
+        setComments([]);
         setError(data.error);
       }
     } catch (error) {
@@ -85,17 +90,33 @@ const Comments = ({ ticketId, signedIn, user, ticket }) => {
         },
         body: JSON.stringify({ message: editCommentMessage, imageURL: editCommentImage }),
       });
+
+      const data = await response.json();
+
       if (response.ok) {
+        setCommentServerMessage({commentId: editCommentId, message: "Comment updated successfully"});
+
+        setTimeout(() => {
+          setCommentServerMessage({commentId: "", message: ""});
+        }, 2000);
+
         setEditCommentId(null);
         setEditCommentMessage("");
         setEditCommentImage("");
+
         fetchComments();
+
       } else {
-        const data = await response.json();
-        setError(data.error);
+        setCommentServerError({commentId: editCommentId, error: data.error});
+        setTimeout(() => {
+          setCommentServerError({commentId: "", error: ""});
+        }, 2000);
       }
     } catch (error) {
-      setError(error);
+      setCommentServerError({commentId: editCommentId, error: error});
+      setTimeout(() => {
+        setCommentServerError({commentId: "", error: ""});
+      }, 2000);
     }
   };
 
@@ -105,14 +126,28 @@ const Comments = ({ ticketId, signedIn, user, ticket }) => {
         method: "DELETE",
         credentials: "include",
       });
+
+      const data = await response.json();
+      
       if (response.ok) {
+        setCommentServerMessage({commentId: commentId, message: data.message});
+
+        setTimeout(() => {
+          setCommentServerMessage({commentId: "", message: ""});
+        }, 2000);
+
         fetchComments();
       } else {
-        const data = await response.json();
-        setError(data.error);
+        setCommentServerError({commentId: commentId, error: data.error});
+        setTimeout(() => {
+          setCommentServerError({commentId: "", error: ""});
+        }, 2000);
       }
     } catch (error) {
-      setError(error);
+      setCommentServerError({commentId: commentId, error: error});
+      setTimeout(() => {
+        setCommentServerError({commentId: "", error: ""});
+      }, 2000);
     }
   };
 
@@ -186,108 +221,115 @@ const Comments = ({ ticketId, signedIn, user, ticket }) => {
 
       {comments.length > 0 &&
         comments.map((comment) => (
-          <div key={comment._id} className="mb-4 bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
-            
-            <div className="flex justify-between mb-3 pb-1 gap-4 text-sm lg:text-base border-b-2 border-gray-400">
+          <div key={comment._id}>
 
-              {/* User Name */}
-              { comment?.user && ( comment?.user?._id === user?._id || user?.role === "superAdmin" || (user?.role === "admin" && !["admin", "superAdmin"].includes(comment?.user?.role))) ? (
-                <Link href={`/users/view-user/${comment?.user?._id}`} className="text-gray-600 lg:text-lg font-bold hover:text-sky-500 group">
-                  {comment.user?.name || "Support"} 
-                  {/* {comment.user && user?.role !== "customer" ? " | " : ""} */}
-                  {comment.user && user?.role !== "customer" && (
-                    <span className="text-xs lg:text-sm font-semibold">
-                      <br />
-                      {userRoleDisplay(comment.user?.role)}{" "}
-                      {comment.user.role !== "customer" &&
-                        <StatusIcons field={comment.user?.role} className="text-gray-500 group-hover:text-sky-500" />}
-                      {comment.user.role === "customer" &&
-                        <StatusIcons field={comment.user?.role} className="text-gray-500 group-hover:text-sky-500" />}
-                    </span>
-                  )}
-                </Link>
-              ) : (
-                <p className="text-gray-600 lg:text-lg font-bold">
-                  {comment.user?.name || "Support"} 
-                  {/* {comment.user && comment.user.role !== "customer" ? " | " : ""} */}
-                  {comment.user && comment.user.role !== "customer" && (
-                    <span className="text-xs lg:text-sm font-semibold">
-                      <br />
-                      {userRoleDisplay(comment.user?.role)}{" "}
-                      {comment.user.role !== "customer" &&
-                        <StatusIcons field={comment.user?.role} className="text-gray-500" />}
-                      {comment.user.role === "customer" &&
-                        <StatusIcons field={comment.user?.role} className="text-gray-500" />}
-                    </span>
-                  )}
-                </p>
-              )}
-
-              {/* Created At */}
-              <p className="text-gray-600 text-right text-xs lg:text-base">
-                {formatDate(comment.createdAt)}
-              </p>
-
+            <div className="w-full">
+              {(commentServerMessage?.commentId === comment?._id && commentServerMessage?.message ) && <div className="flex justify-center mb-2 p-2 bg-emerald-300 rounded-md">{commentServerMessage?.message}</div>}
+              {(commentServerError?.commentId === comment?._id && commentServerError?.error ) && <div className="flex justify-center mb-2 p-2 rounded-md">{commentServerError.error}</div>}
             </div>
-              
-            {/* Edit Message Form Section */}
-            {editCommentId === comment._id ? (
-              <form onSubmit={handleUpdateComment}>
-                <textarea
-                  value={editCommentMessage}
-                  onChange={(e) => setEditCommentMessage(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md mb-2 text-sm lg:text-base"
-                  required
-                />
-                <input
-                  value={editCommentImage}
-                  onChange={(e) => setEditCommentImage(e.target.value)}
-                  placeholder="Provide an image of the problem if any using google drive public image url only"
-                  className="w-full p-2 border border-gray-300 rounded-md mb-3 text-sm lg:text-base"
-                />
-                <button type="submit" className="bg-gray-600 hover:bg-gray-400 text-white text-sm lg:text-base font-bold py-2 px-4 rounded mr-2">
-                  Update
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditCommentId(null)}
-                  className="bg-red-600 hover:bg-red-400 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
-                >
-                  Cancel
-                </button>
-              </form>
-            ) : (
-              
-              <div>
-                {/* Message Section */}
-                <div className="mt-5 mb-7 flex flex-row items-center justify-between">
 
-                  {/* Comment Message */}
-                  <p className="text-gray-600  text-sm lg:text-base">{comment.message}</p>
-
-                  {/* Edit and Delete Buttons for Comment Message. Component is defined at the bottom*/}
-                  { (comment.user?._id === user?._id || roles.includes(user?.role)) &&
-                    <EditDeleteButtons user={user} comment={comment} handleEditComment={handleEditComment} handleDeleteComment={handleDeleteComment} />
+            <div className="mb-4 bg-gray-200 border border-gray-600 rounded-lg px-4 py-3">
+              <div className="flex justify-between mb-3 pb-1 gap-4 text-sm lg:text-base border-b-2 border-gray-400">
+  
+                {/* User Name */}
+                { comment?.user && ( comment?.user?._id === user?._id || user?.role === "superAdmin" || (user?.role === "admin" && !["admin", "superAdmin"].includes(comment?.user?.role))) ? (
+                  <Link href={`/users/view-user/${comment?.user?._id}`} className="text-gray-600 lg:text-lg font-bold hover:text-sky-500 group">
+                    {comment.user?.name || "Support"} 
+                    {/* {comment.user && user?.role !== "customer" ? " | " : ""} */}
+                    {comment.user && user?.role !== "customer" && (
+                      <span className="text-xs lg:text-sm font-semibold">
+                        <br />
+                        {userRoleDisplay(comment.user?.role)}{" "}
+                        {comment.user.role !== "customer" &&
+                          <StatusIcons field={comment.user?.role} className="text-gray-500 group-hover:text-sky-500" />}
+                        {comment.user.role === "customer" &&
+                          <StatusIcons field={comment.user?.role} className="text-gray-500 group-hover:text-sky-500" />}
+                      </span>
+                    )}
+                  </Link>
+                ) : (
+                  <p className="text-gray-600 lg:text-lg font-bold">
+                    {comment.user?.name || "Support"} 
+                    {/* {comment.user && comment.user.role !== "customer" ? " | " : ""} */}
+                    {comment.user && comment.user.role !== "customer" && (
+                      <span className="text-xs lg:text-sm font-semibold">
+                        <br />
+                        {userRoleDisplay(comment.user?.role)}{" "}
+                        {comment.user.role !== "customer" &&
+                          <StatusIcons field={comment.user?.role} className="text-gray-500" />}
+                        {comment.user.role === "customer" &&
+                          <StatusIcons field={comment.user?.role} className="text-gray-500" />}
+                      </span>
+                    )}
+                  </p>
+                )}
+  
+                {/* Created At */}
+                <p className="text-gray-600 text-right text-xs lg:text-base">
+                  {formatDate(comment.createdAt)}
+                </p>
+  
+              </div>
+                
+              {/* Edit Message Form Section */}
+              {editCommentId === comment._id ? (
+                <form onSubmit={handleUpdateComment}>
+                  <textarea
+                    value={editCommentMessage}
+                    onChange={(e) => setEditCommentMessage(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md mb-2 text-sm lg:text-base"
+                    required
+                  />
+                  <input
+                    value={editCommentImage}
+                    onChange={(e) => setEditCommentImage(e.target.value)}
+                    placeholder="Provide an image of the problem if any using google drive public image url only"
+                    className="w-full p-2 border border-gray-300 rounded-md mb-3 text-sm lg:text-base"
+                  />
+                  <button type="submit" className="bg-gray-600 hover:bg-gray-400 text-white text-sm lg:text-base font-bold py-2 px-4 rounded mr-2">
+                    Update
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditCommentId(null)}
+                    className="bg-red-600 hover:bg-red-400 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
+                  >
+                    Cancel
+                  </button>
+                </form>
+              ) : (
+                
+                <div>
+                  {/* Message Section */}
+                  <div className="mt-5 mb-7 flex flex-row items-center justify-between">
+  
+                    {/* Comment Message */}
+                    <p className="text-gray-600  text-sm lg:text-base">{comment.message}</p>
+  
+                    {/* Edit and Delete Buttons for Comment Message. Component is defined at the bottom*/}
+                    { (comment.user?._id === user?._id || roles.includes(user?.role)) &&
+                      <EditDeleteButtons user={user} comment={comment} handleEditComment={handleEditComment} handleDeleteComment={handleDeleteComment} />
+                    }
+                  </div>
+  
+                  {/* Image Section */}
+                  {comment.imageURL && 
+                    <div className="my-4 text-sm lg:text-base text-gray-600">
+                      <p className="mb-2 p-3 font-semibold bg-gray-400 text-gray-800 overflow-hidden rounded-lg">
+                        Comment Attachment: 
+                      </p>
+                      <a href={comment.imageURL} target="_blank" rel="noopener noreferrer">
+                        <img src={comment?.imageURL? extractImageId(comment.imageURL) : ""}
+                          className="rounded-lg border border-gray-900 lg:h-[28rem] w-full text-center p-2"
+                          title="Click for the larger version."
+                          alt="comment attachment image"
+                        />
+                      </a>
+                    </div>
                   }
                 </div>
-
-                {/* Image Section */}
-                {comment.imageURL && 
-                  <div className="my-4 text-sm lg:text-base text-gray-600">
-                    <p className="mb-2 p-3 font-semibold bg-gray-400 text-gray-800 overflow-hidden rounded-lg">
-                      Comment Attachment: 
-                    </p>
-                    <a href={comment.imageURL} target="_blank" rel="noopener noreferrer">
-                      <img src={comment?.imageURL? extractImageId(comment.imageURL) : ""}
-                        className="rounded-lg border border-gray-900 lg:h-[28rem] w-full text-center p-2"
-                        title="Click for the larger version."
-                        alt="comment attachment image"
-                      />
-                    </a>
-                  </div>
-                }
-              </div>
-            )}
+              )}
+            </div>
           </div>
         ))}
     </>
@@ -295,6 +337,7 @@ const Comments = ({ ticketId, signedIn, user, ticket }) => {
 };
 
 export default Comments;
+
 
 // Edit and Delete Buttons for Comment Message
 export const EditDeleteButtons = ({user, comment, handleEditComment, handleDeleteComment}) => {

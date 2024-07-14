@@ -68,7 +68,7 @@ export default function SignUp() {
 
   return (
     <main>
-      <div className="font-[sans-serif] bg-white flex justify-center items-center mx-auto p-4">
+      <div className="font-[sans-serif] bg-white min-[1920px]:h-screen flex justify-center items-center mx-auto p-4">
         <div className="grid lg:grid-cols-8 items-center shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-xl overflow-hidden">
           <div className="lg:col-span-3 lg:col-start-2 py-10 px-6 flex flex-col justify-center items-center">
             
@@ -172,7 +172,7 @@ export default function SignUp() {
           </div>
 
           {/* image laptop-desk */}
-          <div className="-order-1 lg:order-1 lg:col-start-6 lg:col-span-3 h-80 lg:h-full w-full bg-[url('/laptop-desk.png')] bg-cover bg-no-repeat bg-center before:content-['']">
+          <div className="-order-1 lg:order-1 lg:col-start-6 lg:col-span-3 h-56 md:h-80 lg:h-full w-full bg-[url('/laptop-desk.png')] bg-cover bg-no-repeat bg-center before:content-['']">
           </div>
 
         </div>

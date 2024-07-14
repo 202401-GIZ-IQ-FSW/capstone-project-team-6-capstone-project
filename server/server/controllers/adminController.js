@@ -8,12 +8,14 @@ const getUsers = async (req, res) => {
     let users;
 
     if (role === "superAdmin") {
-      users = await User.find({role: {$ne: 'superAdmin'}}).select('-password');
+      users = await User.find({role: {$ne: 'superAdmin'}}).select('-password').sort({ createdAt: -1 });
+
       if (!users || users.length === 0) {
         return res.status(404).json({error: "Can't find or there aren't any admins, support agents or customers accounts"})
       }
     } else {
-      users = await User.find({role: {$nin: ['superAdmin', 'admin']}}).select('-password');
+      users = await User.find({role: {$nin: ['superAdmin', 'admin']}}).select('-password').sort({ createdAt: -1 });
+      
       if (!users || users.length === 0) {
         return res.status(404).json({error: "Can't find or there aren't any customers or support agents accounts"})
       }
@@ -79,19 +81,24 @@ const deleteUser = async (req, res) => {
     // Find and update all tickets assigned to the user
     await Ticket.updateMany({assignedUser: user?._id}, {$unset: {assignedUser: ""}});
 
-    // Delete user profile
-    await user.remove()
-
     if (isLoggedUser) {
+      // Delete logged admin profile
+      await user.remove()
+
       req.session.destroy((err) => {
         if (err) {
           return res.status(500).json({ error: 'Could not destroy session' });
+        } else {
+          return res.status(200).json({ message: 'Admin Profile and associated tickets deleted successfully' })
         }
-        return res.status(200).json({ message: 'Profile and associated tickets deleted successfully' })
       });
+    } else {
+      // Delete user profile
+      await user.remove()
+
+      return res.status(200).json({ message: 'User Profile and associated tickets deleted successfully' })
     }
 
-    res.status(200).json({ message: 'Profile and associated tickets deleted successfully' })
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

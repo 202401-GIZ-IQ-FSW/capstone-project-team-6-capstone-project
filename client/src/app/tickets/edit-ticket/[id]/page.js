@@ -9,6 +9,9 @@ export default function editTicketPage({params}) {
   const router = useRouter();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [isTicket, setIsTicket] = useState(null);
+
   const ticketId = params.id; 
 
   const [ticketFormData, setTicketFormData] = useState({
@@ -20,18 +23,23 @@ export default function editTicketPage({params}) {
 
   useEffect(() => {
     if (signedIn === false) {
+      setLoading(false);
       setTimeout(() => {
         router.push('/signin');
       }, 1000);
-    } else if ( signedIn === true && ticketFormData?.user?._id && ticketFormData?.user?._id !== user?._id ) {
+    } else if ( 
+      signedIn === true && 
+      ( ( ticketFormData?.user?._id && ticketFormData?.user?._id !== user?._id ) 
+      || isTicket === false ) ) {
       setTimeout(() => {
         router.push('/tickets');
       }, 1000);
     }
-  }, [router, signedIn, user, ticketFormData]);
+  }, [router, signedIn, user, ticketFormData, isTicket]);
 
   useEffect(() => {
     if (signedIn) {
+      setLoading(true);
       const fetchTicket = async () => {
         try {
           const response = await fetch(`http://localhost:3001/tickets/${ticketId}`, {
@@ -42,22 +50,29 @@ export default function editTicketPage({params}) {
 
           if (response.ok) {
             setTicketFormData(data);
+            setIsTicket(true);
           } else {
             setError(data.error);
+            setIsTicket(false);
           }
         } catch (error) {
             setError(error);
+            setIsTicket(false);
+        } finally {
+          setLoading(false); 
         }
       };
 
       fetchTicket();
     }
-  }, [signedIn]);
+  }, [signedIn, ticketId, user]);
 
-  if (signedIn === null) {
+  if (signedIn === null || loading) {
     return (
-      <div className="flex justify-center items-center m-52">
-        <div className="pageLoader"></div>
+      <div className="h-screen">
+        <div className="flex justify-center items-center m-52">
+          <div className="pageLoader"></div>
+        </div>
       </div>
     );
   }
@@ -107,22 +122,23 @@ export default function editTicketPage({params}) {
   return (
     <>
       {signedIn === false && 
-        <div className="px-5 py-40">
+        <div className="h-screen px-5 py-28">
           <div className="flex flex-col items-center justify-center gap-6 lg:text-lg font-semibold">
             <h1>Only signed in users can view this page</h1>
-            <p>Redirecting to sign in page ......</p>
+            <p>Redirecting to sign in page......</p>
           </div>
         </div>
       }
-      { ( signedIn === true && ticketFormData?.user?._id && ticketFormData?.user?._id !== user?._id ) && 
-        <div className="px-5 py-40">
+      { ( signedIn === true && 
+        ( ( ticketFormData?.user?._id && ticketFormData?.user?._id !== user?._id ) || isTicket === false ) ) && 
+        <div className="h-screen px-5 py-28">
           <div className="flex flex-col items-center justify-center gap-6 lg:text-lg font-semibold">
             <h1>User can only edit their own tickets</h1>
-            <p>Redirecting to ticket page ......</p>
+            <p>Redirecting to ticket page......</p>
           </div>
         </div>
       }
-      {signedIn === true && 
+      { ( signedIn === true && ticketFormData?.user?._id && ticketFormData?.user?._id === user?._id ) && 
         <div className="bg-white">
           <div className="max-w-screen-lg mx-auto px-4 py-8">
             

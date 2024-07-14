@@ -87,7 +87,7 @@ const Sidebar = ({ onFiltersChange, userRole, onSortChange, sortField, sortOrder
         >
           <option value="title">Title</option>
           <option value="number">Number</option>
-          <option value="description">Description</option>
+          {/* <option value="description">Description</option> */}
           {userRole !== "customer" && <option value="user">Created By</option>}
           <option value="assigned to">Assigned To</option>
         </select>

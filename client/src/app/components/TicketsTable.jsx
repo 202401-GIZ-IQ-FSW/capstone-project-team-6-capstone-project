@@ -38,14 +38,14 @@ export default function TicketsTable({tickets, errorMessage, user}) {
         { tickets.length > 0 ? (
             <div className="">
                 <div className="overflow-x-auto rounded-lg border-gray-500 border-2">
-                    <table className="divide-y divide-gray-200">
+                    <table className="w-screen xl:w-full divide-y divide-gray-200">
 
                         <thead>
                             <tr className="text-xs lg:text-sm bg-gray-400 text-gray-800 align-top text-left font-medium uppercase tracking-wider">
                                 <th className="px-2 py-3">no.</th>
                                 <th className="px-2 py-3">Ticket</th>                          
                                 <th className="px-2 py-3">Title</th>
-                                <th className="px-2 py-3">Description</th>
+                                {/* <th className="px-2 py-3">Description</th> */}
                                 <th className="px-2 py-3">Category</th>
                                 <th className="px-2 py-3">Status</th>
                                 <th className="px-2 py-3">Priority</th>
@@ -64,7 +64,7 @@ export default function TicketsTable({tickets, errorMessage, user}) {
                                     <td className="text-center px-2 py-4"> {index + 1}</td>
                                     <td className="text-center px-2 py-4"># {ticket?.number}</td>
                                     <td className="px-2 py-3">{ticket?.title}</td>
-                                    <td className="px-2 py-3">{ticket?.description}</td>
+                                    {/* <td className="px-2 py-3">{ticket?.description}</td> */}
                                     <td className="px-2 py-3">{ticket?.category}</td>
                                     <td className="px-2 py-3">{ticket?.status}</td>
                                     <td className="px-2 py-3">{ticket?.priority}</td>

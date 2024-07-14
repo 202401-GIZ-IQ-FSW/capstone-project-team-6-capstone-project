@@ -32,8 +32,10 @@ export default function newTicketPage() {
 
   if (signedIn === null) {
     return (
-      <div className="flex justify-center items-center m-52">
-        <div className="pageLoader"></div>
+      <div className="h-screen">
+        <div className="flex justify-center items-center m-52">
+          <div className="pageLoader"></div>
+        </div>
       </div>
     );
   }
@@ -114,7 +116,7 @@ export default function newTicketPage() {
   return (
     <>
       {signedIn === false && 
-        <div className="px-5 py-40">
+        <div className="h-screen px-5 py-40">
           <div className="flex flex-col items-center justify-center gap-6 lg:text-lg font-semibold">
             <h1>Only signed in users can view this page</h1>
             <p>Redirecting to sign in page ......</p>

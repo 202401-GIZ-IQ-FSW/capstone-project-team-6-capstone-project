@@ -18,9 +18,9 @@ const getTickets = async (req, res) => {
     let tickets;
     
     if (role === "customer") {
-      tickets = await Ticket.find({ user: req.session?.user._id });
+      tickets = await Ticket.find({ user: req.session?.user._id }).sort({ createdAt: -1 });
     } else {
-      tickets = await Ticket.find();
+      tickets = await Ticket.find().sort({ createdAt: -1 });
     }
     
     if (!tickets || tickets.length === 0) {
@@ -42,7 +42,7 @@ const getTicket = async (req, res) => {
       return res.status(404).json({error: "Ticket not found"})
     }
     if (ticket.user._id.toString() !== req.session?.user._id && !roles.includes(role) ) {
-      return res.status(403).json({error: "Not Authorized"})
+      return res.status(403).json({error: "Not Authorized to view ticket"})
     }
     res.status(200).json(ticket)
   } catch (err) {
@@ -99,7 +99,6 @@ const updateTicket = async (req, res) => {
   try {
     const ticket = await Ticket.findById(req.params.id)
     const { title, description, category, imageURL } = req.body;
-    const newData = { title, description, category, imageURL };
 
     if (!ticket) {
       return res.status(404).json({error: "Ticket not found"})
@@ -108,6 +107,20 @@ const updateTicket = async (req, res) => {
     if (ticket.user._id.toString() !== req.session?.user._id) {
       return res.status(403).json({error: "Not Authorized"})
     }
+
+    if (!title || title === "") {
+      return res.status(400).json({ error: 'Title field must not be empty' });
+    }
+
+    if (!description || description === "") {
+      return res.status(400).json({ error: 'Description field must not be empty' });
+    }
+
+    if (!category || category === "") {
+      return res.status(400).json({ error: 'Category field must not be empty' });
+    }
+
+    const newData = { title, description, category, imageURL };
 
     // // Filter out empty fields
     // const filteredData = filterEmptyFields(newData);

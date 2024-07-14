@@ -1,15 +1,16 @@
 const Comment = require('../models/comment');
+const Ticket = require('../models/ticket');
 
 // Function to filter out empty fields from the request body
-const filterEmptyFields = (data) => {
-  const filteredData = {};
-  for (const key in data) {
-    if (data[key] !== "") {
-      filteredData[key] = data[key];
-    }
-  }
-  return filteredData;
-};
+// const filterEmptyFields = (data) => {
+//   const filteredData = {};
+//   for (const key in data) {
+//     if (data[key] !== "") {
+//       filteredData[key] = data[key];
+//     }
+//   }
+//   return filteredData;
+// };
 
 const getComments = async (req, res) => {
   try {
@@ -53,10 +54,24 @@ const getComment = async (req, res) => {
 
 const createComment = async (req, res) => {
   try {
+    const loggedUser = req.session?.user;
+
+    const ticketId = req.ticketId.toString();
+    
+    const ticket = await Ticket.findOne( { _id: ticketId } );
+
+    if (!ticket) {
+      return res.status(404).json({error: "Ticket not found"});
+    }
+
+    if ( loggedUser.role === "customer" && ticket?.user?._id.toString() !== loggedUser._id ) {
+      return res.status(403).json({error: "Not authorized to comment"});
+    }
+
     const commentData = req.body;
 
     if (!commentData) {
-      return res.status(400).json({error: "Please add comment data like message and image url"})
+      return res.status(400).json({error: "Comment message field must not be empty"})
     }
   
     const comment = await Comment.create({
@@ -86,15 +101,19 @@ const updateComment = async (req, res) => {
 
       const { message, imageURL } = req.body;
 
-      // Filter out empty fields
-      const filteredMessage = filterEmptyFields({ message : message });
+      // // Filter out empty fields
+      // const filteredMessage = filterEmptyFields({ message : message });
   
-      // Check if there is any data left to update
-      if (Object.keys(filteredMessage).length === 0) {
-        return res.status(400).json({ error: 'Please provide data to update like message or imageURL' });
+      // // Check if there is any data left to update
+      // if (Object.keys(filteredMessage).length === 0) {
+      //   return res.status(400).json({ error: 'Please provide data to update like Message' });
+      // }
+
+      if (!message || message === "") {
+        return res.status(400).json({ error: 'Comment message field must not be empty' });
       }
 
-      const newData = { ...filteredMessage, imageURL } ;
+      const newData = { message, imageURL } ;
 
       const updatedComment = await Comment.findByIdAndUpdate(
         req.params.id,
