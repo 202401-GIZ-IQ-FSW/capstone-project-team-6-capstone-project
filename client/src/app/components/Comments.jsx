@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faBriefcase, faUserCog } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faBriefcase, faUserCog, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import StatusIcons from "./StatusIcons";
 
 
@@ -17,6 +17,7 @@ const Comments = ({ ticketId, signedIn, user, ticket }) => {
   const [commentServerMessage, setCommentServerMessage] = useState({commentId: "", message: ""});
   const [commentServerError, setCommentServerError] = useState({commentId: "", error: ""});
   const [loading, setLoading] = useState(true);
+  const [imageVisible, setImageVisible] = useState({});
 
   const roles = ["superAdmin", "admin"];
 
@@ -192,6 +193,13 @@ const Comments = ({ ticketId, signedIn, user, ticket }) => {
     );
   }
 
+  const toggleImageVisibility = (commentId) => {
+    setImageVisible((prev) => ({
+      ...prev,
+      [commentId]: !prev[commentId],
+    }));
+  };
+
   return (
     <>
       <div className="w-full">
@@ -304,7 +312,7 @@ const Comments = ({ ticketId, signedIn, user, ticket }) => {
                   <div className="mt-5 mb-7 flex flex-row items-center justify-between">
   
                     {/* Comment Message */}
-                    <p className="text-gray-600  text-sm lg:text-base">{comment.message}</p>
+                    <p className="text-gray-600 font-semibold text-sm lg:text-base px-2">{comment.message}</p>
   
                     {/* Edit and Delete Buttons for Comment Message. Component is defined at the bottom*/}
                     { (comment.user?._id === user?._id || roles.includes(user?.role)) &&
@@ -314,17 +322,27 @@ const Comments = ({ ticketId, signedIn, user, ticket }) => {
   
                   {/* Image Section */}
                   {comment.imageURL && 
-                    <div className="my-4 text-sm lg:text-base text-gray-600">
-                      <p className="mb-2 p-3 font-semibold bg-gray-400 text-gray-800 overflow-hidden rounded-lg">
-                        Comment Attachment: 
-                      </p>
-                      <a href={comment.imageURL} target="_blank" rel="noopener noreferrer">
-                        <img src={comment?.imageURL? extractImageId(comment.imageURL) : ""}
-                          className="rounded-lg border border-gray-900 lg:h-[28rem] w-full text-center p-2"
-                          title="Click for the larger version."
-                          alt="comment attachment image"
-                        />
-                      </a>
+                    <div className="my-4 text-sm lg:text-base text-gray-600 ">
+                      <div className="flex flex-row items-center gap-2 mb-2 p-3 font-bold bg-gray-400 text-gray-800 overflow-hidden rounded-lg">
+                        <p>Comment Attachment:</p>
+                        <button
+                          onClick={() => toggleImageVisibility(comment._id)}
+                          className="text-gray-700 hover:text-slate-200 rounded bg text-left"
+                        >
+                          <span>{imageVisible[comment._id] ? "Hide Image" : "Show Image"}</span>
+                          <FontAwesomeIcon icon={faChevronDown} className="pl-2" />
+                        </button>
+                      </div>
+                      
+                      { imageVisible[comment._id] && 
+                        <a href={comment.imageURL} target="_blank" rel="noopener noreferrer">
+                          <img src={comment?.imageURL? extractImageId(comment.imageURL) : ""}
+                            className="rounded-lg border border-gray-900 md:h-[28rem] w-full text-center p-2"
+                            title="Click for the larger version."
+                            alt="comment attachment image"
+                          />
+                        </a>
+                      }
                     </div>
                   }
                 </div>

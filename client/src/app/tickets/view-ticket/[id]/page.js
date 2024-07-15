@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import Comments from "../../../components/Comments";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faUserCog } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import StatusIcons from "@/app/components/StatusIcons";
 
 
@@ -16,6 +16,7 @@ export default function viewTicketPage({params}) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [isTicket, setIsTicket] = useState(null);
+  const [imageVisible, setImageVisible] = useState(false);
 
   const ticketId = params.id; 
   const roles = ["superAdmin", "admin", "supportAgent"];
@@ -447,18 +448,27 @@ export default function viewTicketPage({params}) {
             {/* Image Section */}
             { ticketFormData?.imageURL &&
               <div className="bg-gray-200 border border-gray-600 rounded-lg my-6">
-                <p className="lg:text-xl mb-4 p-4 font-bold bg-gray-400 text-gray-800 overflow-hidden rounded-t-lg">
-                  Ticket Attachment: 
-                </p>
-                <div className="mx-4 mb-2">
-                  <a href={ticketFormData?.imageURL} target="_blank" rel="noopener noreferrer">
-                    <img src={ticketFormData?.imageURL? extractImageId(ticketFormData?.imageURL) : ""}
-                      className=" rounded-lg lg:h-[35rem] w-full border border-gray-900 p-2 text-center text-gray-600"
-                      title="Click for the larger version."
-                      alt="ticket attachment image"
-                    />
-                  </a>
+                <div className="flex flex-row items-center gap-2 lg:text-xl  p-4 font-bold bg-gray-400 text-gray-800 overflow-hidden rounded-t-lg">
+                  <p>Ticket Attachment: </p>
+                  <button
+                    onClick={() => setImageVisible(!imageVisible)}
+                    className="text-gray-700 hover:text-slate-200 rounded bg text-left"
+                  >
+                    <span>{imageVisible ? "Hide Image" : "Show Image"}</span>
+                    <FontAwesomeIcon icon={faChevronDown} className="pl-2" />
+                  </button>
                 </div>
+                { imageVisible &&
+                  <div className="mx-4 mb-2 mt-4">
+                    <a href={ticketFormData?.imageURL} target="_blank" rel="noopener noreferrer">
+                      <img src={ticketFormData?.imageURL? extractImageId(ticketFormData?.imageURL) : ""}
+                        className=" rounded-lg md:h-[28rem] xl:h-[35rem] w-full border border-gray-900 p-2 text-center text-gray-600"
+                        title="Click for the larger version."
+                        alt="ticket attachment image"
+                      />
+                    </a>
+                  </div>
+                }
               </div>
             }
 
