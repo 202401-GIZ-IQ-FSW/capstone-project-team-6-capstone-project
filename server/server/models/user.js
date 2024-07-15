@@ -150,5 +150,22 @@ userSchema.pre('findOneAndUpdate', function(next) {
     next();
 });
 
+// Phone number validation before save
+userSchema.pre('save', function(next) {
+    if (this.phone && !phoneNumberValidator(this.phone)) {
+        return next(new Error('Please provide a valid phone number'));
+    }
+    next();
+});
+
+// Phone number validation before findOneAndUpdate
+userSchema.pre('findOneAndUpdate', function(next) {
+    const update = this.getUpdate();
+    if (update.phone && !phoneNumberValidator(update.phone)) {
+        return next(new Error('Please provide a valid phone number'));
+    }
+    next();
+});
+
 // Export the model
 module.exports = mongoose.model("User", userSchema);

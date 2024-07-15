@@ -25,7 +25,6 @@ const getUsers = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-  
 };
 
 const getUser = async (req, res) => {
@@ -241,6 +240,101 @@ const updateUserStatus = async (req, res) => {
   }
 };
 
+const searchUsers = async (req, res) => {
+  try {
+    const role = req.session?.user?.role; // Ensure to access role safely
+    let users;
+
+    const { name, username, email } = req.query;
+
+    if (!name && !username && !email) {
+      return res.status(400).json({ error: 'At least one query parameter (name, username, email) is required' });
+    }
+
+    let query = {};
+    // If searching by name
+    if (name) {
+      query.name = new RegExp(name, 'i'); // Case-insensitive search
+    }
+    if (username) {
+      query.username = new RegExp(username, 'i'); // Case-insensitive search
+    }
+    if (email) {
+      query.email = new RegExp(email, 'i'); // Case-insensitive search
+    }
+
+    // Constructing the regex condition for search
+    const searchRegex = new RegExp(Object.values(query).map(val => val.source).join('|'), 'i'); // Case-insensitive search
+
+    let searchConditions;
+    if (role === "superAdmin") {
+      searchConditions = {
+        role: { $ne: 'superAdmin' },
+        $or: [
+          { name: searchRegex },
+          { email: searchRegex },
+          { username: searchRegex }
+        ]
+      };
+    } else {
+      searchConditions = {
+        role: { $nin: ['superAdmin', 'admin'] },
+        $or: [
+          { name: searchRegex },
+          { email: searchRegex },
+          { username: searchRegex }
+        ]
+      };
+    }
+
+    users = await User.find(searchConditions).select('-password');
+
+    if (!users || users.length === 0) {
+      if (role === "superAdmin") {
+        return res.status(404).json({ error: "Can't find any admins, support agents, or customers accounts" });
+      } else {
+        return res.status(404).json({ error: "Can't find any customers or support agents accounts" });
+      }
+    }
+
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const sortUsers = async (req, res) => {
+  try {
+    const role = req.session?.user.role;
+    let users;
+
+    const { sort } = req.query;
+    let sortOrder = -1; // Default to descending
+
+    if (sort && (sort === 'asc' || sort === 'desc')) {
+      sortOrder = sort === 'asc' ? 1 : -1;
+    }
+
+    if (role === "superAdmin") {
+      users = await User.find({role: {$ne: 'superAdmin'}}).select('-password').sort({ createdAt: sortOrder });
+
+      if (!users || users.length === 0) {
+        return res.status(404).json({error: "Can't find or there aren't any admins, support agents or customers accounts"})
+      }
+    } else {
+      users = await User.find({role: {$nin: ['superAdmin', 'admin']}}).select('-password').sort({ createdAt: sortOrder });
+      
+      if (!users || users.length === 0) {
+        return res.status(404).json({error: "Can't find or there aren't any customers or support agents accounts"})
+      }
+    }
+    
+    res.status(200).json(users)
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   getUsers,
   getUser,
@@ -248,5 +342,7 @@ module.exports = {
   // createAdmin,
   // createSupportAgent,
   updateUserRole,
-  updateUserStatus
+  updateUserStatus,
+  searchUsers,
+  sortUsers
 };
