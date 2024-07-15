@@ -117,7 +117,7 @@ const Navbar = () => {
               onClick={toggleDropdown}
               tabIndex={0}
               role="button"
-              className="btn btn-ghost px-0 lg:hidden"
+              className="btn btn-ghost pl-1 pr-3 lg:hidden"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -141,7 +141,7 @@ const Navbar = () => {
             )}
           </div>
           
-          <Link href="/" className="btn btn-ghost text-base lg:text-xl">
+          <Link href="/" className="btn px-1 btn-ghost text-base lg:text-xl">
             <img src="/R.png" alt="Logo" className="h-10 w-10" />{" "}
             <span>Ticket Master</span>
           </Link>
