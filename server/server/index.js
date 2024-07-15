@@ -2,8 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const session = require('express-session');
 require("dotenv").config();
-
 const axios = require("axios");
+const rateLimit = require("express-rate-limit");
+
+// Swagger Api documentation view at "http://localhost:3001/api-docs"
+const { swaggerUi, swaggerSpec } = require('./swagger');
 
 // const bodyParser = require("body-parser");
 // const path = require('path');
@@ -54,6 +57,15 @@ app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+// Rate limiter setup
+const limiter = rateLimit({
+  windowMs: 30 * 60 * 1000, // 15 minutes
+  max: 500, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later",
+});
+
+app.use(limiter); // Apply rate limiter to all requests
+
 // Configure session options
 const sessionOptions = {
   secret: process.env.APP_SECRET,
@@ -85,8 +97,72 @@ app.use('/user/profile', ensureAuthenticated, profileRouter);
 app.use('/admin', ensureAuthenticated, ensureAdmin, adminRouter);
 // Using Routes for tickets
 app.use('/tickets', ensureAuthenticated, ticketsRouter);
+// Swagger route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 
-// Allow All Route
+
+/**
+ * @swagger
+ * tags:
+ *   name: Allow All
+ *   description: Allow All status management
+ */
+
+/**
+ * @swagger
+ * /allow-all:
+ *   get:
+ *     summary: Get Allow All status
+ *     tags: [Allow All]
+ *     security:
+ *       - sessionAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved Allow All status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Allow'
+ *       403:
+ *         description: Not authorized or Allow All model not found
+ *       500:
+ *         description: Internal server error
+ *   put:
+ *     summary: Update Allow All status
+ *     tags: [Allow All]
+ *     security:
+ *       - sessionAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               allowAll:
+ *                 type: string
+ *                 enum: [Yes, No]
+ *             required:
+ *               - allowAll
+ *     responses:
+ *       200:
+ *         description: Successfully updated Allow All status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Invalid request body
+ *       403:
+ *         description: Not authorized or Allow All model not found
+ *       500:
+ *         description: Internal server error
+ */
+
+// Allow All Get
 app.get("/allow-all", ensureAuthenticated, async (req, res) => {
   try {
     const role = req.session?.user?.role;
@@ -107,7 +183,7 @@ app.get("/allow-all", ensureAuthenticated, async (req, res) => {
   }
 });
 
-// Allow All Route
+// Allow All Update
 app.put("/allow-all", ensureAuthenticated, async (req, res) => {
   try {
     const role = req.session?.user?.role;

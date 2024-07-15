@@ -1,5 +1,6 @@
 const Ticket = require('../models/ticket');
 const Comment = require('../models/comment');
+const User = require('../models/user');
 
 // Function to filter out empty fields from the request body
 const filterEmptyFields = (data) => {
@@ -190,11 +191,92 @@ const updateStatusPriorityAssignedTo = async (req, res) => {
   }
 };
 
+const searchTickets = async (req, res) => {
+  try {
+    const role = req.session?.user.role;
+    const { title, userFullName, assignedUserName } = req.query;
+
+    if (!title && !userFullName && !assignedUserName) {
+      return res.status(400).json({ error: 'Query parameter is required' });
+    }
+
+    let query = {};
+
+    if (role === "customer") {
+      query.user = req.session?.user._id;
+    }
+
+    // If searching by title
+    if (title) {
+      query.title = new RegExp(title, 'i'); // Case-insensitive search
+    }
+
+    // If searching by user name
+    if (userFullName) {
+      const user = await User.findOne({ name: new RegExp(userFullName, 'i') });
+      if (user) {
+        query.user = user._id;
+      } else {
+        return res.status(404).json({ error: "User not found" });
+      }
+    }
+
+    // If searching by assigned user name
+    if (assignedUserName) {
+      const assignedUser = await User.findOne({ name: new RegExp(assignedUserName, 'i') });
+      if (assignedUser) {
+        query.assignedUser = assignedUser._id;
+      } else {
+        return res.status(404).json({ error: "Assigned user not found" });
+      }
+    }
+
+    const tickets = await Ticket.find(query).sort({ createdAt: -1 });
+
+    if (!tickets || tickets.length === 0) {
+      return res.status(404).json({ error: "No tickets available" });
+    }
+    res.status(200).json(tickets);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const sortTickets = async (req, res) => {
+  try {
+    const role = req.session?.user.role;
+    let tickets;
+    
+    const { sort } = req.query;
+    let sortOrder = -1; // Default to descending
+
+    if (sort && (sort === 'asc' || sort === 'desc')) {
+      sortOrder = sort === 'asc' ? 1 : -1;
+    }
+    
+    if (role === "customer") {
+      tickets = await Ticket.find({ user: req.session?.user._id }).sort({ createdAt: sortOrder });
+    } else {
+      tickets = await Ticket.find().sort({ createdAt: sortOrder });
+    }
+    
+    if (!tickets || tickets.length === 0) {
+      return res.status(404).json({error: "No tickets available"})
+    }
+    res.status(200).json(tickets)
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+  
+};
+
 module.exports = {
   getTickets,
   getTicket,
   createTicket,
   deleteTicket,
   updateTicket,
-  updateStatusPriorityAssignedTo
+  updateStatusPriorityAssignedTo,
+  searchTickets,
+  sortTickets
 };
