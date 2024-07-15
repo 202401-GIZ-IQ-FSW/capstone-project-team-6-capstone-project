@@ -8,7 +8,7 @@ const Footer = () => {
           <h1 className="text-xl font-bold text-black text-center md:text-left">Ticket Master</h1>
           <p className='text-black text-center'>Your ultimate ticket support solution!</p>
         </div>
-        <div className="text-center md:text-right mb-4">
+        <div className="text-center md:text-right mb-4 flex flex-col gap-1">
           <Link href="/tickets/new-ticket">
             <span className="block text-black hover:underline">Submit a Ticket</span>
           </Link>

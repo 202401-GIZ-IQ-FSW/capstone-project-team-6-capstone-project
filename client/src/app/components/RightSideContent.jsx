@@ -64,18 +64,18 @@ const RightSideContent = ({tickets, filteredTickets, errorMessage, user}) => {
             <div className="flex flex-col md:flex-row items-center">
 
               {/* Image */}
-              <div className="text-center z-1 w-full md:w-7/12 lg:w-5/12 md:h-48 lg:h-56 bg-gray-200 rounded-md mb-2 md:mb-0 md:mr-4">
+              <div className="flex justify-center text-center z-1 w-[88%] sm:w-[88%] md:w-7/12 lg:w-5/12 sm:h-56 md:h-52 lg:h-56 rounded-md mb-2 md:mb-0 md:mr-4">
                 {ticket?.imageURL ? 
-                  <a href={ticket?.imageURL} onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className="rounded-lg text-center">
+                  <a href={ticket?.imageURL} onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className="w-[88%] h-[11rem] sm:w-[88%] sm:h-56 md:w-full md:h-52 lg:h-56 rounded-lg text-center">
                     <img src={ticket?.imageURL? extractImageId(ticket.imageURL) : ""}
-                      className="w-full h-40 md:h-48 lg:h-56 rounded-md text-center"
+                      className="w-[88%] h-[11rem] sm:w-[88%] sm:h-56 md:w-full md:h-52 lg:h-56 rounded-md text-center"
                       title="Click for the larger version."
                       alt="image for ticket problem"
                     />
                   </a>
                 :
                   <img 
-                    className="w-full h-40 md:h-48 lg:h-56 rounded-md text-center" 
+                    className="w-[88%] h-[11rem] sm:w-[88%] sm:h-56 md:w-full md:h-52 lg:h-56 rounded-md text-center" 
                     src="/laptop-desk.png"
                     alt="default site logo"
                   />
